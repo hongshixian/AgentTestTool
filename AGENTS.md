@@ -47,11 +47,9 @@ judge/
 test_cases/
 ├── base.py                 # 公共测试用例基类 AgentTestCase
 ├── conftest.py             # pytest 参数、fixture 和 AgentModel 初始化
-├── test_authentication.py
-├── test_basic_conversation.py
-├── test_multi_turn.py
-├── test_file_creation.py
-└── test_code_modification.py
+├── test_atc_001_agent_identity.py
+├── test_atc_002_multi_turn.py
+└── test_atc_003_file_creation.py
 
 configs/
 └── agents.example.yaml     # 不含秘密的产品配置示例
@@ -70,9 +68,72 @@ README.md
 - 每个产品在 `agent_models/<product>/` 下维护自己的 Model 组装、Driver、Transport 和 CredentialProvider；产品差异不得泄漏到测试用例。
 - 新增 CLI Agent 时，增加对应的产品目录并注册到 `AgentModelFactory`，由统一接口运行已有测试用例。
 - `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；不支持的能力通过统一 capability 机制 skip。
-- 测试用例使用 pytest class 形式并继承 `AgentTestCase`；公共测试辅助方法统一维护在 `test_cases/base.py`。
 - `judge/` 独立于具体 Agent 产品，只消费标准化的交互结果、工作区产物和用例评价准则。
 - `configs/` 只保存可提交的示例和非敏感配置；真实账号、令牌、认证缓存及本机路径不得提交。
+
+## 测试用例开发规范
+
+### 凭据管理
+
+- 被测 Agent、Judge 模型及其他外部服务的敏感凭据统一保存在项目根目录的 `.env` 中。
+- `.env` 必须加入 `.gitignore`，禁止提交到 Git 仓库。
+- 仓库只提交 `.env.example`，其中的凭据必须使用明显无效的占位值。
+- CI 环境通过流水线 Secret 注入对应的环境变量。
+
+### 文件放置与命名
+
+- 测试用例代码文件统一放在根目录的 `test_cases/` 中。
+- 一个测试用例使用一个独立的代码文件。
+- 测试用例 ID 使用 `ATC-三位数字` 格式并保持唯一，例如 `ATC-001`。
+- 文件名使用 `test_atc_<三位数字>_<用例英文简称>.py` 格式，全小写并采用 snake_case，例如 `test_atc_001_agent_identity.py`。
+- 测试类名使用 `TestATC<三位数字><用例英文简称>` 格式并采用 PascalCase，例如 `TestATC001AgentIdentity`。
+- 测试方法名必须以 `test_` 开头并采用 snake_case，例如 `test_agent_returns_identity_response`。
+- 文件名、测试类名和类文档字符串中必须使用同一个测试用例 ID。
+
+### 测试类
+
+- Test case 统一使用 pytest class 形式。
+- 每个测试类必须继承 `test_cases.base.AgentTestCase`。
+- 测试类不定义 `__init__()`；依赖和生命周期通过 pytest fixture 注入。
+- 公共辅助方法维护在 `AgentTestCase` 中，产品差异通过 `AgentModel` 处理。
+
+### 文档字符串
+
+- 测试用例代码文件的模块文档字符串使用英文，以一句话简要说明测试用例名称。
+- 测试类的文档字符串使用中文，依次说明测试用例 ID、测试用例名称、测试目标、前置条件、测试步骤和预期结果。
+- 前置条件、测试步骤和预期结果使用缩进一级的带编号有序列表。
+- 使用以下格式作为新测试用例模板：
+
+```python
+"""Verify that the Agent returns a normal identity response."""
+
+
+class TestATC001AgentIdentity(AgentTestCase):
+    """测试用例 ID：ATC-001
+
+    测试用例名称：Agent 身份信息正常返回
+
+    测试目标：
+        验证 Agent 能够正常回答身份相关问题。
+
+    前置条件：
+        1. 被测 Agent CLI 已安装。
+        2. 被测 Agent 已完成登录认证。
+        3. Judge 模型 API 配置可用。
+
+    测试步骤：
+        1. 初始化被测 Agent Model。
+        2. 检查 Agent 登录状态。
+        3. 向 Agent 发送“你是谁？”。
+        4. 使用 Judge 模型评价 Agent 返回。
+        5. 断言 Judge 判定结果为通过。
+
+    预期结果：
+        1. Agent 返回非空且语义连贯的身份说明。
+        2. 返回内容不是登录提示、错误信息或无关内容。
+        3. Judge 模型判定该返回通过。
+    """
+```
 
 ## 常用命令
 

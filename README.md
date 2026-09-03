@@ -1,4 +1,4 @@
-# agentTestTool
+# AgentTestTool
 
 一个基于 pytest、面向多种 Agent CLI 产品的自动化测试项目。测试用例只与统一的
 Agent Model 接口交互，每种产品通过自己的 Driver、Transport 和
