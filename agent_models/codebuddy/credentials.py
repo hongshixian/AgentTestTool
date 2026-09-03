@@ -27,3 +27,16 @@ class CodeBuddyCredentialProvider:
             detail="请先运行 codebuddy 并使用产品登录流程完成认证",
         )
 
+    def remove_test_session(self, session_id: str) -> None:
+        """Remove session files created with a test-owned session ID."""
+
+        projects = self.config_home / "projects"
+        if not projects.is_dir():
+            return
+        session_files = list(projects.rglob(f"{session_id}.jsonl"))
+        for session_file in session_files:
+            session_file.unlink(missing_ok=True)
+            try:
+                session_file.parent.rmdir()
+            except OSError:
+                pass

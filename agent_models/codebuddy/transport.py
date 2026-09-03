@@ -41,6 +41,9 @@ class CodeBuddyStdioTransport:
         prompt: str,
         *,
         timeout: float | None = None,
+        session_id: str | None = None,
+        resume: bool = False,
+        allow_tools: bool = False,
         extra_args: Sequence[str] = (),
     ) -> StdioResponse:
         command = [
@@ -48,17 +51,27 @@ class CodeBuddyStdioTransport:
             "--print",
             "--output-format",
             "json",
-            "--tools",
-            "",
-            "--no-session-persistence",
-            *extra_args,
         ]
+        if allow_tools:
+            command.append("--dangerously-skip-permissions")
+        else:
+            command.extend(["--tools", ""])
+        if session_id:
+            command.extend(["--resume" if resume else "--session-id", session_id])
+        else:
+            command.append("--no-session-persistence")
+        command.extend(extra_args)
+
+        process_environment = os.environ.copy()
+        if allow_tools:
+            process_environment["CODEBUDDY_IS_SANDBOX"] = "1"
+
         started = time.monotonic()
         completed = subprocess.run(
             command,
             input=prompt + "\n",
             cwd=self.workspace,
-            env=os.environ.copy(),
+            env=process_environment,
             capture_output=True,
             check=False,
             text=True,
@@ -73,4 +86,3 @@ class CodeBuddyStdioTransport:
 
     def close(self) -> None:
         """Print mode owns no long-running process."""
-

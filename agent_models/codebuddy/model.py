@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+import uuid
 from pathlib import Path
 
 from agent_models.base import AgentModel
@@ -26,6 +27,8 @@ class CodeBuddyAgentModel(AgentModel):
         self.driver = driver
         self.transport = transport
         self.credentials = credentials
+        self._session_id = f"atc-{uuid.uuid4().hex}"
+        self._has_started_session = False
 
     @property
     def product(self) -> str:
@@ -37,7 +40,7 @@ class CodeBuddyAgentModel(AgentModel):
 
     @property
     def capabilities(self) -> AgentCapabilities:
-        return AgentCapabilities()
+        return AgentCapabilities(multi_turn=True, file_operations=True)
 
     def check_authentication(self) -> AuthResult:
         if not self.transport.is_available():
@@ -60,8 +63,18 @@ class CodeBuddyAgentModel(AgentModel):
         return self.credentials.login()
 
     def send_prompt(self, prompt: str, *, timeout: float | None = None) -> TurnResult:
-        response = self.transport.request(prompt, timeout=timeout)
-        return self.driver.parse_turn(response)
+        response = self.transport.request(
+            prompt,
+            timeout=timeout,
+            session_id=self._session_id,
+            resume=self._has_started_session,
+            allow_tools=True,
+        )
+        turn = self.driver.parse_turn(response)
+        if turn.completed:
+            self._has_started_session = True
+        return turn
 
     def close(self) -> None:
         self.transport.close()
+        self.credentials.remove_test_session(self._session_id)

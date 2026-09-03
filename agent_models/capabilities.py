@@ -10,4 +10,4 @@ class AgentCapabilities:
     authentication: bool = True
     prompt: bool = True
     multi_turn: bool = False
-
+    file_operations: bool = False
