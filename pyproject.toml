@@ -1,0 +1,25 @@
+[project]
+name = "agent-test-tool"
+version = "0.1.0"
+description = "Pytest-based automation tests for Agent CLI products"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "agentTestTool contributors" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["test_cases"]
+pythonpath = ["."]
+markers = [
+    "e2e: invokes a real Agent CLI and Judge API",
+]
+
+[tool.uv]
+package = false

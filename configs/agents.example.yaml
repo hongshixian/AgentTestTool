@@ -1,0 +1,7 @@
+agent: codebuddy
+
+judge:
+  api_url_env: JUDGE_API_URL
+  api_key_env: JUDGE_API_KEY
+  model_name_env: JUDGE_MODEL_NAME
+  default_model: infi/deepseek-v4-flash
