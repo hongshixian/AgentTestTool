@@ -47,9 +47,9 @@ judge/
 test_cases/
 ├── base.py                 # 公共测试用例基类 AgentTestCase
 ├── conftest.py             # pytest 参数、fixture 和 AgentModel 初始化
-├── test_atc_001_agent_identity.py
-├── test_atc_002_multi_turn.py
-└── test_atc_003_file_creation.py
+├── test_agent_identity.py
+├── test_multi_turn.py
+└── test_file_creation.py
 
 configs/
 └── agents.example.yaml     # 不含秘密的产品配置示例
@@ -85,10 +85,10 @@ README.md
 - 测试用例代码文件统一放在根目录的 `test_cases/` 中。
 - 一个测试用例使用一个独立的代码文件。
 - 测试用例 ID 使用 `ATC-三位数字` 格式并保持唯一，例如 `ATC-001`。
-- 文件名使用 `test_atc_<三位数字>_<用例英文简称>.py` 格式，全小写并采用 snake_case，例如 `test_atc_001_agent_identity.py`。
+- 文件名使用 `test_<用例英文简称>.py` 格式，全小写并采用 snake_case，例如 `test_agent_identity.py`；文件名中不包含测试用例 ID。
 - 测试类名使用 `TestATC<三位数字><用例英文简称>` 格式并采用 PascalCase，例如 `TestATC001AgentIdentity`。
 - 测试方法名必须以 `test_` 开头并采用 snake_case，例如 `test_agent_returns_identity_response`。
-- 文件名、测试类名和类文档字符串中必须使用同一个测试用例 ID。
+- 测试类名和类文档字符串中必须使用同一个测试用例 ID。
 
 ### 测试类
 
