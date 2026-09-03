@@ -45,6 +45,7 @@ judge/
 └── result.py               # JudgeVerdict 等结构化判定结果
 
 test_cases/
+├── base.py                 # 公共测试用例基类 AgentTestCase
 ├── conftest.py             # pytest 参数、fixture 和 AgentModel 初始化
 ├── test_authentication.py
 ├── test_basic_conversation.py
@@ -69,6 +70,7 @@ README.md
 - 每个产品在 `agent_models/<product>/` 下维护自己的 Model 组装、Driver、Transport 和 CredentialProvider；产品差异不得泄漏到测试用例。
 - 新增 CLI Agent 时，增加对应的产品目录并注册到 `AgentModelFactory`，由统一接口运行已有测试用例。
 - `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；不支持的能力通过统一 capability 机制 skip。
+- 测试用例使用 pytest class 形式并继承 `AgentTestCase`；公共测试辅助方法统一维护在 `test_cases/base.py`。
 - `judge/` 独立于具体 Agent 产品，只消费标准化的交互结果、工作区产物和用例评价准则。
 - `configs/` 只保存可提交的示例和非敏感配置；真实账号、令牌、认证缓存及本机路径不得提交。
 
