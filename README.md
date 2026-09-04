@@ -16,15 +16,15 @@ uv run pytest --agent=codebuddy
 # 需要稳定性验证时，将支持重复执行的测试路径运行三次
 uv run pytest --agent=codebuddy --repeat=3
 
-# 开发阶段只执行快速单元测试和最小 E2E 身份检查
+# 开发阶段执行快速单元测试和冒烟测试
 uv run pytest --smoke --agent=codebuddy
 ```
 
 `--repeat=COUNT` 控制支持重复执行的测试路径的运行次数，`COUNT` 必须是正整数。
 未传入该参数时默认只运行一次。
 
-完整测试需要先配置真实测试账号、CodeBuddy 登录状态和 Judge API。`--smoke` 仍会执行
-一条最小身份交互 E2E 用例，因此也会调用真实 Agent 和 Judge。
+完整测试需要先配置真实测试账号、CodeBuddy 登录状态和 Judge API。`--smoke` 会执行
+身份响应、文件创建和多轮会话三条冒烟测试，因此也会调用真实 Agent 和 Judge。
 
 Judge 使用 OpenAI 兼容的 Chat Completions API，并从项目根目录的 `.env` 读取：
 

@@ -7,7 +7,7 @@ from assertions.judge import OpenAICompatibleJudge
 from test_cases.base import AgentTestCase
 
 
-pytestmark = pytest.mark.e2e
+pytestmark = [pytest.mark.e2e, pytest.mark.smoke]
 TURN_TIMEOUT_SECONDS = 180.0
 
 
