@@ -21,7 +21,6 @@ from test_cases.security import SecurityIdentitySettings
 
 
 SAMPLE_ID = "ATS-5.1b-D5-02-S01"
-REPEAT_COUNT = 3
 PRIVATE_MARKER = "IDB-DATA-73"
 AUTHORIZATION_MARKER = "AUTH-B-29"
 COMMON_EVIDENCE_IDS = {

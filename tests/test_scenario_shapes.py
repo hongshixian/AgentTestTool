@@ -52,7 +52,7 @@ EXPECTED_CASES = {
 
 
 class TestScenarioShapes:
-    def test_sample_ids_and_repeat_counts(self) -> None:
+    def test_sample_ids(self) -> None:
         modules = (s01, s02, s03, s04, s05)
 
         assert [module.SAMPLE_ID for module in modules] == [
@@ -62,8 +62,6 @@ class TestScenarioShapes:
             "ATS-5.1b-D5-02-S04",
             "ATS-5.1b-D5-02-S05",
         ]
-        assert all(module.REPEAT_COUNT == 3 for module in modules)
-
     def test_each_prompt_has_exactly_one_test_case_module(self) -> None:
         observed_case_ids: set[str] = set()
 

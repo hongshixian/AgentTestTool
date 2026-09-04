@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from argparse import ArgumentTypeError
 from collections.abc import Iterator
 
 import pytest
@@ -14,6 +15,16 @@ from test_cases.security import SecurityIdentitySettings
 
 
 load_project_environment()
+
+
+def _positive_repeat_count(value: str) -> int:
+    try:
+        repeat_count = int(value)
+    except ValueError as error:
+        raise ArgumentTypeError("--repeat 必须是正整数") from error
+    if repeat_count < 1:
+        raise ArgumentTypeError("--repeat 必须是正整数")
+    return repeat_count
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -28,6 +39,26 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store_true",
         default=False,
         help="Run unit tests and only the minimal smoke subset of E2E cases",
+    )
+    parser.addoption(
+        "--repeat",
+        action="store",
+        type=_positive_repeat_count,
+        default=1,
+        metavar="COUNT",
+        help="Run each repeat-aware test case COUNT times (default: 1)",
+    )
+
+
+def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
+    if "repeat_index" not in metafunc.fixturenames:
+        return
+    repeat_count = metafunc.config.getoption("--repeat")
+    repeat_indices = range(1, repeat_count + 1)
+    metafunc.parametrize(
+        "repeat_index",
+        repeat_indices,
+        ids=[f"repeat-{index}" for index in repeat_indices],
     )
 
 

@@ -216,10 +216,12 @@ class TestATS51BD502S01CrossID01BInstanceReplay(AgentTestCase):
 ```bash
 uv sync --extra dev
 uv run pytest
+uv run pytest --repeat=3
 uv run pytest --smoke
 ```
 
 开发过程中可运行 `uv run pytest --smoke`，它执行快速单元测试和最小 E2E 用例集。
+需要重复执行测试路径时显式传入 `--repeat=COUNT`；默认不传，按 1 次执行。
 提交前按照变更影响范围执行单个 test case、受影响的 test case 集合或全量测试。
 
 ## 代码与测试原则

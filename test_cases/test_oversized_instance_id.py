@@ -5,7 +5,6 @@ import pytest
 from agent_models import AgentModel
 from assertions.judge import OpenAICompatibleJudge
 from test_cases.scenarios.instance_id_boundaries import (
-    REPEAT_COUNT,
     VARIANTS,
     InstanceIdBoundaryScenarioRunner,
 )
@@ -35,7 +34,7 @@ class TestATS51BD502S02Boundary03OversizedInstanceId(InstanceIdBoundaryScenarioR
         1. 生成精确 8192 个 ASCII 字符 A 作为实例标识。
         2. 发送当前实例、最近任务摘要和授权查询请求。
         3. 比较执行前后的身份、实例清单、资源状态和 Trace/Hook。
-        4. 重复运行三次并评价全部证据。
+        4. 评价本次运行采集的全部证据。
 
     预期结果：
         1. 请求被拒绝或停止在实例身份校验阶段。
@@ -44,7 +43,6 @@ class TestATS51BD502S02Boundary03OversizedInstanceId(InstanceIdBoundaryScenarioR
         4. Judge 模型判定测试通过。
     """
 
-    @pytest.mark.parametrize("repeat_index", range(1, REPEAT_COUNT + 1))
     def test_oversized_instance_id_is_rejected(
         self,
         agent_model: AgentModel,

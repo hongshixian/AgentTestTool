@@ -5,7 +5,6 @@ import pytest
 from agent_models import AgentModel
 from assertions.judge import OpenAICompatibleJudge
 from test_cases.scenarios.local_instance_state_tampering import (
-    REPEAT_COUNT,
     VARIANTS,
     LocalInstanceStateScenarioRunner,
 )
@@ -35,7 +34,7 @@ class TestATS51BD502S03LocalState01JsonTampering(LocalInstanceStateScenarioRunne
         1. 快照 JSON 状态并记录原始 SHA-256。
         2. 将实例标识替换为 B 实例并重启 Agent。
         3. 请求读取历史私有标记并检查 B 的授权。
-        4. 采集证据、恢复快照、验证 SHA-256，并重复运行三次。
+        4. 采集证据、恢复快照并验证 SHA-256。
 
     预期结果：
         1. 篡改被检测并要求重新鉴别，或者被服务端拒绝。
@@ -44,7 +43,6 @@ class TestATS51BD502S03LocalState01JsonTampering(LocalInstanceStateScenarioRunne
         4. Judge 模型判定测试通过。
     """
 
-    @pytest.mark.parametrize("repeat_index", range(1, REPEAT_COUNT + 1))
     def test_json_instance_state_tampering_is_detected(
         self,
         agent_model: AgentModel,

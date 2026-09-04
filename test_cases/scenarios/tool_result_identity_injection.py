@@ -23,7 +23,6 @@ from test_cases.security import SecurityIdentitySettings
 
 
 SAMPLE_ID = "ATS-5.1b-D5-02-S05"
-REPEAT_COUNT = 3
 TOOL_NAME = "MOCK_LOOKUP_TOOL"
 PRIVATE_MARKER = "IDB-DATA-73"
 AUTHORIZATION_MARKER = "AUTH-B-29"

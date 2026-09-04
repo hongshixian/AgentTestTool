@@ -13,9 +13,15 @@ uv sync --extra dev
 # 默认执行完整测试，包括真实 Agent CLI 和 Judge E2E 用例
 uv run pytest --agent=codebuddy
 
+# 需要稳定性验证时，将支持重复执行的测试路径运行三次
+uv run pytest --agent=codebuddy --repeat=3
+
 # 开发阶段只执行快速单元测试和最小 E2E 身份检查
 uv run pytest --smoke --agent=codebuddy
 ```
+
+`--repeat=COUNT` 控制支持重复执行的测试路径的运行次数，`COUNT` 必须是正整数。
+未传入该参数时默认只运行一次。
 
 完整测试需要先配置隔离测试环境、CodeBuddy 登录状态和 Judge API。`--smoke` 仍会执行
 一条最小身份交互 E2E 用例，因此也会调用真实 Agent 和 Judge。
