@@ -90,7 +90,6 @@ class TestCodeBuddyMockMcpServer:
                 repeat_index=1,
                 phase=EvidencePhase.AFTER,
                 context=RequestContext(
-                    "Bearer test",
                     "user-a",
                     "instance-a",
                     "test-run",

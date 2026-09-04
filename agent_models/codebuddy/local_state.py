@@ -1,4 +1,4 @@
-"""Control isolated CodeBuddy local state through a trusted command."""
+"""Control a recoverable CodeBuddy test profile through a helper command."""
 
 from __future__ import annotations
 
@@ -81,12 +81,9 @@ class CodeBuddyCommandLocalStateController:
         except subprocess.TimeoutExpired as error:
             raise RuntimeError("CodeBuddy 本地状态控制命令执行超时") from error
         if completed.returncode != 0:
-            detail = completed.stderr.strip()
-            if request.context.authorization:
-                detail = detail.replace(request.context.authorization, "***")
             raise RuntimeError(
                 f"CodeBuddy 本地状态控制命令失败（退出码 {completed.returncode}）："
-                f"{detail[-500:]}"
+                f"{completed.stderr.strip()[-500:]}"
             )
         try:
             payload = json.loads(completed.stdout)

@@ -51,7 +51,7 @@ class AgentModel(ABC):
 
     @abstractmethod
     def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:
-        """Collect trusted product and environment evidence for a scenario phase."""
+        """Collect evidence observable through public product interfaces."""
 
     @abstractmethod
     def configure_mock_tool(self, profile: MockToolProfile, *, run_id: str) -> None:

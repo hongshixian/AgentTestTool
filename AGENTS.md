@@ -6,6 +6,9 @@
 Agent Model 接口交互；每种 CLI 产品通过自己的 Driver、Transport 和
 CredentialProvider 接入。新增产品时通过对应的产品实现接入已有测试体系。
 
+本项目按第三方黑盒 E2E 定位运行真实应用和真实网络服务。认证使用专门准备的真实测试
+账号；断言只依赖第三方可从公开 CLI、网页、API、文件系统和工具 I/O 观察到的证据。
+
 首个计划接入的被测产品是腾讯 **CodeBuddy Code CLI**，其入口命令为
 `codebuddy`。
 
@@ -40,8 +43,7 @@ agent_models/
     ├── model.py            # CodeBuddy AgentModel 的组件组装
     ├── driver.py           # 产品命令、状态识别和输出解析
     ├── transport.py        # 产品使用的 STDIO/PTY 交互
-    ├── context.py          # 统一请求上下文到产品参数的映射
-    ├── evidence.py         # 产品可信环境与 Trace/Hook 证据适配
+    ├── evidence.py         # 产品公开界面的黑盒观察证据适配
     ├── mock_tool.py        # CodeBuddy Mock Tool 会话组装与证据采集
     ├── mock_mcp_server.py  # 确定性 stdio MCP 测试服务
     ├── local_state.py      # 隔离配置的快照、篡改、重启与恢复适配
@@ -58,7 +60,7 @@ assertions/
 test_cases/
 ├── base.py                 # 公共测试用例基类 AgentTestCase
 ├── conftest.py             # pytest 参数、fixture 和 AgentModel 初始化
-├── security.py             # 安全用例共享的隔离身份配置
+├── security.py             # 安全用例共享的真实测试身份配置
 ├── scenarios/              # 不被 pytest 收集的 Test Sample 公共执行逻辑
 │   ├── cross_identity_replay.py
 │   ├── instance_id_boundaries.py
@@ -85,10 +87,11 @@ test_cases/
 tests/
 ├── test_evidence.py          # 证据模型与断言的离线回归测试
 ├── test_scenario_shapes.py   # ATS 场景结构的离线回归测试
-├── test_codebuddy_context.py # 请求上下文适配器的离线回归测试
+├── test_codebuddy_credentials.py
 ├── test_codebuddy_evidence.py
 ├── test_codebuddy_local_state.py
-└── test_codebuddy_mock_tool.py
+├── test_codebuddy_mock_tool.py
+└── test_security_settings.py
 
 assets/
 └── README.md               # 测试用例共用的静态资源
@@ -97,7 +100,7 @@ configs/
 ├── agents.example.yaml     # 不含秘密的产品配置示例
 └── environment.py          # 根目录 .env 加载方法
 
-.env.example                # Judge、产品隔离环境与安全用例配置示例
+.env.example                # Judge、产品真实测试账号与安全用例配置示例
 pyproject.toml
 AGENTS.md
 README.md
@@ -115,8 +118,10 @@ README.md
 - `tests/` 只存放测试框架自身的离线回归测试，不属于被测 Agent 的公共 Test Case，也不使用 ATS 用例 ID。
 - `assertions/` 统一维护测试断言；`logical.py` 提供确定性的传统断言，`assertions/judge/` 提供基于 Judge 模型的智能断言。
 - `assertions/judge/` 独立于具体 Agent 产品，只消费标准化的交互结果、工作区产物和用例评价准则。
-- 安全测试所需的权威环境状态和 Trace/Hook 通过 `AgentModel` 的产品证据 Provider 采集；缺少必需证据时不得仅凭 Agent 回复判定通过。
-- 测试用例通过统一 RequestContext、Mock Tool 和 LocalStateController 能力表达产品相关操作；具体 CLI 参数、Header、MCP 和本地配置差异只能由产品 AgentModel 封装。
+- 安全测试使用专用真实账号和可清理的真实测试数据；账号 A 是当前登录身份，账号 B 是受保护目标。
+- 黑盒观察 Provider 只能使用第三方可访问的公开 CLI、网页、API、文件系统和工具 I/O；不得把产品内部 Trace、Hook 或私有测试接口作为公共用例的必需能力。
+- 测试用例通过统一 RequestContext、Mock Tool 和 LocalStateController 能力表达产品公开操作；具体 CLI 参数、MCP 和本地配置差异只能由产品 AgentModel 封装。
+- 产品没有公开用户或实例上下文选择能力时，依赖该能力的路径必须通过 capability skip；不得通过猜测或伪造私有 HTTP Header 模拟支持。
 - `assets/` 统一存放测试用例使用的静态资源文件，例如输入样本、图片、归档文件和固定的测试工程模板。
 - `configs/` 只保存可提交的示例和非敏感配置；真实账号、令牌、认证缓存及本机路径不得提交。
 
@@ -176,7 +181,7 @@ class TestATS51BD502S01CrossID01BInstanceReplay(AgentTestCase):
 
     前置条件：
         1. 被测 Agent CLI 已安装。
-        2. 被测 Agent 使用隔离的账号 A 配置完成认证。
+        2. 被测 Agent 使用专用真实账号 A 的配置完成认证。
         3. 账号 B 的实例和私有资源已经建立。
 
     测试步骤：

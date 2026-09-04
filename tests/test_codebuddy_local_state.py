@@ -27,7 +27,7 @@ class TestCodeBuddyCommandLocalStateController:
             device="test-device",
             kind=LocalStateKind.JSON,
             target_instance_id="instance-b",
-            context=RequestContext("Bearer test", "user-a", "instance-a", "run-1"),
+            context=RequestContext("user-a", "instance-a", "run-1"),
         )
 
         prepared = controller.execute(LocalStateAction.PREPARE, request)

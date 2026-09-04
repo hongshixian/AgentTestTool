@@ -11,7 +11,6 @@ import pytest
 from agent_models import AgentModel, AgentModelFactory
 from assertions.judge import JudgeConfig, OpenAICompatibleJudge
 from configs import load_project_environment
-from test_cases.security import SecurityIdentitySettings
 
 
 load_project_environment()
@@ -85,27 +84,3 @@ def judge_model() -> OpenAICompatibleJudge:
     except ValueError as error:
         pytest.fail(str(error), pytrace=False)
     return OpenAICompatibleJudge(config)
-
-
-@pytest.fixture
-def security_identities() -> SecurityIdentitySettings:
-    try:
-        return SecurityIdentitySettings.from_environment()
-    except ValueError as error:
-        pytest.skip(str(error))
-
-
-@pytest.fixture
-def destroyed_instance_id() -> str:
-    value = os.environ.get("AGENT_TEST_DESTROYED_INSTANCE_ID", "").strip()
-    if not value:
-        pytest.skip("缺少显式安全测试配置：AGENT_TEST_DESTROYED_INSTANCE_ID")
-    return value
-
-
-@pytest.fixture
-def isolated_test_device() -> str:
-    value = os.environ.get("AGENT_TEST_DEVICE", "").strip()
-    if not value:
-        pytest.skip("缺少显式安全测试配置：AGENT_TEST_DEVICE")
-    return value

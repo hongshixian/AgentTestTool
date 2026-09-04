@@ -1,8 +1,8 @@
-"""Product-neutral evidence types for security-oriented Agent tests."""
+"""Product-neutral black-box evidence types for Agent tests."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import TypeAlias
 
@@ -20,16 +20,14 @@ class EvidencePhase(str, Enum):
 
 @dataclass(frozen=True, slots=True)
 class RequestContext:
-    """Trusted identity context selected for one scenario run."""
+    """Identity selectors exposed by a product's public CLI interface."""
 
-    authorization: str = field(repr=False)
     user_id: str
     instance_id: str | None
     run_id: str
 
     def provider_payload(self) -> dict[str, JsonValue]:
         return {
-            "authorization": self.authorization,
             "user_id": self.user_id,
             "instance_id": self.instance_id,
             "run_id": self.run_id,
@@ -42,7 +40,7 @@ class EvidenceRequest:
     prompt_id: str
     repeat_index: int
     phase: EvidencePhase
-    context: RequestContext
+    context: RequestContext | None = None
     session_id: str | None = None
 
     def provider_payload(self) -> dict[str, JsonValue]:
@@ -51,7 +49,9 @@ class EvidenceRequest:
             "prompt_id": self.prompt_id,
             "repeat_index": self.repeat_index,
             "phase": self.phase.value,
-            "request_context": self.context.provider_payload(),
+            "request_context": (
+                self.context.provider_payload() if self.context is not None else None
+            ),
             "session_id": self.session_id,
         }
 

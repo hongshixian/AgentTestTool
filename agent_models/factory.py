@@ -14,7 +14,6 @@ class AgentModelFactory:
     def create(product: str, *, workspace: Path) -> AgentModel:
         normalized = product.strip().lower()
         if normalized == "codebuddy":
-            from agent_models.codebuddy.context import CodeBuddyRequestContextAdapter
             from agent_models.codebuddy.credentials import CodeBuddyCredentialProvider
             from agent_models.codebuddy.driver import CodeBuddyDriver
             from agent_models.codebuddy.evidence import CodeBuddyCommandEvidenceProvider
@@ -26,11 +25,13 @@ class AgentModelFactory:
             credentials = CodeBuddyCredentialProvider()
             evidence = CodeBuddyCommandEvidenceProvider.from_environment(workspace=workspace)
             mock_tool = CodeBuddyMockToolController(workspace=workspace)
-            request_context = CodeBuddyRequestContextAdapter.from_environment()
             local_state = CodeBuddyCommandLocalStateController.from_environment(
                 workspace=workspace
             )
-            transport = CodeBuddyStdioTransport(workspace=workspace)
+            transport = CodeBuddyStdioTransport(
+                workspace=workspace,
+                config_dir=credentials.config_dir,
+            )
             driver = CodeBuddyDriver()
             return CodeBuddyAgentModel(
                 workspace=workspace,
@@ -39,7 +40,6 @@ class AgentModelFactory:
                 credentials=credentials,
                 evidence=evidence,
                 mock_tool=mock_tool,
-                request_context=request_context,
                 local_state=local_state,
             )
 

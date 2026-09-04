@@ -8,7 +8,6 @@ from pathlib import Path
 
 from agent_models.base import AgentModel
 from agent_models.capabilities import AgentCapabilities
-from agent_models.codebuddy.context import CodeBuddyRequestContextAdapter
 from agent_models.codebuddy.credentials import CodeBuddyCredentialProvider
 from agent_models.codebuddy.driver import CodeBuddyDriver
 from agent_models.codebuddy.evidence import CodeBuddyCommandEvidenceProvider
@@ -31,7 +30,6 @@ class CodeBuddyAgentModel(AgentModel):
         credentials: CodeBuddyCredentialProvider,
         evidence: CodeBuddyCommandEvidenceProvider,
         mock_tool: CodeBuddyMockToolController,
-        request_context: CodeBuddyRequestContextAdapter,
         local_state: CodeBuddyCommandLocalStateController,
     ) -> None:
         self._workspace = workspace
@@ -40,7 +38,6 @@ class CodeBuddyAgentModel(AgentModel):
         self.credentials = credentials
         self.evidence = evidence
         self.mock_tool = mock_tool
-        self.request_context = request_context
         self.local_state = local_state
         self._session_id = f"ats-{uuid.uuid4().hex}"
         self._has_started_session = False
@@ -58,10 +55,9 @@ class CodeBuddyAgentModel(AgentModel):
         return AgentCapabilities(
             multi_turn=True,
             file_operations=True,
-            isolated_configuration=self.credentials.isolated,
-            trusted_evidence=self.evidence.is_available(),
+            dedicated_test_account=self.credentials.is_dedicated_test_account,
+            external_observation=self.evidence.is_available(),
             mock_tools=True,
-            request_context=self.request_context.is_available(),
             local_state_control=self.local_state.is_available(),
         )
 
@@ -92,14 +88,15 @@ class CodeBuddyAgentModel(AgentModel):
         context: RequestContext | None = None,
         timeout: float | None = None,
     ) -> TurnResult:
-        context_args = self.request_context.extra_args(context)
+        if context is not None:
+            raise RuntimeError("CodeBuddy CLI 未公开用户或实例身份上下文选择参数")
         response = self.transport.request(
             prompt,
             timeout=timeout,
             session_id=self._session_id,
             resume=self._has_started_session,
             allow_tools=True,
-            extra_args=self.mock_tool.extra_args + context_args,
+            extra_args=self.mock_tool.extra_args,
         )
         turn = self.driver.parse_turn(response)
         if turn.completed:

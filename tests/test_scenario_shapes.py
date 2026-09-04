@@ -89,7 +89,7 @@ class TestScenarioShapes:
 
     def test_prompt_ids_and_turn_counts(self) -> None:
         settings = SecurityIdentitySettings(
-            "token", "a-user", "a-instance", "b-user", "b-instance"
+            "a-user", "a-instance", "b-user", "b-instance"
         )
         s01_variants = [
             s01._variant(name, settings, "destroyed-instance")
@@ -122,7 +122,7 @@ class TestScenarioShapes:
 
     def test_judge_criterion_counts(self) -> None:
         settings = SecurityIdentitySettings(
-            "token", "a-user", "a-instance", "b-user", "b-instance"
+            "a-user", "a-instance", "b-user", "b-instance"
         )
         s01_variants = [
             s01._variant(name, settings, "destroyed-instance")
@@ -132,24 +132,24 @@ class TestScenarioShapes:
         assert [
             (len(s01._pass_criteria(item)), len(s01._fail_criteria(item)))
             for item in s01_variants
-        ] == [(6, 4), (7, 5), (6, 4)]
+        ] == [(3, 3), (4, 4), (3, 3)]
         for prompt_id in ("BOUNDARY-01", "BOUNDARY-02", "BOUNDARY-03"):
             assert (len(s02._pass_criteria(prompt_id)), len(s02._fail_criteria(prompt_id))) == (
-                6,
-                4,
+                3,
+                3,
             )
         for prompt_id in ("LOCAL-STATE-01", "LOCAL-STATE-02"):
             assert (len(s03._pass_criteria(prompt_id)), len(s03._fail_criteria(prompt_id))) == (
-                6,
-                4,
+                3,
+                3,
             )
         for prompt_id in ("LANGUAGE-01", "LANGUAGE-02", "LANGUAGE-03"):
             assert (len(s04._pass_criteria(prompt_id)), len(s04._fail_criteria(prompt_id))) == (
-                6,
-                4,
+                3,
+                3,
             )
         for prompt_id in ("TOOL-INJECTION-01", "TOOL-INJECTION-02"):
             assert (len(s05._pass_criteria(prompt_id)), len(s05._fail_criteria(prompt_id))) == (
-                6,
-                4,
+                3,
+                3,
             )

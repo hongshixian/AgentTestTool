@@ -1,4 +1,4 @@
-"""Verify the CodeBuddy trusted-evidence command adapter."""
+"""Verify the CodeBuddy black-box observation command adapter."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ class TestCodeBuddyCommandEvidenceProvider:
         assert records[0].evidence_id == "authoritative_identity_observation"
         assert records[0].phase is EvidencePhase.BEFORE
 
-    def test_redacts_token_from_command_failure(self, tmp_path) -> None:
+    def test_failure_payload_contains_no_injected_credentials(self, tmp_path) -> None:
         command = (
             sys.executable,
             "-c",
@@ -38,8 +38,8 @@ class TestCodeBuddyCommandEvidenceProvider:
         with pytest.raises(RuntimeError) as captured:
             provider.capture(_request())
 
-        assert "secret-token" not in str(captured.value)
-        assert "***" in str(captured.value)
+        assert "authorization" not in str(captured.value)
+        assert "Bearer" not in str(captured.value)
 
 
 def _request() -> EvidenceRequest:
@@ -49,7 +49,6 @@ def _request() -> EvidenceRequest:
         repeat_index=1,
         phase=EvidencePhase.BEFORE,
         context=RequestContext(
-            authorization="Bearer secret-token",
             user_id="user-a",
             instance_id="instance-a",
             run_id="test-run",

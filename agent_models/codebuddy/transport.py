@@ -28,10 +28,12 @@ class CodeBuddyStdioTransport:
         workspace: Path,
         executable: str = "codebuddy",
         default_timeout: float = 90.0,
+        config_dir: Path | None = None,
     ) -> None:
         self.workspace = workspace
         self.executable = executable
         self.default_timeout = default_timeout
+        self.config_dir = config_dir
 
     def is_available(self) -> bool:
         return shutil.which(self.executable) is not None
@@ -63,6 +65,8 @@ class CodeBuddyStdioTransport:
         command.extend(extra_args)
 
         process_environment = os.environ.copy()
+        if self.config_dir is not None:
+            process_environment["CODEBUDDY_CONFIG_DIR"] = str(self.config_dir)
         if allow_tools:
             process_environment["CODEBUDDY_IS_SANDBOX"] = "1"
 

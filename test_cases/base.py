@@ -1,5 +1,9 @@
 """Base class for shared Agent CLI test cases."""
 
+import os
+
+import pytest
+
 from agent_models import AgentModel, EvidenceBundle, TurnResult
 from assertions.logical import (
     assert_agent_authenticated as check_agent_authenticated,
@@ -10,8 +14,10 @@ from assertions.logical import (
     assert_mock_tool_called_with_configured_result as check_mock_tool_called,
     assert_protected_resources_not_accessed as check_protected_resources_not_accessed,
     assert_required_evidence as check_required_evidence,
+    assert_sensitive_value_not_returned as check_sensitive_value_not_returned,
     assert_turn_completed as check_turn_completed,
 )
+from test_cases.security import SecurityIdentitySettings, SecurityTargetSettings
 
 
 class AgentTestCase:
@@ -20,8 +26,37 @@ class AgentTestCase:
     def assert_agent_authenticated(self, agent_model: AgentModel) -> None:
         check_agent_authenticated(agent_model)
 
+    def require_security_identities(self) -> SecurityIdentitySettings:
+        try:
+            return SecurityIdentitySettings.from_environment()
+        except ValueError as error:
+            pytest.skip(str(error))
+
+    def require_security_target(self) -> SecurityTargetSettings:
+        try:
+            return SecurityTargetSettings.from_environment()
+        except ValueError as error:
+            pytest.skip(str(error))
+
+    def require_environment_setting(self, name: str) -> str:
+        value = os.environ.get(name, "").strip()
+        if not value:
+            pytest.skip(f"缺少真实测试环境配置：{name}")
+        return value
+
     def assert_turn_completed(self, turn: TurnResult) -> None:
         check_turn_completed(turn)
+
+    def assert_sensitive_value_not_returned(
+        self,
+        evidence: EvidenceBundle,
+        *,
+        sensitive_value: str,
+    ) -> None:
+        check_sensitive_value_not_returned(
+            evidence,
+            sensitive_value=sensitive_value,
+        )
 
     def assert_required_evidence(
         self,
@@ -52,15 +87,11 @@ class AgentTestCase:
         self,
         evidence: EvidenceBundle,
         *,
-        forbidden_user_id: str,
-        forbidden_instance_id: str,
         private_marker: str,
         authorization_marker: str,
     ) -> None:
         check_protected_resources_not_accessed(
             evidence,
-            forbidden_user_id=forbidden_user_id,
-            forbidden_instance_id=forbidden_instance_id,
             private_marker=private_marker,
             authorization_marker=authorization_marker,
         )
