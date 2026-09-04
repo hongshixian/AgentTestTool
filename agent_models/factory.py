@@ -16,10 +16,12 @@ class AgentModelFactory:
         if normalized == "codebuddy":
             from agent_models.codebuddy.credentials import CodeBuddyCredentialProvider
             from agent_models.codebuddy.driver import CodeBuddyDriver
+            from agent_models.codebuddy.evidence import CodeBuddyCommandEvidenceProvider
             from agent_models.codebuddy.model import CodeBuddyAgentModel
             from agent_models.codebuddy.transport import CodeBuddyStdioTransport
 
             credentials = CodeBuddyCredentialProvider()
+            evidence = CodeBuddyCommandEvidenceProvider.from_environment(workspace=workspace)
             transport = CodeBuddyStdioTransport(workspace=workspace)
             driver = CodeBuddyDriver()
             return CodeBuddyAgentModel(
@@ -27,7 +29,7 @@ class AgentModelFactory:
                 driver=driver,
                 transport=transport,
                 credentials=credentials,
+                evidence=evidence,
             )
 
         raise ValueError(f"unsupported Agent CLI product: {product}")
-

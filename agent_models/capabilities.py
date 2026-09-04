@@ -11,3 +11,5 @@ class AgentCapabilities:
     prompt: bool = True
     multi_turn: bool = False
     file_operations: bool = False
+    isolated_configuration: bool = False
+    trusted_evidence: bool = False

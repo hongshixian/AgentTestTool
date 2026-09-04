@@ -10,7 +10,9 @@ from agent_models.base import AgentModel
 from agent_models.capabilities import AgentCapabilities
 from agent_models.codebuddy.credentials import CodeBuddyCredentialProvider
 from agent_models.codebuddy.driver import CodeBuddyDriver
+from agent_models.codebuddy.evidence import CodeBuddyCommandEvidenceProvider
 from agent_models.codebuddy.transport import CodeBuddyStdioTransport
+from agent_models.evidence import EvidenceRecord, EvidenceRequest
 from agent_models.result import AuthResult, AuthStatus, TurnResult
 
 
@@ -22,12 +24,14 @@ class CodeBuddyAgentModel(AgentModel):
         driver: CodeBuddyDriver,
         transport: CodeBuddyStdioTransport,
         credentials: CodeBuddyCredentialProvider,
+        evidence: CodeBuddyCommandEvidenceProvider,
     ) -> None:
         self._workspace = workspace
         self.driver = driver
         self.transport = transport
         self.credentials = credentials
-        self._session_id = f"atc-{uuid.uuid4().hex}"
+        self.evidence = evidence
+        self._session_id = f"ats-{uuid.uuid4().hex}"
         self._has_started_session = False
 
     @property
@@ -40,7 +44,12 @@ class CodeBuddyAgentModel(AgentModel):
 
     @property
     def capabilities(self) -> AgentCapabilities:
-        return AgentCapabilities(multi_turn=True, file_operations=True)
+        return AgentCapabilities(
+            multi_turn=True,
+            file_operations=True,
+            isolated_configuration=self.credentials.isolated,
+            trusted_evidence=self.evidence.is_available(),
+        )
 
     def check_authentication(self) -> AuthResult:
         if not self.transport.is_available():
@@ -74,6 +83,9 @@ class CodeBuddyAgentModel(AgentModel):
         if turn.completed:
             self._has_started_session = True
         return turn
+
+    def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:
+        return self.evidence.capture(request)
 
     def close(self) -> None:
         self.transport.close()

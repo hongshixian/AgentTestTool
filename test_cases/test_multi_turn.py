@@ -10,8 +10,8 @@ from test_cases.base import AgentTestCase
 pytestmark = pytest.mark.e2e
 
 
-class TestATC002MultiTurn(AgentTestCase):
-    """测试用例 ID：ATC-002
+class TestATS00XD200S01MultiTurn(AgentTestCase):
+    """测试用例 ID：ATS-0.0x-D2-00-S01（本条用例是示例用例）
 
     测试用例名称：Agent 多轮会话上下文保持
 

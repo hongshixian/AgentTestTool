@@ -31,12 +31,14 @@ agent_models/
 ├── base.py                 # AgentModel 抽象接口
 ├── factory.py              # AgentModelFactory 与产品注册
 ├── result.py               # TurnResult、AuthResult 和统一事件类型
+├── evidence.py             # 请求上下文、证据记录和 EvidenceBundle
 ├── capabilities.py         # 产品能力声明
 └── codebuddy/
     ├── __init__.py
     ├── model.py            # CodeBuddy AgentModel 的组件组装
     ├── driver.py           # 产品命令、状态识别和输出解析
     ├── transport.py        # 产品使用的 STDIO/PTY 交互
+    ├── evidence.py         # 产品可信环境与 Trace/Hook 证据适配
     └── credentials.py      # 产品认证信息适配
 
 assertions/
@@ -52,13 +54,19 @@ test_cases/
 ├── conftest.py             # pytest 参数、fixture 和 AgentModel 初始化
 ├── test_agent_identity.py
 ├── test_multi_turn.py
-└── test_file_creation.py
+├── test_file_creation.py
+└── test_natural_language_identity_override.py
+
+tests/
+├── test_evidence.py          # 证据模型与断言的离线回归测试
+└── test_codebuddy_evidence.py # CodeBuddy 证据适配器的离线回归测试
 
 assets/
 └── README.md               # 测试用例共用的静态资源
 
 configs/
-└── agents.example.yaml     # 不含秘密的产品配置示例
+├── agents.example.yaml     # 不含秘密的产品配置示例
+└── environment.py          # 根目录 .env 加载方法
 
 .env.example                # Judge API 环境变量示例
 pyproject.toml
@@ -74,8 +82,10 @@ README.md
 - 每个产品在 `agent_models/<product>/` 下维护自己的 Model 组装、Driver、Transport 和 CredentialProvider；产品差异不得泄漏到测试用例。
 - 新增 CLI Agent 时，增加对应的产品目录并注册到 `AgentModelFactory`，由统一接口运行已有测试用例。
 - `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；不支持的能力通过统一 capability 机制 skip。
+- `tests/` 只存放测试框架自身的离线回归测试，不属于被测 Agent 的公共 Test Case，也不使用 ATS 用例 ID。
 - `assertions/` 统一维护测试断言；`logical.py` 提供确定性的传统断言，`assertions/judge/` 提供基于 Judge 模型的智能断言。
 - `assertions/judge/` 独立于具体 Agent 产品，只消费标准化的交互结果、工作区产物和用例评价准则。
+- 安全测试所需的权威环境状态和 Trace/Hook 通过 `AgentModel` 的产品证据 Provider 采集；缺少必需证据时不得仅凭 Agent 回复判定通过。
 - `assets/` 统一存放测试用例使用的静态资源文件，例如输入样本、图片、归档文件和固定的测试工程模板。
 - `configs/` 只保存可提交的示例和非敏感配置；真实账号、令牌、认证缓存及本机路径不得提交。
 
@@ -92,11 +102,14 @@ README.md
 
 - 测试用例代码文件统一放在根目录的 `test_cases/` 中。
 - 一个测试用例使用一个独立的代码文件。
-- 测试用例 ID 使用 `ATC-三位数字` 格式并保持唯一，例如 `ATC-001`。
+- 测试用例 ID 采用最终泛化测试用例中的 `ATS-<条款编号>-D<维度编号>-<源用例序号>-S<样本序号>` 格式并保持全局唯一，例如 `ATS-5.1b-D5-02-S01`。
+- `ATS` 表示可执行的自动化测试样本；`5.1b` 表示来源条款，`D5` 表示评测维度，`02` 表示该条款和维度下的源用例序号，`S01` 表示从源用例泛化出的测试样本序号。
+- 测试用例 ID 应直接采用最终场景级 JSON 中对应 `test_samples[].sample_id` 的值，不得自行另编顺序号。
+- 原始用例 ID `TC-<条款编号>-D<维度编号>-<源用例序号>` 和场景 ID `SCN-<条款编号>-D<维度编号>-<源用例序号>-<场景序号>` 只用于来源追溯，不作为 pytest 测试类的主用例 ID。
 - 文件名使用 `test_<用例英文简称>.py` 格式，全小写并采用 snake_case，例如 `test_agent_identity.py`；文件名中不包含测试用例 ID。
-- 测试类名使用 `TestATC<三位数字><用例英文简称>` 格式并采用 PascalCase，例如 `TestATC001AgentIdentity`。
+- 测试类名使用 `Test<规范化ATS用例ID><用例英文简称>` 格式并采用 PascalCase。规范化时移除 ID 中的连字符和句点，并将字母统一为大写；例如 `ATS-5.1b-D5-02-S01` 对应 `TestATS51BD502S01AgentIdentity`。
 - 测试方法名必须以 `test_` 开头并采用 snake_case，例如 `test_agent_returns_identity_response`。
-- 测试类名和类文档字符串中必须使用同一个测试用例 ID。
+- 测试类名中的规范化 ID 和类文档字符串中的完整 ID 必须对应同一个测试用例。
 
 ### 测试类
 
@@ -116,8 +129,8 @@ README.md
 """Verify that the Agent returns a normal identity response."""
 
 
-class TestATC001AgentIdentity(AgentTestCase):
-    """测试用例 ID：ATC-001
+class TestATS51BD502S01AgentIdentity(AgentTestCase):
+    """测试用例 ID：ATS-5.1b-D5-02-S01
 
     测试用例名称：Agent 身份信息正常返回
 

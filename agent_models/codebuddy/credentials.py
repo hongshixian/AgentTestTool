@@ -13,6 +13,7 @@ class CodeBuddyCredentialProvider:
 
     def __init__(self, config_home: Path | None = None) -> None:
         configured_home = os.environ.get("CODEBUDDY_CONFIG_HOME")
+        self.isolated = config_home is not None or bool(configured_home)
         self.config_home = config_home or (
             Path(configured_home).expanduser() if configured_home else Path.home() / ".codebuddy"
         )

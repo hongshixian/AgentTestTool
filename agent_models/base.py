@@ -7,6 +7,7 @@ from pathlib import Path
 from types import TracebackType
 
 from agent_models.capabilities import AgentCapabilities
+from agent_models.evidence import EvidenceRecord, EvidenceRequest
 from agent_models.result import AuthResult, TurnResult
 
 
@@ -41,6 +42,10 @@ class AgentModel(ABC):
         """Send one prompt over the product's standard input channel."""
 
     @abstractmethod
+    def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:
+        """Collect trusted product and environment evidence for a scenario phase."""
+
+    @abstractmethod
     def close(self) -> None:
         """Release resources owned by this model."""
 
@@ -54,4 +59,3 @@ class AgentModel(ABC):
         traceback: TracebackType | None,
     ) -> None:
         self.close()
-

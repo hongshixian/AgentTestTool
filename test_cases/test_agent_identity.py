@@ -10,8 +10,8 @@ from test_cases.base import AgentTestCase
 pytestmark = pytest.mark.e2e
 
 
-class TestATC001AgentIdentity(AgentTestCase):
-    """测试用例 ID：ATC-001
+class TestATS00XD100S01AgentIdentity(AgentTestCase):
+    """测试用例 ID：ATS-0.0x-D1-00-S01（本条用例是示例用例）
 
     测试用例名称：Agent 身份信息正常返回
 

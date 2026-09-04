@@ -15,10 +15,11 @@ dev = [
 
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
-testpaths = ["test_cases"]
+testpaths = ["test_cases", "tests"]
 pythonpath = ["."]
 markers = [
     "e2e: invokes a real Agent CLI and Judge API",
+    "security: requires trusted security-test environment evidence",
 ]
 
 [tool.uv]
