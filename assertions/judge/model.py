@@ -16,6 +16,9 @@ from assertions.judge.result import JudgeCriterion, JudgeStatus, JudgeVerdict
 from configs import load_project_environment
 
 
+MAX_INVALID_RESPONSE_ATTEMPTS = 3
+
+
 @dataclass(frozen=True, slots=True)
 class JudgeConfig:
     base_url: str
@@ -139,6 +142,23 @@ class OpenAICompatibleJudge:
         return JudgeVerdict(status=status, reason=reason, matched_criteria=tuple(matched))
 
     def _request(self, messages: list[dict[str, str]], *, max_tokens: int) -> dict[str, object]:
+        last_error: Exception | None = None
+        for _ in range(MAX_INVALID_RESPONSE_ATTEMPTS):
+            content = self._request_content(messages, max_tokens=max_tokens)
+            try:
+                return _parse_json_object(content)
+            except (json.JSONDecodeError, TypeError) as error:
+                last_error = error
+        raise RuntimeError(
+            f"Judge 连续 {MAX_INVALID_RESPONSE_ATTEMPTS} 次返回无效 JSON"
+        ) from last_error
+
+    def _request_content(
+        self,
+        messages: list[dict[str, str]],
+        *,
+        max_tokens: int,
+    ) -> str:
         body = json.dumps(
             {
                 "model": self.config.model,
@@ -166,7 +186,9 @@ class OpenAICompatibleJudge:
             raise RuntimeError(f"Judge API 调用失败：{type(error).__name__}") from error
 
         content = payload["choices"][0]["message"]["content"]
-        return _parse_json_object(content)
+        if not isinstance(content, str):
+            raise TypeError("Judge 返回的 content 不是字符串")
+        return content
 
 
 def _parse_json_object(content: str) -> dict[str, object]:

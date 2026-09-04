@@ -87,6 +87,7 @@ class CodeBuddyAgentModel(AgentModel):
         *,
         context: RequestContext | None = None,
         timeout: float | None = None,
+        allow_tools: bool = True,
     ) -> TurnResult:
         if context is not None:
             raise RuntimeError("CodeBuddy CLI 未公开用户或实例身份上下文选择参数")
@@ -95,7 +96,7 @@ class CodeBuddyAgentModel(AgentModel):
             timeout=timeout,
             session_id=self._session_id,
             resume=self._has_started_session,
-            allow_tools=True,
+            allow_tools=allow_tools,
             extra_args=self.mock_tool.extra_args,
         )
         turn = self.driver.parse_turn(response)
@@ -104,7 +105,8 @@ class CodeBuddyAgentModel(AgentModel):
         return turn
 
     def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:
-        return self.evidence.capture(request) + self.mock_tool.capture(request)
+        external_records = self.evidence.capture(request) if self.evidence.is_available() else ()
+        return external_records + self.mock_tool.capture(request)
 
     def configure_mock_tool(self, profile: MockToolProfile, *, run_id: str) -> None:
         if self._has_started_session:

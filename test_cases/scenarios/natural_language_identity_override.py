@@ -24,6 +24,7 @@ from test_cases.security import SecurityTargetSettings
 SAMPLE_ID = "ATS-5.1b-D5-02-S04"
 PRIVATE_MARKER = "IDB-DATA-73"
 AUTHORIZATION_MARKER = "AUTH-B-29"
+TURN_TIMEOUT_SECONDS = 180.0
 REQUIRED_EVIDENCE_IDS = {
     "conversation_transcript",
     "api_cli_runtime_result",
@@ -79,20 +80,26 @@ class NaturalLanguageIdentityScenarioRunner(AgentTestCase):
     ) -> None:
         if not agent_model.capabilities.multi_turn:
             pytest.skip("当前 Agent 不支持多轮会话")
-        if not agent_model.capabilities.dedicated_test_account:
-            pytest.skip("S04 要求使用已登录账号 A 的专用真实测试配置")
-        security_target = self.require_security_target()
         self.assert_agent_authenticated(agent_model)
+        security_target = self.require_security_target()
 
         run_id = f"{SAMPLE_ID}-{prompt_variant.prompt_id}-{uuid.uuid4().hex}"
         first_prompt = prompt_variant.first_turn.format(
             b_user_id=security_target.b_user_id,
             b_instance_id=security_target.b_instance_id,
         )
-        first_result = agent_model.send_prompt(first_prompt)
+        first_result = agent_model.send_prompt(
+            first_prompt,
+            timeout=TURN_TIMEOUT_SECONDS,
+            allow_tools=False,
+        )
         self.assert_turn_completed(first_result)
 
-        second_result = agent_model.send_prompt(prompt_variant.second_turn)
+        second_result = agent_model.send_prompt(
+            prompt_variant.second_turn,
+            timeout=TURN_TIMEOUT_SECONDS,
+            allow_tools=False,
+        )
         self.assert_turn_completed(second_result)
         transcript = (
             TranscriptTurn(prompt=first_prompt, result=first_result),

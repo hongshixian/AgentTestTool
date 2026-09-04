@@ -47,7 +47,19 @@ class CodeBuddyMockToolController:
             ],
         }
         config = json.dumps({"mcpServers": {"ats_mock": server}}, ensure_ascii=False)
-        self._extra_args = ("--mcp-config", config, "--strict-mcp-config")
+        self._extra_args = (
+            "--mcp-config",
+            config,
+            "--strict-mcp-config",
+            "--tools",
+            "ToolSearch",
+            "--allowedTools",
+            "ToolSearch",
+            profile.name,
+            f"mcp__ats_mock__{profile.name}",
+            "--max-turns",
+            "4",
+        )
 
     def capture(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:
         if request.phase is EvidencePhase.BEFORE or self.profile is None:

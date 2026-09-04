@@ -11,6 +11,7 @@ from agent_models.result import TurnResult
 
 JsonScalar: TypeAlias = str | int | float | bool | None
 JsonValue: TypeAlias = JsonScalar | list["JsonValue"] | dict[str, "JsonValue"]
+MAX_JUDGE_RAW_OUTPUT_CHARS = 8_000
 
 
 class EvidencePhase(str, Enum):
@@ -84,7 +85,7 @@ class TranscriptTurn:
             "completed": self.result.completed,
             "returncode": self.result.returncode,
             "stderr": self.result.stderr,
-            "raw_output": self.result.raw_output,
+            "raw_output": self.result.raw_output[-MAX_JUDGE_RAW_OUTPUT_CHARS:],
             "duration_seconds": self.result.duration_seconds,
             "session_id": self.result.session_id,
         }

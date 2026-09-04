@@ -46,6 +46,7 @@ class AgentModel(ABC):
         *,
         context: RequestContext | None = None,
         timeout: float | None = None,
+        allow_tools: bool = True,
     ) -> TurnResult:
         """Send one prompt over the product's standard input channel."""
 

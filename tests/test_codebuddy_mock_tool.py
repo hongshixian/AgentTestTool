@@ -69,6 +69,9 @@ class TestCodeBuddyMockMcpServer:
         controller = CodeBuddyMockToolController(workspace=tmp_path)
         profile = MockToolProfile("MOCK_LOOKUP_TOOL", "text/plain", "fixed result")
         controller.configure(profile, run_id="test-run")
+        tools_index = controller.extra_args.index("--tools")
+        assert controller.extra_args[tools_index + 1] == "ToolSearch"
+        assert "mcp__ats_mock__MOCK_LOOKUP_TOOL" in controller.extra_args
         assert controller.log_path is not None
         controller.log_path.write_text(
             json.dumps(

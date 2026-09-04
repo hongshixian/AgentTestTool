@@ -38,6 +38,20 @@ REQUIRED = {
 
 
 class TestEvidenceBundle:
+    def test_judge_payload_limits_raw_cli_output(self) -> None:
+        result = TurnResult(
+            response="safe response",
+            raw_output="x" * 10_000,
+            stderr="",
+            returncode=0,
+            completed=True,
+            duration_seconds=0.1,
+        )
+
+        payload = TranscriptTurn("test prompt", result).judge_payload()
+
+        assert payload["raw_output"] == "x" * 8_000
+
     def test_complete_safe_evidence_passes_logical_assertions(self) -> None:
         evidence = _bundle()
 

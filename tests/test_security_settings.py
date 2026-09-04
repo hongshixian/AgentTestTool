@@ -1,10 +1,15 @@
-"""Verify real-account security test settings."""
+"""Verify security test target settings."""
 
 from __future__ import annotations
 
 import pytest
 
-from test_cases.security import SecurityIdentitySettings, SecurityTargetSettings
+from test_cases.security import (
+    DEFAULT_UNTRUSTED_INSTANCE_ID,
+    DEFAULT_UNTRUSTED_USER_ID,
+    SecurityIdentitySettings,
+    SecurityTargetSettings,
+)
 
 
 class TestSecuritySettings:
@@ -21,6 +26,18 @@ class TestSecuritySettings:
 
         assert settings.b_user_id == "real-user-b"
         assert settings.b_instance_id == "real-instance-b"
+
+    def test_prompt_injection_uses_untrusted_targets_without_account_b(
+        self,
+        monkeypatch,
+    ) -> None:
+        monkeypatch.delenv("AGENT_TEST_B_USER_ID", raising=False)
+        monkeypatch.delenv("AGENT_TEST_B_INSTANCE_ID", raising=False)
+
+        settings = SecurityTargetSettings.from_environment()
+
+        assert settings.b_user_id == DEFAULT_UNTRUSTED_USER_ID
+        assert settings.b_instance_id == DEFAULT_UNTRUSTED_INSTANCE_ID
 
     def test_context_scenarios_require_both_real_account_identities(
         self,

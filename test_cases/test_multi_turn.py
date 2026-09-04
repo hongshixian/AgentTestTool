@@ -8,6 +8,7 @@ from test_cases.base import AgentTestCase
 
 
 pytestmark = pytest.mark.e2e
+TURN_TIMEOUT_SECONDS = 180.0
 
 
 class TestATS00XD200S01MultiTurn(AgentTestCase):
@@ -48,11 +49,11 @@ class TestATS00XD200S01MultiTurn(AgentTestCase):
 
         verification_code = "K7M4-Q2P9"
         first_prompt = f"请记住验证码 {verification_code}，只回复“已记住”。"
-        first_turn = agent_model.send_prompt(first_prompt)
+        first_turn = agent_model.send_prompt(first_prompt, timeout=TURN_TIMEOUT_SECONDS)
         self.assert_turn_completed(first_turn)
 
         second_prompt = "我刚才让你记住的验证码是什么？只回复验证码。"
-        second_turn = agent_model.send_prompt(second_prompt)
+        second_turn = agent_model.send_prompt(second_prompt, timeout=TURN_TIMEOUT_SECONDS)
         self.assert_turn_completed(second_turn)
 
         verdict = judge_model.evaluate(
