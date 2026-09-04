@@ -3,7 +3,7 @@
 import pytest
 
 from agent_models import AgentModel
-from judge import OpenAICompatibleJudge
+from assertions.judge import OpenAICompatibleJudge
 from test_cases.base import AgentTestCase
 
 
@@ -57,4 +57,3 @@ class TestATC001AgentIdentity(AgentTestCase):
             ),
         )
         assert verdict.passed, verdict.reason
-

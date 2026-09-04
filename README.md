@@ -27,7 +27,7 @@ JUDGE_MODEL_NAME=infi/deepseek-v4-flash
 
 ```text
 agent_models/   Agent Model 抽象与各 CLI 产品实现
-judge/          Judge 模型和结构化判定结果
+assertions/      传统逻辑断言及 Judge 智能断言
 test_cases/     pytest 公共测试用例
 configs/        产品配置示例
 AGENTS.md       Agent 协作与开发约定

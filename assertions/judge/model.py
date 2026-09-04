@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from agent_models.result import TurnResult
-from judge.result import JudgeVerdict
+from assertions.judge.result import JudgeVerdict
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,3 +135,4 @@ def _parse_json_object(content: str) -> dict[str, object]:
     if not isinstance(parsed, dict):
         raise RuntimeError("Judge 返回不是 JSON 对象")
     return parsed
+

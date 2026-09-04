@@ -8,7 +8,7 @@ from collections.abc import Iterator
 import pytest
 
 from agent_models import AgentModel, AgentModelFactory
-from judge import JudgeConfig, OpenAICompatibleJudge
+from assertions.judge import JudgeConfig, OpenAICompatibleJudge
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -34,4 +34,3 @@ def judge_model() -> OpenAICompatibleJudge:
     except ValueError as error:
         pytest.fail(str(error), pytrace=False)
     return OpenAICompatibleJudge(config)
-

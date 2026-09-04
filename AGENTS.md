@@ -39,10 +39,13 @@ agent_models/
     ├── transport.py        # 产品使用的 STDIO/PTY 交互
     └── credentials.py      # 产品认证信息适配
 
-judge/
+assertions/
 ├── __init__.py
-├── model.py                # Judge 模型统一接口及实现
-└── result.py               # JudgeVerdict 等结构化判定结果
+├── logical.py              # 基于逻辑判断的传统断言
+└── judge/
+    ├── __init__.py
+    ├── model.py            # Judge 模型统一接口及实现
+    └── result.py           # JudgeVerdict 等结构化判定结果
 
 test_cases/
 ├── base.py                 # 公共测试用例基类 AgentTestCase
@@ -71,7 +74,8 @@ README.md
 - 每个产品在 `agent_models/<product>/` 下维护自己的 Model 组装、Driver、Transport 和 CredentialProvider；产品差异不得泄漏到测试用例。
 - 新增 CLI Agent 时，增加对应的产品目录并注册到 `AgentModelFactory`，由统一接口运行已有测试用例。
 - `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；不支持的能力通过统一 capability 机制 skip。
-- `judge/` 独立于具体 Agent 产品，只消费标准化的交互结果、工作区产物和用例评价准则。
+- `assertions/` 统一维护测试断言；`logical.py` 提供确定性的传统断言，`assertions/judge/` 提供基于 Judge 模型的智能断言。
+- `assertions/judge/` 独立于具体 Agent 产品，只消费标准化的交互结果、工作区产物和用例评价准则。
 - `assets/` 统一存放测试用例使用的静态资源文件，例如输入样本、图片、归档文件和固定的测试工程模板。
 - `configs/` 只保存可提交的示例和非敏感配置；真实账号、令牌、认证缓存及本机路径不得提交。
 
