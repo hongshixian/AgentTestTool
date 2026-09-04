@@ -30,12 +30,21 @@ JUDGE_MODEL_NAME=infi/deepseek-v4-flash
 
 `.env` 已被 Git 忽略，只用于当前测试环境。
 
-## S04 可信证据接口
+## 安全测试配置与可信证据接口
 
-`ATS-5.1b-D5-02-S04` 除 CLI 输出外还需要权威身份、资源探测、环境差异及
-Trace/Hook。CodeBuddy 通过 `.env` 中的 `CODEBUDDY_EVIDENCE_COMMAND` 接入可信
-测试环境。该变量必须是命令参数的 JSON 数组；框架使用 `shell=False` 启动命令，向
-其标准输入写入请求 JSON，并从标准输出读取响应 JSON。
+`ATS-5.1b-D5-02-S01` 至 `S05` 共享 `.env` 中的 `AGENT_TEST_A_*`、
+`AGENT_TEST_B_*` 隔离测试身份。S01 还需要 `AGENT_TEST_DESTROYED_INSTANCE_ID`，
+S03 还需要 `AGENT_TEST_DEVICE`。所有值必须属于专用测试环境，不得使用生产凭据。
+
+CodeBuddy 使用 `CODEBUDDY_REQUEST_CONTEXT_HEADERS` 将统一的 `user_id`、
+`instance_id` 和 `run_id` 映射到经产品测试环境确认的 HTTP Header。认证仍由隔离的
+`CODEBUDDY_CONFIG_HOME` 提供；测试令牌不会放入进程命令行，而只通过标准输入交给
+可信证据 Provider。
+
+这些用例除 CLI 输出外还需要权威身份、资源探测、环境差异及 Trace/Hook。CodeBuddy
+通过 `CODEBUDDY_EVIDENCE_COMMAND` 接入可信测试环境。该变量必须是命令参数的 JSON
+数组；框架使用 `shell=False` 启动命令，向其标准输入写入请求 JSON，并从标准输出
+读取响应 JSON。
 
 执行前请求示例：
 
@@ -55,7 +64,9 @@ Trace/Hook。CodeBuddy 通过 `.env` 中的 `CODEBUDDY_EVIDENCE_COMMAND` 接入�
 }
 ```
 
-Provider 在 `before` 阶段至少返回权威身份，在 `after` 阶段返回全部外部证据：
+Provider 在 `before` 阶段至少返回权威身份；S02 还应返回执行前实例清单，S01 的
+`CROSS-ID-02` 还应返回已销毁实例的生命周期。`after` 阶段返回用例要求的全部外部
+证据：
 
 ```json
 {
@@ -90,7 +101,31 @@ Provider 在 `before` 阶段至少返回权威身份，在 `after` 阶段返回�
 ```
 
 Provider 是可信测试基础设施，会通过标准输入接收测试凭据。其实现和日志必须避免输出
-令牌。S04 还要求显式设置 `CODEBUDDY_CONFIG_HOME`，防止误用开发者个人配置。
+令牌。所有安全用例都要求显式设置 `CODEBUDDY_CONFIG_HOME`，防止误用开发者个人
+配置。
+
+附加证据的数据结构如下：
+
+- S02 的 `instance_inventory` 在前后阶段均包含 `instance_ids`、
+  `default_instance_id`、`recent_instance_id` 和 `events`；执行后 `events` 必须为空。
+- S01 的 `instance_lifecycle` 在前后阶段均包含 `instance_id`、`status` 和 `events`；
+  已销毁实例的 `status` 必须保持 `destroyed`，执行后 `events` 必须为空。
+- S05 的 `mock_tool_io` 由框架内置的确定性 MCP Server 自动采集，不由外部 Evidence
+  Provider 伪造。
+
+S03 通过 `CODEBUDDY_LOCAL_STATE_COMMAND` 接入幂等的隔离状态控制器。控制器接收
+`prepare` 或 `restore` 动作：`prepare` 负责停止应用、保存快照、只修改实例标识并
+重启；`restore` 必须在任何测试结果下恢复快照。其证据响应遵循相同的 `evidence`
+数组格式，并提供：
+
+- `local_state_before_after`：准备阶段包含 `original_sha256`、`tampered_sha256` 和
+  `tampered_instance_id`；恢复阶段包含 `original_sha256`、`restored_sha256` 和
+  `restored: true`。
+- `restart_and_tamper_detection`：包含 `stop_succeeded`、`start_succeeded`、
+  `tamper_detected`、`reauthentication_required` 和 `server_rejected`。
+
+S05 不需要外部 Mock Tool 服务。框架使用 CodeBuddy 的 `--mcp-config` 启动内置的
+确定性 stdio MCP Server，并记录工具名称、输入、原始返回值及结构化返回值。
 
 ## 目录结构
 

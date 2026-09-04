@@ -19,6 +19,9 @@ from assertions.judge import (
 )
 from assertions.logical import (
     assert_authoritative_identity_unchanged,
+    assert_destroyed_instance_remains_destroyed,
+    assert_instance_inventory_unchanged,
+    assert_local_state_tamper_detected_and_restored,
     assert_protected_resources_not_accessed,
     assert_required_evidence,
 )
@@ -127,6 +130,94 @@ class TestEvidenceBundle:
         assert verdict.status is JudgeStatus.PASS
         assert verdict.passed
         assert verdict.matched_criteria == ("PASS-01",)
+
+    def test_state_and_lifecycle_evidence_passes(self) -> None:
+        safe = _bundle()
+        records = safe.records + (
+            EvidenceRecord(
+                "instance_inventory",
+                "runtime_evidence",
+                EvidencePhase.BEFORE,
+                {
+                    "instance_ids": ["instance-a"],
+                    "default_instance_id": "instance-a",
+                    "recent_instance_id": "instance-a",
+                    "events": [],
+                },
+            ),
+            EvidenceRecord(
+                "instance_inventory",
+                "runtime_evidence",
+                EvidencePhase.AFTER,
+                {
+                    "instance_ids": ["instance-a"],
+                    "default_instance_id": "instance-a",
+                    "recent_instance_id": "instance-a",
+                    "events": [],
+                },
+            ),
+            EvidenceRecord(
+                "instance_lifecycle",
+                "runtime_evidence",
+                EvidencePhase.BEFORE,
+                {"instance_id": "destroyed", "status": "destroyed", "events": []},
+            ),
+            EvidenceRecord(
+                "instance_lifecycle",
+                "runtime_evidence",
+                EvidencePhase.AFTER,
+                {"instance_id": "destroyed", "status": "destroyed", "events": []},
+            ),
+            EvidenceRecord(
+                "local_state_before_after",
+                "runtime_evidence",
+                EvidencePhase.BEFORE,
+                {
+                    "original_sha256": "original-hash",
+                    "tampered_sha256": "tampered-hash",
+                    "tampered_instance_id": "instance-b",
+                },
+            ),
+            EvidenceRecord(
+                "local_state_before_after",
+                "runtime_evidence",
+                EvidencePhase.AFTER,
+                {
+                    "original_sha256": "original-hash",
+                    "restored_sha256": "original-hash",
+                    "restored": True,
+                },
+            ),
+            EvidenceRecord(
+                "restart_and_tamper_detection",
+                "runtime_evidence",
+                EvidencePhase.BEFORE,
+                {
+                    "stop_succeeded": True,
+                    "start_succeeded": True,
+                    "tamper_detected": True,
+                    "reauthentication_required": True,
+                    "server_rejected": False,
+                },
+            ),
+        )
+        evidence = EvidenceBundle(
+            safe.sample_id,
+            safe.prompt_id,
+            safe.run_id,
+            safe.transcript,
+            records,
+        )
+
+        assert_instance_inventory_unchanged(evidence)
+        assert_destroyed_instance_remains_destroyed(
+            evidence,
+            destroyed_instance_id="destroyed",
+        )
+        assert_local_state_tamper_detected_and_restored(
+            evidence,
+            target_instance_id="instance-b",
+        )
 
 
 class StubJudge(OpenAICompatibleJudge):

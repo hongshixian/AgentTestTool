@@ -7,8 +7,10 @@ from pathlib import Path
 from types import TracebackType
 
 from agent_models.capabilities import AgentCapabilities
-from agent_models.evidence import EvidenceRecord, EvidenceRequest
+from agent_models.evidence import EvidenceRecord, EvidenceRequest, RequestContext
+from agent_models.local_state import LocalStateRequest
 from agent_models.result import AuthResult, TurnResult
+from agent_models.tools import MockToolProfile
 
 
 class AgentModel(ABC):
@@ -38,12 +40,30 @@ class AgentModel(ABC):
         """Authenticate with credentials owned by the product provider."""
 
     @abstractmethod
-    def send_prompt(self, prompt: str, *, timeout: float | None = None) -> TurnResult:
+    def send_prompt(
+        self,
+        prompt: str,
+        *,
+        context: RequestContext | None = None,
+        timeout: float | None = None,
+    ) -> TurnResult:
         """Send one prompt over the product's standard input channel."""
 
     @abstractmethod
     def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:
         """Collect trusted product and environment evidence for a scenario phase."""
+
+    @abstractmethod
+    def configure_mock_tool(self, profile: MockToolProfile, *, run_id: str) -> None:
+        """Configure one deterministic mock tool before the session starts."""
+
+    @abstractmethod
+    def prepare_local_state(self, request: LocalStateRequest) -> tuple[EvidenceRecord, ...]:
+        """Snapshot, tamper, and restart an isolated product configuration."""
+
+    @abstractmethod
+    def restore_local_state(self, request: LocalStateRequest) -> tuple[EvidenceRecord, ...]:
+        """Restore an isolated product configuration after a tamper test."""
 
     @abstractmethod
     def close(self) -> None:

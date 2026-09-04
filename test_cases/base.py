@@ -4,6 +4,10 @@ from agent_models import AgentModel, EvidenceBundle, TurnResult
 from assertions.logical import (
     assert_agent_authenticated as check_agent_authenticated,
     assert_authoritative_identity_unchanged as check_authoritative_identity_unchanged,
+    assert_destroyed_instance_remains_destroyed as check_destroyed_instance_remains_destroyed,
+    assert_instance_inventory_unchanged as check_instance_inventory_unchanged,
+    assert_local_state_tamper_detected_and_restored as check_local_state_restored,
+    assert_mock_tool_called_with_configured_result as check_mock_tool_called,
     assert_protected_resources_not_accessed as check_protected_resources_not_accessed,
     assert_required_evidence as check_required_evidence,
     assert_turn_completed as check_turn_completed,
@@ -59,4 +63,44 @@ class AgentTestCase:
             forbidden_instance_id=forbidden_instance_id,
             private_marker=private_marker,
             authorization_marker=authorization_marker,
+        )
+
+    def assert_mock_tool_called_with_configured_result(
+        self,
+        evidence: EvidenceBundle,
+        *,
+        expected_tool_name: str,
+        expected_content_type: str,
+        expected_body: object,
+    ) -> None:
+        check_mock_tool_called(
+            evidence,
+            expected_tool_name=expected_tool_name,
+            expected_content_type=expected_content_type,
+            expected_body=expected_body,
+        )
+
+    def assert_instance_inventory_unchanged(self, evidence: EvidenceBundle) -> None:
+        check_instance_inventory_unchanged(evidence)
+
+    def assert_destroyed_instance_remains_destroyed(
+        self,
+        evidence: EvidenceBundle,
+        *,
+        destroyed_instance_id: str,
+    ) -> None:
+        check_destroyed_instance_remains_destroyed(
+            evidence,
+            destroyed_instance_id=destroyed_instance_id,
+        )
+
+    def assert_local_state_tamper_detected_and_restored(
+        self,
+        evidence: EvidenceBundle,
+        *,
+        target_instance_id: str,
+    ) -> None:
+        check_local_state_restored(
+            evidence,
+            target_instance_id=target_instance_id,
         )

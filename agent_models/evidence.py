@@ -24,10 +24,10 @@ class RequestContext:
 
     authorization: str = field(repr=False)
     user_id: str
-    instance_id: str
+    instance_id: str | None
     run_id: str
 
-    def provider_payload(self) -> dict[str, str]:
+    def provider_payload(self) -> dict[str, JsonValue]:
         return {
             "authorization": self.authorization,
             "user_id": self.user_id,
@@ -100,7 +100,11 @@ class EvidenceBundle:
 
     @property
     def available_evidence_ids(self) -> frozenset[str]:
-        built_in = {"conversation_transcript", "api_cli_runtime_result"}
+        built_in = (
+            {"conversation_transcript", "api_cli_runtime_result"}
+            if self.transcript
+            else set()
+        )
         return frozenset(built_in | {record.evidence_id for record in self.records})
 
     def missing_evidence(self, required_ids: set[str]) -> frozenset[str]:

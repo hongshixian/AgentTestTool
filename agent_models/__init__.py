@@ -10,7 +10,9 @@ from agent_models.evidence import (
     TranscriptTurn,
 )
 from agent_models.factory import AgentModelFactory
+from agent_models.local_state import LocalStateAction, LocalStateKind, LocalStateRequest
 from agent_models.result import AuthResult, AuthStatus, TurnResult
+from agent_models.tools import MockToolProfile
 
 __all__ = [
     "AgentModel",
@@ -22,6 +24,10 @@ __all__ = [
     "EvidenceRecord",
     "EvidenceRequest",
     "RequestContext",
+    "MockToolProfile",
+    "LocalStateAction",
+    "LocalStateKind",
+    "LocalStateRequest",
     "TranscriptTurn",
     "TurnResult",
 ]

@@ -8,12 +8,17 @@ from pathlib import Path
 
 from agent_models.base import AgentModel
 from agent_models.capabilities import AgentCapabilities
+from agent_models.codebuddy.context import CodeBuddyRequestContextAdapter
 from agent_models.codebuddy.credentials import CodeBuddyCredentialProvider
 from agent_models.codebuddy.driver import CodeBuddyDriver
 from agent_models.codebuddy.evidence import CodeBuddyCommandEvidenceProvider
+from agent_models.codebuddy.local_state import CodeBuddyCommandLocalStateController
+from agent_models.codebuddy.mock_tool import CodeBuddyMockToolController
 from agent_models.codebuddy.transport import CodeBuddyStdioTransport
-from agent_models.evidence import EvidenceRecord, EvidenceRequest
+from agent_models.evidence import EvidenceRecord, EvidenceRequest, RequestContext
+from agent_models.local_state import LocalStateAction, LocalStateRequest
 from agent_models.result import AuthResult, AuthStatus, TurnResult
+from agent_models.tools import MockToolProfile
 
 
 class CodeBuddyAgentModel(AgentModel):
@@ -25,12 +30,18 @@ class CodeBuddyAgentModel(AgentModel):
         transport: CodeBuddyStdioTransport,
         credentials: CodeBuddyCredentialProvider,
         evidence: CodeBuddyCommandEvidenceProvider,
+        mock_tool: CodeBuddyMockToolController,
+        request_context: CodeBuddyRequestContextAdapter,
+        local_state: CodeBuddyCommandLocalStateController,
     ) -> None:
         self._workspace = workspace
         self.driver = driver
         self.transport = transport
         self.credentials = credentials
         self.evidence = evidence
+        self.mock_tool = mock_tool
+        self.request_context = request_context
+        self.local_state = local_state
         self._session_id = f"ats-{uuid.uuid4().hex}"
         self._has_started_session = False
 
@@ -49,6 +60,9 @@ class CodeBuddyAgentModel(AgentModel):
             file_operations=True,
             isolated_configuration=self.credentials.isolated,
             trusted_evidence=self.evidence.is_available(),
+            mock_tools=True,
+            request_context=self.request_context.is_available(),
+            local_state_control=self.local_state.is_available(),
         )
 
     def check_authentication(self) -> AuthResult:
@@ -71,13 +85,21 @@ class CodeBuddyAgentModel(AgentModel):
     def login(self) -> AuthResult:
         return self.credentials.login()
 
-    def send_prompt(self, prompt: str, *, timeout: float | None = None) -> TurnResult:
+    def send_prompt(
+        self,
+        prompt: str,
+        *,
+        context: RequestContext | None = None,
+        timeout: float | None = None,
+    ) -> TurnResult:
+        context_args = self.request_context.extra_args(context)
         response = self.transport.request(
             prompt,
             timeout=timeout,
             session_id=self._session_id,
             resume=self._has_started_session,
             allow_tools=True,
+            extra_args=self.mock_tool.extra_args + context_args,
         )
         turn = self.driver.parse_turn(response)
         if turn.completed:
@@ -85,8 +107,22 @@ class CodeBuddyAgentModel(AgentModel):
         return turn
 
     def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:
-        return self.evidence.capture(request)
+        return self.evidence.capture(request) + self.mock_tool.capture(request)
+
+    def configure_mock_tool(self, profile: MockToolProfile, *, run_id: str) -> None:
+        if self._has_started_session:
+            raise RuntimeError("必须在 Agent 会话开始前配置 Mock Tool")
+        self.mock_tool.configure(profile, run_id=run_id)
+
+    def prepare_local_state(self, request: LocalStateRequest) -> tuple[EvidenceRecord, ...]:
+        if self._has_started_session:
+            raise RuntimeError("必须在 Agent 会话开始前准备本地状态")
+        return self.local_state.execute(LocalStateAction.PREPARE, request)
+
+    def restore_local_state(self, request: LocalStateRequest) -> tuple[EvidenceRecord, ...]:
+        return self.local_state.execute(LocalStateAction.RESTORE, request)
 
     def close(self) -> None:
         self.transport.close()
+        self.mock_tool.close()
         self.credentials.remove_test_session(self._session_id)

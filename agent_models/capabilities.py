@@ -13,3 +13,6 @@ class AgentCapabilities:
     file_operations: bool = False
     isolated_configuration: bool = False
     trusted_evidence: bool = False
+    mock_tools: bool = False
+    request_context: bool = False
+    local_state_control: bool = False

@@ -32,13 +32,19 @@ agent_models/
 ├── factory.py              # AgentModelFactory 与产品注册
 ├── result.py               # TurnResult、AuthResult 和统一事件类型
 ├── evidence.py             # 请求上下文、证据记录和 EvidenceBundle
+├── tools.py                # 产品无关的确定性 Mock Tool 配置
+├── local_state.py          # 本地状态篡改与恢复请求模型
 ├── capabilities.py         # 产品能力声明
 └── codebuddy/
     ├── __init__.py
     ├── model.py            # CodeBuddy AgentModel 的组件组装
     ├── driver.py           # 产品命令、状态识别和输出解析
     ├── transport.py        # 产品使用的 STDIO/PTY 交互
+    ├── context.py          # 统一请求上下文到产品参数的映射
     ├── evidence.py         # 产品可信环境与 Trace/Hook 证据适配
+    ├── mock_tool.py        # CodeBuddy Mock Tool 会话组装与证据采集
+    ├── mock_mcp_server.py  # 确定性 stdio MCP 测试服务
+    ├── local_state.py      # 隔离配置的快照、篡改、重启与恢复适配
     └── credentials.py      # 产品认证信息适配
 
 assertions/
@@ -52,14 +58,23 @@ assertions/
 test_cases/
 ├── base.py                 # 公共测试用例基类 AgentTestCase
 ├── conftest.py             # pytest 参数、fixture 和 AgentModel 初始化
+├── security.py             # 安全用例共享的隔离身份配置
 ├── test_agent_identity.py
 ├── test_multi_turn.py
 ├── test_file_creation.py
-└── test_natural_language_identity_override.py
+├── test_cross_identity_replay.py
+├── test_instance_id_boundaries.py
+├── test_local_instance_state_tampering.py
+├── test_natural_language_identity_override.py
+└── test_tool_result_identity_injection.py
 
 tests/
 ├── test_evidence.py          # 证据模型与断言的离线回归测试
-└── test_codebuddy_evidence.py # CodeBuddy 证据适配器的离线回归测试
+├── test_scenario_shapes.py   # ATS 场景结构的离线回归测试
+├── test_codebuddy_context.py # 请求上下文适配器的离线回归测试
+├── test_codebuddy_evidence.py
+├── test_codebuddy_local_state.py
+└── test_codebuddy_mock_tool.py
 
 assets/
 └── README.md               # 测试用例共用的静态资源
@@ -68,7 +83,7 @@ configs/
 ├── agents.example.yaml     # 不含秘密的产品配置示例
 └── environment.py          # 根目录 .env 加载方法
 
-.env.example                # Judge API 环境变量示例
+.env.example                # Judge、产品隔离环境与安全用例配置示例
 pyproject.toml
 AGENTS.md
 README.md
@@ -86,6 +101,7 @@ README.md
 - `assertions/` 统一维护测试断言；`logical.py` 提供确定性的传统断言，`assertions/judge/` 提供基于 Judge 模型的智能断言。
 - `assertions/judge/` 独立于具体 Agent 产品，只消费标准化的交互结果、工作区产物和用例评价准则。
 - 安全测试所需的权威环境状态和 Trace/Hook 通过 `AgentModel` 的产品证据 Provider 采集；缺少必需证据时不得仅凭 Agent 回复判定通过。
+- 测试用例通过统一 RequestContext、Mock Tool 和 LocalStateController 能力表达产品相关操作；具体 CLI 参数、Header、MCP 和本地配置差异只能由产品 AgentModel 封装。
 - `assets/` 统一存放测试用例使用的静态资源文件，例如输入样本、图片、归档文件和固定的测试工程模板。
 - `configs/` 只保存可提交的示例和非敏感配置；真实账号、令牌、认证缓存及本机路径不得提交。
 
