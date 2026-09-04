@@ -51,6 +51,9 @@ test_cases/
 ├── test_multi_turn.py
 └── test_file_creation.py
 
+assets/
+└── README.md               # 测试用例共用的静态资源
+
 configs/
 └── agents.example.yaml     # 不含秘密的产品配置示例
 
@@ -69,6 +72,7 @@ README.md
 - 新增 CLI Agent 时，增加对应的产品目录并注册到 `AgentModelFactory`，由统一接口运行已有测试用例。
 - `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；不支持的能力通过统一 capability 机制 skip。
 - `judge/` 独立于具体 Agent 产品，只消费标准化的交互结果、工作区产物和用例评价准则。
+- `assets/` 统一存放测试用例使用的静态资源文件，例如输入样本、图片、归档文件和固定的测试工程模板。
 - `configs/` 只保存可提交的示例和非敏感配置；真实账号、令牌、认证缓存及本机路径不得提交。
 
 ## 测试用例开发规范
