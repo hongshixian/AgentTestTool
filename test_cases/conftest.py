@@ -24,20 +24,20 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         help="Agent CLI product passed to AgentModelFactory",
     )
     parser.addoption(
-        "--run-e2e",
+        "--smoke",
         action="store_true",
-        default=os.environ.get("AGENT_E2E_ENABLED", "").lower() in {"1", "true", "yes"},
-        help="Run tests that invoke a real Agent CLI and Judge API",
+        default=False,
+        help="Run unit tests and only the minimal smoke subset of E2E cases",
     )
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
-    if config.getoption("--run-e2e"):
+    if not config.getoption("--smoke"):
         return
-    skip_e2e = pytest.mark.skip(reason="需要通过 --run-e2e 显式启用真实 E2E 测试")
+    skip_non_smoke_e2e = pytest.mark.skip(reason="smoke 模式仅执行最小 E2E 用例集")
     for item in items:
-        if "e2e" in item.keywords:
-            item.add_marker(skip_e2e)
+        if "e2e" in item.keywords and "smoke" not in item.keywords:
+            item.add_marker(skip_non_smoke_e2e)
 
 
 @pytest.fixture

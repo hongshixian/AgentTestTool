@@ -194,9 +194,11 @@ class TestATS51BD502S01AgentIdentity(AgentTestCase):
 ```bash
 uv sync --extra dev
 uv run pytest
+uv run pytest --smoke
 ```
 
-提交改动前运行 `uv run pytest`。若无法运行，需要在交付说明中明确原因。
+开发过程中可运行 `uv run pytest --smoke`，它执行快速单元测试和最小 E2E 用例集。
+提交改动前运行 `uv run pytest` 执行完整测试。若无法运行，需要在交付说明中明确原因。
 
 ## 代码与测试原则
 

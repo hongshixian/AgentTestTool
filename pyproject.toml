@@ -19,6 +19,7 @@ testpaths = ["test_cases", "tests"]
 pythonpath = ["."]
 markers = [
     "e2e: invokes a real Agent CLI and Judge API",
+    "smoke: belongs to the minimal E2E verification subset",
     "security: requires trusted security-test environment evidence",
 ]
 

@@ -10,15 +10,15 @@ CredentialProvider 接入。
 
 ```bash
 uv sync --extra dev
-uv run pytest
+# 默认执行完整测试，包括真实 Agent CLI 和 Judge E2E 用例
+uv run pytest --agent=codebuddy
+
+# 开发阶段只执行快速单元测试和最小 E2E 身份检查
+uv run pytest --smoke --agent=codebuddy
 ```
 
-默认测试命令不会调用真实 Agent 或 Judge。显式配置隔离测试环境后，使用以下命令运行
-E2E 用例：
-
-```bash
-uv run pytest --run-e2e --agent=codebuddy
-```
+完整测试需要先配置隔离测试环境、CodeBuddy 登录状态和 Judge API。`--smoke` 仍会执行
+一条最小身份交互 E2E 用例，因此也会调用真实 Agent 和 Judge。
 
 Judge 使用 OpenAI 兼容的 Chat Completions API，并从项目根目录的 `.env` 读取：
 
