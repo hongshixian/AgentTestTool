@@ -71,6 +71,7 @@ class LocalInstanceStateScenarioRunner(AgentTestCase):
             pytest.skip("S03 要求使用专用真实测试账号配置")
         if not agent_model.capabilities.external_observation:
             pytest.skip("当前 Agent 未配置基于公开界面的黑盒观察 Provider")
+        self.require_security_boundary_observation(agent_model)
         security_identities = self.require_security_identities()
         isolated_test_device = self.require_environment_setting("AGENT_TEST_DEVICE")
         self.assert_agent_authenticated(agent_model)

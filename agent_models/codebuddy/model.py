@@ -57,6 +57,7 @@ class CodeBuddyAgentModel(AgentModel):
             file_operations=True,
             dedicated_test_account=self.credentials.is_dedicated_test_account,
             external_observation=self.evidence.is_available(),
+            security_boundary_observation=False,
             mock_tools=True,
             local_state_control=self.local_state.is_available(),
         )

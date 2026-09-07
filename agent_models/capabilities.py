@@ -13,6 +13,8 @@ class AgentCapabilities:
     file_operations: bool = False
     dedicated_test_account: bool = False
     external_observation: bool = False
+    # Requires verified public evidence of identity use, data access and auth events.
+    security_boundary_observation: bool = False
     mock_tools: bool = False
     public_identity_context: bool = False
     local_state_control: bool = False

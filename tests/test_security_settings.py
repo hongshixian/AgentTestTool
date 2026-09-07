@@ -5,15 +5,13 @@ from __future__ import annotations
 import pytest
 
 from test_cases.security import (
-    DEFAULT_UNTRUSTED_INSTANCE_ID,
-    DEFAULT_UNTRUSTED_USER_ID,
     SecurityIdentitySettings,
     SecurityTargetSettings,
 )
 
 
 class TestSecuritySettings:
-    def test_prompt_injection_only_requires_real_account_b_identifiers(
+    def test_target_settings_accept_explicit_real_account_b_identifiers(
         self,
         monkeypatch,
     ) -> None:
@@ -27,17 +25,20 @@ class TestSecuritySettings:
         assert settings.b_user_id == "real-user-b"
         assert settings.b_instance_id == "real-instance-b"
 
-    def test_prompt_injection_uses_untrusted_targets_without_account_b(
+    @pytest.mark.parametrize("configured_value", [None, "", "   "])
+    def test_target_settings_reject_missing_account_b_instead_of_using_fake_ids(
         self,
         monkeypatch,
+        configured_value: str | None,
     ) -> None:
-        monkeypatch.delenv("AGENT_TEST_B_USER_ID", raising=False)
-        monkeypatch.delenv("AGENT_TEST_B_INSTANCE_ID", raising=False)
+        for name in ("AGENT_TEST_B_USER_ID", "AGENT_TEST_B_INSTANCE_ID"):
+            if configured_value is None:
+                monkeypatch.delenv(name, raising=False)
+            else:
+                monkeypatch.setenv(name, configured_value)
 
-        settings = SecurityTargetSettings.from_environment()
-
-        assert settings.b_user_id == DEFAULT_UNTRUSTED_USER_ID
-        assert settings.b_instance_id == DEFAULT_UNTRUSTED_INSTANCE_ID
+        with pytest.raises(ValueError, match="AGENT_TEST_B_USER_ID"):
+            SecurityTargetSettings.from_environment()
 
     def test_context_scenarios_require_both_real_account_identities(
         self,

@@ -38,6 +38,31 @@ REQUIRED = {
 
 
 class TestEvidenceBundle:
+    @pytest.mark.parametrize(
+        "missing_key", ["instance_ids", "default_instance_id", "recent_instance_id"]
+    )
+    def test_missing_inventory_fields_cannot_count_as_unchanged(
+        self, missing_key: str
+    ) -> None:
+        safe = _bundle()
+        inventory = {
+            "instance_ids": ["instance-a"],
+            "default_instance_id": "instance-a",
+            "recent_instance_id": "instance-a",
+            "events": [],
+        }
+        del inventory[missing_key]
+        records = tuple(
+            EvidenceRecord("instance_inventory", "runtime_evidence", phase, inventory)
+            for phase in (EvidencePhase.BEFORE, EvidencePhase.AFTER)
+        )
+        evidence = EvidenceBundle(
+            safe.sample_id, safe.prompt_id, safe.run_id, safe.transcript, records
+        )
+
+        with pytest.raises(AssertionError, match=missing_key):
+            assert_instance_inventory_unchanged(evidence)
+
     def test_judge_payload_limits_raw_cli_output(self) -> None:
         result = TurnResult(
             response="safe response",

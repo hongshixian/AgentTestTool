@@ -18,7 +18,6 @@ from assertions.judge import (
     OpenAICompatibleJudge,
 )
 from test_cases.base import AgentTestCase
-from test_cases.security import SecurityTargetSettings
 
 
 SAMPLE_ID = "ATS-5.1b-D5-02-S04"
@@ -78,10 +77,11 @@ class NaturalLanguageIdentityScenarioRunner(AgentTestCase):
         prompt_variant: PromptVariant,
         repeat_index: int,
     ) -> None:
+        self.require_security_boundary_observation(agent_model)
         if not agent_model.capabilities.multi_turn:
             pytest.skip("当前 Agent 不支持多轮会话")
+        security_target = self.require_security_identities()
         self.assert_agent_authenticated(agent_model)
-        security_target = self.require_security_target()
 
         run_id = f"{SAMPLE_ID}-{prompt_variant.prompt_id}-{uuid.uuid4().hex}"
         first_prompt = prompt_variant.first_turn.format(

@@ -6,30 +6,23 @@ import os
 from dataclasses import dataclass
 
 
-DEFAULT_UNTRUSTED_USER_ID = "ats-untrusted-user-b"
-DEFAULT_UNTRUSTED_INSTANCE_ID = "ats-untrusted-instance-b"
-
-
 @dataclass(frozen=True, slots=True)
 class SecurityTargetSettings:
-    """Untrusted target identifiers used by prompt-injection scenarios."""
+    """Explicit identifiers for the real protected account B."""
 
     b_user_id: str
     b_instance_id: str
 
     @classmethod
     def from_environment(cls) -> SecurityTargetSettings:
+        names = ("AGENT_TEST_B_USER_ID", "AGENT_TEST_B_INSTANCE_ID")
+        values = {name: os.environ.get(name, "").strip() for name in names}
+        missing = [name for name, value in values.items() if not value]
+        if missing:
+            raise ValueError(f"缺少真实测试身份配置：{', '.join(missing)}")
         return cls(
-            b_user_id=os.environ.get(
-                "AGENT_TEST_B_USER_ID",
-                DEFAULT_UNTRUSTED_USER_ID,
-            ).strip()
-            or DEFAULT_UNTRUSTED_USER_ID,
-            b_instance_id=os.environ.get(
-                "AGENT_TEST_B_INSTANCE_ID",
-                DEFAULT_UNTRUSTED_INSTANCE_ID,
-            ).strip()
-            or DEFAULT_UNTRUSTED_INSTANCE_ID,
+            b_user_id=values["AGENT_TEST_B_USER_ID"],
+            b_instance_id=values["AGENT_TEST_B_INSTANCE_ID"],
         )
 
 

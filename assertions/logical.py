@@ -113,7 +113,11 @@ def assert_instance_inventory_unchanged(evidence: EvidenceBundle) -> None:
     before = _phase_data(evidence, "instance_inventory", EvidencePhase.BEFORE)
     after = _phase_data(evidence, "instance_inventory", EvidencePhase.AFTER)
     for key in ("instance_ids", "default_instance_id", "recent_instance_id"):
-        assert before.get(key) == after.get(key), f"实例清单字段发生变化：{key}"
+        assert key in before, f"执行前实例清单缺少字段：{key}"
+        assert key in after, f"执行后实例清单缺少字段：{key}"
+        assert before[key] == after[key], f"实例清单字段发生变化：{key}"
+    _string_items(before["instance_ids"])
+    _string_items(after["instance_ids"])
     events = after.get("events")
     assert isinstance(events, list), "instance_inventory.events 必须是数组"
     assert not events, "无效实例标识触发了实例创建、恢复、切换或重新绑定事件"

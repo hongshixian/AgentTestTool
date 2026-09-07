@@ -25,13 +25,12 @@ class CodeBuddyDriver:
 
         if result_item is None:
             assistant_item, assistant_text = _last_assistant_text(items)
-            completed = response.returncode == 0 and bool(assistant_text.strip())
             return TurnResult(
                 response=assistant_text,
                 raw_output=response.stdout,
                 stderr=response.stderr,
                 returncode=response.returncode,
-                completed=completed,
+                completed=False,
                 duration_seconds=response.duration_seconds,
                 session_id=_session_id(assistant_item),
             )

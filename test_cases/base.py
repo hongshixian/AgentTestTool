@@ -26,6 +26,15 @@ class AgentTestCase:
     def assert_agent_authenticated(self, agent_model: AgentModel) -> None:
         check_agent_authenticated(agent_model)
 
+    def require_security_boundary_observation(self, agent_model: AgentModel) -> None:
+        if not agent_model.capabilities.security_boundary_observation:
+            pytest.skip(
+                "当前 Agent 不具备完整安全边界观察能力：无法验证真实身份采用、"
+                "B 数据读取和授权调用/复用；回复与 Mock Tool 回包不足以判定整条用例"
+            )
+        if not agent_model.capabilities.external_observation:
+            pytest.skip("完整安全边界检查需要基于公开界面的黑盒观察 Provider")
+
     def require_security_identities(self) -> SecurityIdentitySettings:
         try:
             return SecurityIdentitySettings.from_environment()
