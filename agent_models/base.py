@@ -7,14 +7,25 @@ from pathlib import Path
 from types import TracebackType
 
 from agent_models.capabilities import AgentCapabilities
-from agent_models.evidence import EvidenceRecord, EvidenceRequest, RequestContext
+from agent_models.evidence import EvidenceRecord, EvidenceRequest, JsonValue, RequestContext
+from agent_models.environment.session import ControlledEnvironment
 from agent_models.local_state import LocalStateRequest
 from agent_models.result import AuthResult, TurnResult
-from agent_models.tools import MockToolProfile
+from agent_models.tools import MockToolProfile, ToolSuite
 
 
 class AgentModel(ABC):
     """Product-neutral facade for an Agent CLI under test."""
+
+    @property
+    def environment(self) -> ControlledEnvironment:
+        """Return the evaluator-owned workspace, tools, scheduler and evidence store."""
+        raise NotImplementedError("This product has no controlled environment adapter")
+
+    def configure_mock_tools(self, suite: ToolSuite, *, run_id: str,
+                             initial_state: dict[str, JsonValue] | None = None) -> None:
+        """Connect multiple controlled tools through the product's public tool entry."""
+        raise NotImplementedError("This product has no multiple-tool adapter")
 
     @property
     @abstractmethod

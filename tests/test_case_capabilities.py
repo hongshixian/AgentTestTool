@@ -25,6 +25,8 @@ class TestSecurityCaseCapabilities:
 
         assert model.capabilities.external_observation
         assert model.capabilities.local_state_control
+        assert model.capabilities.multiple_mock_tools
+        assert model.capabilities.controlled_environment
         assert not model.capabilities.security_boundary_observation
 
     def test_external_helper_alone_does_not_enable_boundary_observation(self) -> None:

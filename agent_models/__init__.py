@@ -12,7 +12,7 @@ from agent_models.evidence import (
 from agent_models.factory import AgentModelFactory
 from agent_models.local_state import LocalStateAction, LocalStateKind, LocalStateRequest
 from agent_models.result import AuthResult, AuthStatus, TurnResult
-from agent_models.tools import MockToolProfile
+from agent_models.tools import MockToolProfile, ToolDefinition, ToolEffect, ToolResponse, ToolSuite
 
 __all__ = [
     "AgentModel",
@@ -25,6 +25,10 @@ __all__ = [
     "EvidenceRequest",
     "RequestContext",
     "MockToolProfile",
+    "ToolDefinition",
+    "ToolEffect",
+    "ToolResponse",
+    "ToolSuite",
     "LocalStateAction",
     "LocalStateKind",
     "LocalStateRequest",

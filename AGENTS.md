@@ -38,6 +38,13 @@ agent_models/
 ├── tools.py                # 产品无关的确定性 Mock Tool 配置
 ├── local_state.py          # 本地状态篡改与恢复请求模型
 ├── capabilities.py         # 产品能力声明
+├── environment/            # 第三方可控制的公共测试环境
+│   ├── session.py          # 工作区、工具、编排与证据生命周期
+│   ├── workspace.py        # 静态资源预置、快照、差异和恢复
+│   ├── tool_runtime.py     # 多工具响应序列与模拟业务状态
+│   ├── receiver.py         # 测试进程持有的本地 HTTP 接收端
+│   ├── orchestration.py    # 有界并发、事件同步和重复恢复
+│   └── ledger.py           # 脱敏证据、关联事件和归档校验
 └── codebuddy/
     ├── __init__.py
     ├── model.py            # CodeBuddy AgentModel 的组件组装
@@ -52,6 +59,7 @@ agent_models/
 assertions/
 ├── __init__.py
 ├── logical.py              # 基于逻辑判断的传统断言
+├── environment.py          # 工具调用、模拟副作用及观察窗口断言
 └── judge/
     ├── __init__.py
     ├── model.py            # Judge 模型统一接口及实现
@@ -123,6 +131,10 @@ README.md
 - 测试用例通过统一 RequestContext、Mock Tool 和 LocalStateController 能力表达产品公开操作；具体 CLI 参数、MCP 和本地配置差异只能由产品 AgentModel 封装。
 - 产品没有公开用户或实例上下文选择能力时，依赖该能力的路径必须通过 capability skip；不得通过猜测或伪造私有 HTTP Header 模拟支持。
 - `assets/` 统一存放测试用例使用的静态资源文件，例如输入样本、图片、归档文件和固定的测试工程模板。
+- 测试通过 `agent_model.environment` 管理受控工作区、模拟工具状态、并发编排和证据；产品工具接线仍通过 `configure_mock_tool()` 或 `configure_mock_tools()` 完成。
+- 依赖公共受控环境或多工具的用例分别检查 `controlled_environment`、`multiple_mock_tools` capability，不支持时明确 skip；这些能力不代表完整安全边界观察。
+- `agent_models/environment/` 只管理第三方可控制的执行环境；产品参数和协议适配留在对应产品目录中。
+- pytest 逐次运行的脱敏证据保存在被 Git 忽略的 `artifacts/<RUN_ID>/`，可通过 `--evidence-dir` 指定父目录；证据目录必须与被测工作区分离。
 - `configs/` 只保存可提交的示例和非敏感配置；真实账号、令牌、认证缓存及本机路径不得提交。
 
 ## 测试用例开发规范
@@ -237,6 +249,18 @@ uv run pytest --smoke
 - 临时文件统一使用 pytest 的 `tmp_path`；环境变量通过 `monkeypatch` 隔离。
 - 平台相关行为需要显式标记，并在测试名或注释中说明限制。
 - 单个变更应聚焦一个目的，不顺带重构无关代码。
+
+### 公共测试环境
+
+- 工作区使用专用目录；静态模板通过 `WorkspaceManager.copy_asset()` 从 `assets/` 预置。快照保留在内存，归档使用脱敏后的产物。
+- 工具通过 `ToolSuite` 定义输入约束、响应序列、延迟、同步门及模拟副作用；配置在首次发送会话 prompt 前完成。
+- 原有单工具 `MockToolProfile` 继续可用。CodeBuddy 的 STDIO MCP 子进程只转发请求，测试进程负责接收、状态和证据持久化。
+- 使用有界事件同步；测试侧任务超时后必须确认停止才能恢复状态。恢复只影响受控工作区和模拟业务状态，不改变产品账号或服务端数据。
+- 重复的真实 Agent 运行应逐次创建新 Model，使用新会话和 RUN_ID；编排器自身生成新运行标识不等于自动重建产品会话。
+- 零调用断言必须提供指定工具的完整观察窗口、正常成功调用基线和前后接收端健康探测；采集异常或缺少证据时不能判通过。
+- 测试侧接收日志只证明所观察端点的请求和模拟副作用。工作区分离不是 OS 沙箱，模拟服务的拒绝结果不能代替产品原生鉴权或取消证据。
+- 证据落盘前脱敏；工厂自动收集已注入环境中的明显敏感变量值，其他秘密通过 `secrets` 显式传入。CodeBuddy 子进程不继承 Judge 和测试编排专属变量。
+- 新增环境能力必须附带 `tests/` 下的离线回归；本地协议探针只验证框架接线，真实产品用例执行情况单独报告。
 
 ## Agent 工作流程
 

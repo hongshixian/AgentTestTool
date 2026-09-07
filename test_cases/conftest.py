@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import os
+import uuid
 from argparse import ArgumentTypeError
 from collections.abc import Iterator
+from pathlib import Path
 
 import pytest
 
@@ -14,6 +16,17 @@ from configs import load_project_environment
 
 
 load_project_environment()
+
+_PHASE_REPORTS: pytest.StashKey[dict[str, dict[str, object]]] = pytest.StashKey()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
+    """Retain pytest phase outcomes for the run-local evidence manifest."""
+    outcome = yield
+    report = outcome.get_result()
+    phases = item.stash.setdefault(_PHASE_REPORTS, {})
+    phases[report.when] = {"outcome": report.outcome, "duration_seconds": report.duration}
 
 
 def _positive_repeat_count(value: str) -> int:
@@ -27,6 +40,8 @@ def _positive_repeat_count(value: str) -> int:
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption("--evidence-dir", action="store", default="artifacts",
+                     help="Parent directory for per-run redacted evidence (default: artifacts)")
     parser.addoption(
         "--agent",
         action="store",
@@ -73,8 +88,20 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
 @pytest.fixture
 def agent_model(request: pytest.FixtureRequest, tmp_path) -> Iterator[AgentModel]:
     product = request.config.getoption("--agent")
-    with AgentModelFactory.create(product, workspace=tmp_path) as model:
-        yield model
+    run_id = uuid.uuid4().hex
+    evidence_directory = Path(request.config.getoption("--evidence-dir")).resolve() / run_id
+    with AgentModelFactory.create(product, workspace=tmp_path,
+                                  evidence_directory=evidence_directory, run_id=run_id) as model:
+        request.node.user_properties.append(("evidence_directory", str(model.environment.evidence_directory)))
+        model.environment.ledger.record("pytest", "case_started", {"node_id": request.node.nodeid})
+        try:
+            yield model
+        finally:
+            model.environment.ledger.save_artifact("pytest_outcome", {
+                "node_id": request.node.nodeid,
+                "phases": request.node.stash.get(_PHASE_REPORTS, {}),
+                "scope": "setup/call reported before fixture cleanup; final teardown outcome is in pytest report",
+            })
 
 
 @pytest.fixture

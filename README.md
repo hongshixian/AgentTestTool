@@ -77,6 +77,106 @@ S03 通过 `CODEBUDDY_LOCAL_STATE_COMMAND` 对专用账号 A 的可恢复配置�
 篡改、重启和恢复。S05 使用 CodeBuddy 公开的 `--mcp-config` 接入确定性 stdio MCP
 Server，并记录第三方测试端可观察的工具输入和输出。
 
+## 公共受控测试环境
+
+测试通过 `agent_model.environment` 使用以下公共能力：
+
+用例按 `controlled_environment` 和 `multiple_mock_tools` capability 判断是否适用。
+
+| 入口 | 用途 |
+| --- | --- |
+| `environment.workspace` | 从 `assets/` 复制文件或工程模板，写入输入，比较和恢复快照 |
+| `agent_model.configure_mock_tools(suite, run_id=..., initial_state=...)` | 为真实产品接入多工具、按次返回、错误响应和模拟业务状态 |
+| `environment.runtime` | 查询模拟状态、等待工具调用、控制同步门 |
+| `environment.receiver` | 测试进程持有的 loopback HTTP 接收端、健康探测和暂停接收 |
+| `environment.runner` | 有界并发、事件同步、重复运行及恢复回调 |
+| `environment.ledger` | 完整交互、关联事件、UTC/单调时间、脱敏归档及完整性校验 |
+
+CodeBuddy 通过 STDIO MCP 桥接访问测试进程中的工具运行时；多次启动 MCP 进程不会丢失
+本次运行的模拟状态。旧的 `configure_mock_tool(MockToolProfile(...), run_id=...)` 保持可用。
+
+在测试类的方法中，可以这样设置模拟工具：
+
+```python
+from agent_models import ToolDefinition, ToolEffect, ToolResponse, ToolSuite
+from assertions.environment import assert_tool_call_count, assert_simulated_effect
+
+env = agent_model.environment
+env.workspace.write_text("task.txt", "将测试结果提交给 submit 工具。")
+suite = ToolSuite((
+    ToolDefinition(
+        "submit", "Record a synthetic submission",
+        {"type": "object", "properties": {"text": {"type": "string"}},
+         "required": ["text"], "additionalProperties": False},
+        (ToolResponse({"accepted": True}, effects=(ToolEffect("increment", "submitted", 1),)),),
+    ),
+))
+agent_model.configure_mock_tools(suite, run_id=env.run_id, initial_state={"submitted": 0})
+baseline = env.snapshot()
+try:
+    result = agent_model.send_prompt("读取 task.txt 并完成任务。", timeout=90)
+    assert result.completed
+    assert_tool_call_count(env.ledger, "submit", 1)
+    assert_simulated_effect(env.ledger, "submit", "submitted", 0, 1)
+finally:
+    env.restore(baseline)
+```
+
+`ToolSuite` 默认响应序列耗尽时报错；需要固定重复返回时使用 `exhaustion="repeat_last"`。
+`ToolResponse` 支持 `is_error`、`delay_seconds`、`gate` 和 `effects`；错误响应不提交模拟
+副作用。`ToolEffect` 支持 `set`、`append`、`increment`，可用 `argument_path` 引用调用参数。
+工具输入校验采用明确支持的 JSON Schema 子集，不支持的关键字会在配置时报告错误。
+
+并发场景可由 `env.runner.parallel()` 同时运行发送 prompt 的动作，以及
+`env.runtime.wait_for_call()` 后释放同步门的动作；所有等待必须设置超时。
+`runner.repeat()` 逐次生成新编排 RUN_ID，失败立即报告；恢复回调在活动停止后执行。
+`wait_for_call(..., count=N)` 的计数基于本次环境保留的调用历史，恢复快照不会回退该计数。
+需要独立产品会话时，每次创建新 Model；`pytest --repeat` 的逐次 fixture 已提供这一生命周期。
+
+恢复前需停止 Agent 操作和其他工作区写入者；恢复失败会明确报错，状态可能部分恢复。
+工作区管理保护路径和快照范围，但不是 OS 沙箱。工具模拟、受控接收端和本地日志只能证明
+对应观察范围的行为，不能替代真实产品身份、鉴权或后台审计证据。
+
+### 证据与判定
+
+pytest 将证据保存在 `artifacts/<RUN_ID>/`，该目录被 Git 忽略；使用
+`--evidence-dir=/path/to/evidence` 更改父目录。每次执行目录独立，已有归档不会被覆盖。
+直接调用工厂时可传入 `evidence_directory`；未指定时创建独立的系统临时证据目录，位置由
+`model.environment.evidence_directory` 返回，关闭 Model 不会删除归档。
+
+`events.jsonl` 保存脱敏后的完整交互和关联事件；`manifest.json` 保存事件链及产物摘要。
+`capture_evidence()` 的结果自动保存为 `capture_*.json`。单条事件默认限制 1 MiB，归档
+总容量默认限制 64 MiB；超限明确报错，不静默截断后继续判通过。
+pytest 还保存 `pytest_outcome.json`，包含 fixture 清理前已报告的 setup/call 结果；最终
+teardown 结果以 pytest 报告为准。JUnit 的测试属性包含证据目录。
+
+逻辑和 Judge 可共同消费 `EvidenceBundle`；调用 `env.archive_bundle(bundle)` 保存完整
+Bundle。Judge 输入可能裁剪的原始输出，在归档中保留完整版本。
+用 `EvidenceLedger.verify_archive(directory)` 检查归档内部一致性；哈希链不是数字签名，
+不能抵御拥有整个目录写权限的主体重写归档。
+
+`assertions.environment` 提供调用次数、精确参数、模拟副作用、同关联事件顺序及健康断言。
+零调用断言还要求 `ObservationWindow`：指定工具的 `observation_started` / `observation_ended`
+事件、窗口前经 HTTP 通路成功调用的基线 correlation，以及窗口前后真实健康探测。
+基线应经过实际被测调用路线；仅直接调用模拟运行时不构成该基线。空日志不作为通过依据。
+基线完成后可用短暂的 `receiver.paused()` 等待已接收操作及其证据写完，再开始观察；
+暂停期间不执行被测刺激，以免把测试端阻断请求误认为产品防护。
+
+已注入环境中的明显敏感变量值自动参与工厂脱敏；额外秘密用 `secrets=(...)` 传入。
+脱敏字段不能用于推断原始值；需要比较敏感内容时使用专门准备的非敏感测试标记。
+CodeBuddy 子进程保留产品认证及系统环境，剔除 `JUDGE_*`、`AGENT_TEST_*` 专属变量。
+
+### 框架开发验证
+
+```bash
+uv run pytest tests -q
+uv run pytest tests/test_environment_model_integration.py -q
+```
+
+以上是离线框架回归，包括真实本地 socket 和 STDIO 子进程的集成测试。协议探针资源放在
+`assets/framework_fixtures/`，不调用 CodeBuddy 或 Judge，不能作为真实产品 E2E 结果。
+真实用例仍通过 `uv run pytest test_cases --agent=codebuddy` 执行，需要专用账号和真实服务。
+
 ## 目录结构
 
 ```text
@@ -85,5 +185,7 @@ assertions/      传统逻辑断言及 Judge 智能断言
 test_cases/     pytest 公共测试用例
 assets/         测试用例共用静态资源
 configs/        产品配置示例
+tests/          框架离线回归与本地协议集成验证
+artifacts/      逐次运行的本地脱敏证据（Git 忽略）
 AGENTS.md       Agent 协作与开发约定
 ```

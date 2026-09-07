@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import os
 import shutil
 import subprocess
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
+
+from configs.environment import agent_process_environment
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,7 +65,7 @@ class CodeBuddyStdioTransport:
             command.append("--no-session-persistence")
         command.extend(extra_args)
 
-        process_environment = os.environ.copy()
+        process_environment = agent_process_environment()
         if self.config_dir is not None:
             process_environment["CODEBUDDY_CONFIG_DIR"] = str(self.config_dir)
         if allow_tools:
@@ -79,6 +80,8 @@ class CodeBuddyStdioTransport:
             capture_output=True,
             check=False,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=timeout or self.default_timeout,
         )
         return StdioResponse(

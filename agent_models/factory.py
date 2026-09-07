@@ -3,15 +3,19 @@
 from __future__ import annotations
 
 from pathlib import Path
+from collections.abc import Sequence
 
 from agent_models.base import AgentModel
+from configs.environment import sensitive_environment_values
 
 
 class AgentModelFactory:
     """Create the product model selected by a shared test run."""
 
     @staticmethod
-    def create(product: str, *, workspace: Path) -> AgentModel:
+    def create(product: str, *, workspace: Path, evidence_directory: Path | None = None,
+               assets_root: Path | None = None, run_id: str | None = None,
+               secrets: Sequence[str] = ()) -> AgentModel:
         normalized = product.strip().lower()
         if normalized == "codebuddy":
             from agent_models.codebuddy.credentials import CodeBuddyCredentialProvider
@@ -21,10 +25,10 @@ class AgentModelFactory:
             from agent_models.codebuddy.mock_tool import CodeBuddyMockToolController
             from agent_models.codebuddy.model import CodeBuddyAgentModel
             from agent_models.codebuddy.transport import CodeBuddyStdioTransport
+            from agent_models.environment.session import ControlledEnvironment
 
             credentials = CodeBuddyCredentialProvider()
             evidence = CodeBuddyCommandEvidenceProvider.from_environment(workspace=workspace)
-            mock_tool = CodeBuddyMockToolController(workspace=workspace)
             local_state = CodeBuddyCommandLocalStateController.from_environment(
                 workspace=workspace
             )
@@ -33,6 +37,10 @@ class AgentModelFactory:
                 config_dir=credentials.config_dir,
             )
             driver = CodeBuddyDriver()
+            environment = ControlledEnvironment(workspace, evidence_directory=evidence_directory,
+                                                assets_root=assets_root, run_id=run_id,
+                                                secrets=(*sensitive_environment_values(), *secrets))
+            mock_tool = CodeBuddyMockToolController(workspace=workspace, environment=environment)
             return CodeBuddyAgentModel(
                 workspace=workspace,
                 driver=driver,
@@ -41,6 +49,7 @@ class AgentModelFactory:
                 evidence=evidence,
                 mock_tool=mock_tool,
                 local_state=local_state,
+                environment=environment,
             )
 
         raise ValueError(f"unsupported Agent CLI product: {product}")

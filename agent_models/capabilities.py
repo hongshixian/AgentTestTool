@@ -16,5 +16,7 @@ class AgentCapabilities:
     # Requires verified public evidence of identity use, data access and auth events.
     security_boundary_observation: bool = False
     mock_tools: bool = False
+    multiple_mock_tools: bool = False
+    controlled_environment: bool = False
     public_identity_context: bool = False
     local_state_control: bool = False
