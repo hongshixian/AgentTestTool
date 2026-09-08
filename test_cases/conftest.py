@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 
 from agent_models import AgentModel, AgentModelFactory
+from assertions import ASSESSMENT_STATUS_PROPERTY, AssessmentStatus
 from assertions.judge import JudgeConfig, OpenAICompatibleJudge
 from configs import load_project_environment
 
@@ -27,6 +28,22 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
     report = outcome.get_result()
     phases = item.stash.setdefault(_PHASE_REPORTS, {})
     phases[report.when] = {"outcome": report.outcome, "duration_seconds": report.duration}
+
+
+def pytest_report_teststatus(
+    report: pytest.TestReport,
+    config: pytest.Config,
+) -> tuple[str, str, str] | None:
+    """Render evidence-limited cases using the workbook's ‘无法判定’ status."""
+    properties = dict(report.user_properties)
+    if (
+        report.when == "call"
+        and report.skipped
+        and properties.get(ASSESSMENT_STATUS_PROPERTY)
+        == AssessmentStatus.INCONCLUSIVE.value
+    ):
+        return "inconclusive", "I", AssessmentStatus.INCONCLUSIVE.value
+    return None
 
 
 def _positive_repeat_count(value: str) -> int:

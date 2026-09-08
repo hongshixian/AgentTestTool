@@ -1,4 +1,4 @@
-"""Verify JSON prompt paths map one-to-one to executable test case modules."""
+"""Verify reviewed prompt paths map one-to-one to test case modules."""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from test_cases.scenarios import cross_identity_replay as s01
 from test_cases.scenarios import instance_id_boundaries as s02
 from test_cases.scenarios import local_instance_state_tampering as s03
 from test_cases.scenarios import natural_language_identity_override as s04
+from test_cases.scenarios import protected_configuration_extraction as configuration
 from test_cases.scenarios import tool_result_identity_injection as s05
 from test_cases.security import SecurityIdentitySettings
 
@@ -37,17 +38,34 @@ EXPECTED_CASES = {
         "ATS-5.1b-D5-02-S03",
         "LOCAL-STATE-02",
     ),
-    "test_cases.test_direct_identity_claim": ("ATS-5.1b-D5-02-S04", "LANGUAGE-01"),
-    "test_cases.test_admin_identity_override": ("ATS-5.1b-D5-02-S04", "LANGUAGE-02"),
-    "test_cases.test_forged_system_identity": ("ATS-5.1b-D5-02-S04", "LANGUAGE-03"),
+    "test_cases.test_direct_identity_claim": ("ATS-5.1b-D5-02-S04", "01"),
+    "test_cases.test_admin_identity_override": ("ATS-5.1b-D5-02-S04", "02"),
+    "test_cases.test_forged_system_identity": ("ATS-5.1b-D5-02-S04", "03"),
     "test_cases.test_text_tool_identity_injection": (
         "ATS-5.1b-D5-02-S05",
-        "TOOL-INJECTION-01",
+        "01",
     ),
     "test_cases.test_structured_tool_identity_injection": (
         "ATS-5.1b-D5-02-S05",
-        "TOOL-INJECTION-02",
+        "02",
     ),
+    "test_cases.test_complete_initial_settings_extraction": ("ATS-6.1b-D5-01-S01", "01"),
+    "test_cases.test_system_prompt_first_200_characters": ("ATS-6.1b-D5-01-S01", "02"),
+    "test_cases.test_verbatim_system_instruction": ("ATS-6.1b-D5-01-S01", "03"),
+    "test_cases.test_complete_tool_json": ("ATS-6.1b-D5-01-S02", "01"),
+    "test_cases.test_internal_identifier_format": ("ATS-6.1b-D5-01-S02", "02"),
+    "test_cases.test_policy_thresholds": ("ATS-6.1b-D5-01-S02", "03"),
+    "test_cases.test_translation_wrapping": ("ATS-6.1b-D5-01-S03", "01"),
+    "test_cases.test_summary_wrapping": ("ATS-6.1b-D5-01-S03", "02"),
+    "test_cases.test_correction_wrapping": ("ATS-6.1b-D5-01-S03", "03"),
+    "test_cases.test_format_conversion_wrapping": ("ATS-6.1b-D5-01-S03", "04"),
+    "test_cases.test_verbatim_repetition_wrapping": ("ATS-6.1b-D5-01-S03", "05"),
+    "test_cases.test_system_prompt_character_fragments": ("ATS-6.1b-D5-01-S04", "01"),
+    "test_cases.test_tool_structure_field_fragments": ("ATS-6.1b-D5-01-S04", "02"),
+    "test_cases.test_internal_configuration_question_fragments": ("ATS-6.1b-D5-01-S04", "03"),
+    "test_cases.test_debug_pretext": ("ATS-6.1b-D5-01-S05", "01"),
+    "test_cases.test_audit_pretext": ("ATS-6.1b-D5-01-S05", "02"),
+    "test_cases.test_compliance_pretext": ("ATS-6.1b-D5-01-S05", "03"),
 }
 
 
@@ -106,7 +124,20 @@ class TestScenarioShapes:
             assert module.TEST_CASE_ID in (case_class.__doc__ or "")
             observed_case_ids.add(module.TEST_CASE_ID)
 
-        assert len(observed_case_ids) == 13
+        assert len(observed_case_ids) == 30
+
+    def test_the_22_supported_paths_have_the_executable_marker(self) -> None:
+        executable_modules = {
+            module_name
+            for module_name, (sample_id, _prompt_id) in EXPECTED_CASES.items()
+            if sample_id.startswith("ATS-6.1b-D5-01-")
+            or sample_id in {"ATS-5.1b-D5-02-S04", "ATS-5.1b-D5-02-S05"}
+        }
+
+        assert len(executable_modules) == 22
+        for module_name in executable_modules:
+            module = importlib.import_module(module_name)
+            assert "executable" in {marker.name for marker in module.pytestmark}
 
     def test_prompt_ids_and_turn_counts(self) -> None:
         settings = SecurityIdentitySettings(
@@ -132,13 +163,17 @@ class TestScenarioShapes:
             "LOCAL-STATE-02",
         ]
         assert [item.prompt_id for item in s04.PROMPT_VARIANTS] == [
-            "LANGUAGE-01",
-            "LANGUAGE-02",
-            "LANGUAGE-03",
+            "01",
+            "02",
+            "03",
         ]
         assert [item.prompt_id for item in s05.VARIANTS] == [
-            "TOOL-INJECTION-01",
-            "TOOL-INJECTION-02",
+            "01",
+            "02",
+        ]
+        assert len(configuration.VARIANTS) == 17
+        assert [len(item.prompts) for item in configuration.VARIANTS.values()] == [
+            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 11, 6, 6, 1, 1, 1
         ]
 
     def test_judge_criterion_counts(self) -> None:
@@ -161,16 +196,6 @@ class TestScenarioShapes:
             )
         for prompt_id in ("LOCAL-STATE-01", "LOCAL-STATE-02"):
             assert (len(s03._pass_criteria(prompt_id)), len(s03._fail_criteria(prompt_id))) == (
-                3,
-                3,
-            )
-        for prompt_id in ("LANGUAGE-01", "LANGUAGE-02", "LANGUAGE-03"):
-            assert (len(s04._pass_criteria(prompt_id)), len(s04._fail_criteria(prompt_id))) == (
-                3,
-                3,
-            )
-        for prompt_id in ("TOOL-INJECTION-01", "TOOL-INJECTION-02"):
-            assert (len(s05._pass_criteria(prompt_id)), len(s05._fail_criteria(prompt_id))) == (
                 3,
                 3,
             )

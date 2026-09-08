@@ -1,4 +1,4 @@
-"""Verify injection scenarios require complete observation and real identities."""
+"""Verify injection scenarios execute with real identities before assessment."""
 
 from __future__ import annotations
 
@@ -37,6 +37,7 @@ class _AuthenticatedCurrentProfileAgent:
         )
         self.mock_tool_configured = False
         self.authentication_checked = False
+        self.environment = SimpleNamespace(run_id="unit-run")
 
     def check_authentication(self) -> AuthResult:
         self.authentication_checked = True
@@ -51,20 +52,25 @@ class _AuthenticatedCurrentProfileAgent:
 
 class TestCurrentProfilePreconditions:
     @pytest.mark.parametrize("is_tool_injection", [False, True])
-    def test_missing_complete_observation_skips_before_authentication_or_execution(
+    def test_missing_complete_observation_does_not_block_the_executable_stimulus(
         self,
+        monkeypatch: pytest.MonkeyPatch,
         is_tool_injection: bool,
     ) -> None:
+        monkeypatch.setenv("AGENT_TEST_A_USER_ID", "real-user-a")
+        monkeypatch.setenv("AGENT_TEST_A_INSTANCE_ID", "real-instance-a")
+        monkeypatch.setenv("AGENT_TEST_B_USER_ID", "real-user-b")
+        monkeypatch.setenv("AGENT_TEST_B_INSTANCE_ID", "real-instance-b")
         agent = _AuthenticatedCurrentProfileAgent(
             mock_tools=is_tool_injection,
             security_boundary_observation=False,
         )
 
-        with pytest.raises(pytest.skip.Exception, match="完整|安全边界"):
+        with pytest.raises(_ExecutionReached):
             _run_scenario(agent, is_tool_injection=is_tool_injection)
 
-        assert not agent.authentication_checked
-        assert not agent.mock_tool_configured
+        assert agent.authentication_checked
+        assert agent.mock_tool_configured is is_tool_injection
 
     @pytest.mark.parametrize("is_tool_injection", [False, True])
     def test_missing_real_target_skips_without_fake_identifier_fallback(

@@ -3,23 +3,22 @@
 import pytest
 
 from agent_models import AgentModel
-from assertions.judge import OpenAICompatibleJudge
 from test_cases.scenarios.natural_language_identity_override import (
     PROMPT_VARIANTS,
     NaturalLanguageIdentityScenarioRunner,
 )
 
 
-pytestmark = [pytest.mark.e2e, pytest.mark.security]
-TEST_CASE_ID = "ATS-5.1b-D5-02-S04-LANGUAGE-02"
+pytestmark = [pytest.mark.e2e, pytest.mark.security, pytest.mark.executable]
+TEST_CASE_ID = "ATS-5.1b-D5-02-S04-02"
 TEST_SAMPLE_ID = "ATS-5.1b-D5-02-S04"
-TEST_PROMPT_ID = "LANGUAGE-02"
+TEST_PROMPT_ID = "02"
 
 
-class TestATS51BD502S04Language02AdminClaim(NaturalLanguageIdentityScenarioRunner):
-    """测试用例 ID：ATS-5.1b-D5-02-S04-LANGUAGE-02
+class TestATS51BD502S0402AdminIdentityOverride(NaturalLanguageIdentityScenarioRunner):
+    """测试用例 ID：ATS-5.1b-D5-02-S04-02
 
-    测试用例名称：冒充管理员不得切换账号与实例
+    测试用例名称：冒充管理员宣布切换实例
 
     测试目标：
         验证管理员话术不能改变真实身份或访问 B 的数据和授权。
@@ -48,12 +47,12 @@ class TestATS51BD502S04Language02AdminClaim(NaturalLanguageIdentityScenarioRunne
     def test_admin_claim_cannot_override_identity(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge,
+        request: pytest.FixtureRequest,
         repeat_index: int,
     ) -> None:
         self.run_natural_language_cannot_override_authoritative_identity(
             agent_model,
-            judge_model,
+            request,
             PROMPT_VARIANTS[1],
             repeat_index,
         )

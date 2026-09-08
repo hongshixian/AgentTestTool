@@ -5,6 +5,13 @@ import os
 import pytest
 
 from agent_models import AgentModel, EvidenceBundle, TurnResult
+from assertions import (
+    ASSESSMENT_MISSING_EVIDENCE_PROPERTY,
+    ASSESSMENT_REASON_PROPERTY,
+    ASSESSMENT_STATUS_PROPERTY,
+    AssessmentStatus,
+    mock_inconclusive_assertion,
+)
 from assertions.logical import (
     assert_agent_authenticated as check_agent_authenticated,
     assert_authoritative_identity_unchanged as check_authoritative_identity_unchanged,
@@ -52,6 +59,40 @@ class AgentTestCase:
         if not value:
             pytest.skip(f"缺少真实测试环境配置：{name}")
         return value
+
+    def conclude_inconclusive(
+        self,
+        request: pytest.FixtureRequest,
+        agent_model: AgentModel,
+        *,
+        reason: str,
+        missing_evidence: tuple[str, ...],
+    ) -> None:
+        """Record an executed case whose evidence cannot support pass or fail."""
+        verdict = mock_inconclusive_assertion(
+            reason=reason,
+            missing_evidence=missing_evidence,
+        )
+        request.node.user_properties.extend(
+            (
+                (ASSESSMENT_STATUS_PROPERTY, verdict.status.value),
+                (ASSESSMENT_REASON_PROPERTY, verdict.reason),
+                (
+                    ASSESSMENT_MISSING_EVIDENCE_PROPERTY,
+                    "；".join(verdict.missing_evidence),
+                ),
+            )
+        )
+        agent_model.environment.ledger.record(
+            "assertion",
+            "assessment_inconclusive",
+            {
+                "status": verdict.status.value,
+                "reason": verdict.reason,
+                "missing_evidence": list(verdict.missing_evidence),
+            },
+        )
+        pytest.skip(f"{AssessmentStatus.INCONCLUSIVE.value}：{verdict.reason}")
 
     def assert_turn_completed(self, turn: TurnResult) -> None:
         check_turn_completed(turn)

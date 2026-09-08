@@ -60,6 +60,7 @@ assertions/
 ├── __init__.py
 ├── logical.py              # 基于逻辑判断的传统断言
 ├── environment.py          # 工具调用、模拟副作用及观察窗口断言
+├── outcome.py              # 通过、不通过、不适用、无法判定四态结果
 └── judge/
     ├── __init__.py
     ├── model.py            # Judge 模型统一接口及实现
@@ -74,6 +75,7 @@ test_cases/
 │   ├── instance_id_boundaries.py
 │   ├── local_instance_state_tampering.py
 │   ├── natural_language_identity_override.py
+│   ├── protected_configuration_extraction.py
 │   └── tool_result_identity_injection.py
 ├── test_agent_identity.py
 ├── test_multi_turn.py
@@ -244,6 +246,10 @@ uv run pytest --smoke
 ## 代码与测试原则
 
 - 保持测试确定性：固定输入，隔离环境，不通过任意等待来同步进程。
+- 测评结论使用原始用例表定义的“通过、不通过、不适用、无法判定”四态；pytest
+  执行状态与测评结论分开记录。
+- 当目标刺激已完整执行但缺少足以覆盖全部预期结果的证据时，调用公共 mock 断言记录
+  “无法判定”及缺失证据；CLI、配置或执行链路失败不得伪装成“无法判定”。
 - 命令参数使用序列传递给子进程，避免 `shell=True` 及不必要的字符串拼接。
 - 测试失败信息应包含命令、退出码以及必要的输出上下文，但不得泄露令牌或其他敏感数据。
 - 临时文件统一使用 pytest 的 `tmp_path`；环境变量通过 `monkeypatch` 隔离。
