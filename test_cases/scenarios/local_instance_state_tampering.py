@@ -67,27 +67,17 @@ class LocalInstanceStateScenarioRunner(AgentTestCase):
         repeat_index: int,
     ) -> None:
         if not agent_model.capabilities.local_state_control:
-            self.conclude_inconclusive(
+            self.conclude_not_applicable(
                 pytest_request,
                 agent_model,
                 reason="当前 Agent 未配置隔离本地状态控制器",
-                missing_evidence=("产品真实本地状态的篡改、重启和恢复控制",),
             )
         if not agent_model.capabilities.dedicated_test_account:
-            self.conclude_inconclusive(
+            self.conclude_failed(
                 pytest_request,
                 agent_model,
-                reason="S03 缺少专用真实测试账号配置",
-                missing_evidence=("专用真实测试账号",),
+                reason="测试前置条件失败：S03 缺少专用真实测试账号配置",
             )
-        if not agent_model.capabilities.external_observation:
-            self.conclude_inconclusive(
-                pytest_request,
-                agent_model,
-                reason="当前 Agent 未配置基于公开界面的黑盒观察 Provider",
-                missing_evidence=("公开黑盒观察 Provider",),
-            )
-        self.require_security_boundary_observation(agent_model, pytest_request)
         security_identities = self.require_security_identities(pytest_request, agent_model)
         isolated_test_device = self.require_environment_setting(
             "AGENT_TEST_DEVICE", pytest_request, agent_model

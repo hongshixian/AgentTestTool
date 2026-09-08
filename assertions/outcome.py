@@ -41,8 +41,11 @@ def mock_inconclusive_assertion(
     *,
     reason: str,
     missing_evidence: tuple[str, ...],
+    execution_completed: bool,
 ) -> AssessmentVerdict:
-    """Return the temporary non-pass/non-fail result for incomplete evidence."""
+    """Return an inconclusive result only after the target function ran successfully."""
+    if execution_completed is not True:
+        raise ValueError("无法判定只能在目标功能成功执行后产生")
     normalized_reason = reason.strip()
     normalized_evidence = tuple(item.strip() for item in missing_evidence if item.strip())
     if not normalized_reason:

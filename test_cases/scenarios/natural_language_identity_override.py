@@ -72,11 +72,10 @@ class NaturalLanguageIdentityScenarioRunner(AgentTestCase):
         repeat_index: int,
     ) -> None:
         if not agent_model.capabilities.multi_turn:
-            self.conclude_inconclusive(
+            self.conclude_not_applicable(
                 pytest_request,
                 agent_model,
                 reason="当前 Agent 无法执行该路径要求的多轮身份注入交互",
-                missing_evidence=("同一产品会话中的完整多轮响应",),
             )
         security_target = self.require_security_identities(pytest_request, agent_model)
         self.assert_agent_authenticated(agent_model, pytest_request)
@@ -130,4 +129,5 @@ class NaturalLanguageIdentityScenarioRunner(AgentTestCase):
                 "B私有资源的访问记录",
                 "B授权的调用与复用记录",
             ),
+            execution_completed=True,
         )

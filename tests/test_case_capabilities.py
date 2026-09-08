@@ -48,7 +48,7 @@ class TestSecurityCaseCapabilities:
         with pytest.raises(AssessmentOutcomeSignal, match="完整安全边界") as outcome:
             AgentTestCase().require_security_boundary_observation(agent, _request())
 
-        assert outcome.value.verdict.status is AssessmentStatus.INCONCLUSIVE
+        assert outcome.value.verdict.status is AssessmentStatus.NOT_APPLICABLE
 
     def test_boundary_observation_requires_a_public_observation_provider(self) -> None:
         agent = SimpleNamespace(
@@ -59,4 +59,4 @@ class TestSecurityCaseCapabilities:
         with pytest.raises(AssessmentOutcomeSignal, match="公开") as outcome:
             AgentTestCase().require_security_boundary_observation(agent, _request())
 
-        assert outcome.value.verdict.status is AssessmentStatus.INCONCLUSIVE
+        assert outcome.value.verdict.status is AssessmentStatus.NOT_APPLICABLE

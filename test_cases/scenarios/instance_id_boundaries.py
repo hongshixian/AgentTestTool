@@ -64,27 +64,17 @@ class InstanceIdBoundaryScenarioRunner(AgentTestCase):
         repeat_index: int,
     ) -> None:
         if not agent_model.capabilities.public_identity_context:
-            self.conclude_inconclusive(
+            self.conclude_not_applicable(
                 pytest_request,
                 agent_model,
                 reason="当前 Agent CLI 未公开实例身份上下文选择能力",
-                missing_evidence=("可控的真实实例请求字段",),
             )
         if not agent_model.capabilities.dedicated_test_account:
-            self.conclude_inconclusive(
+            self.conclude_failed(
                 pytest_request,
                 agent_model,
-                reason="S02 缺少专用真实测试账号配置",
-                missing_evidence=("专用真实测试账号",),
+                reason="测试前置条件失败：S02 缺少专用真实测试账号配置",
             )
-        if not agent_model.capabilities.external_observation:
-            self.conclude_inconclusive(
-                pytest_request,
-                agent_model,
-                reason="当前 Agent 未配置基于公开界面的黑盒观察 Provider",
-                missing_evidence=("公开黑盒观察 Provider",),
-            )
-        self.require_security_boundary_observation(agent_model, pytest_request)
         security_identities = self.require_security_identities(pytest_request, agent_model)
         self.assert_agent_authenticated(agent_model, pytest_request)
 

@@ -1,4 +1,4 @@
-"""Verify context scenarios require complete observations before interaction."""
+"""Verify context scenarios distinguish execution prerequisites from evidence."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from test_cases.scenarios import local_instance_state_tampering as s03
 from test_cases.security import SecurityIdentitySettings
 
 
-class _BoundaryCheckReached(RuntimeError):
+class _IdentityCheckReached(RuntimeError):
     pass
 
 
@@ -28,7 +28,7 @@ class TestContextRequirements:
             *(("local", variant) for variant in s03.VARIANTS),
         ],
     )
-    def test_complete_observation_is_checked_before_identity_or_interaction(
+    def test_assertion_observation_does_not_block_execution_preconditions(
         self,
         monkeypatch: pytest.MonkeyPatch,
         scenario: str,
@@ -53,22 +53,22 @@ class TestContextRequirements:
             runner = s03.LocalInstanceStateScenarioRunner()
             execute = runner.run_local_instance_tampering_is_detected_and_restored
 
-        def require_boundary_observation(model: object, request: object) -> None:
-            assert model is agent
-            raise _BoundaryCheckReached
+        def reject_early_boundary_observation(model: object, request: object) -> None:
+            pytest.fail("仅用于断言的观察能力不得阻止功能触发")
 
-        def reject_early_identity_read(request: object, model: object) -> None:
-            pytest.fail("身份配置读取前必须先判断完整安全观察能力")
+        def require_identities(request: object, model: object) -> None:
+            assert model is agent
+            raise _IdentityCheckReached
 
         monkeypatch.setattr(
             runner,
             "require_security_boundary_observation",
-            require_boundary_observation,
+            reject_early_boundary_observation,
             raising=False,
         )
-        monkeypatch.setattr(runner, "require_security_identities", reject_early_identity_read)
+        monkeypatch.setattr(runner, "require_security_identities", require_identities)
 
-        with pytest.raises(_BoundaryCheckReached):
+        with pytest.raises(_IdentityCheckReached):
             execute(agent, None, object(), variant, 1)
 
     def test_cross_identity_prompts_do_not_disclose_the_private_marker(self) -> None:

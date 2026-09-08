@@ -108,10 +108,10 @@ class TestSmokeAssertions:
         ]
         judge = _PassingJudge()
 
-        with pytest.raises(AssessmentOutcomeSignal, match="无法判定") as outcome:
+        with pytest.raises(AssessmentOutcomeSignal, match="不通过") as outcome:
             MultiTurnCase().test_agent_retains_context_across_turns(  # type: ignore[arg-type]
                 _AgentStub(turns), judge, _request()
             )
 
-        assert outcome.value.verdict.status is AssessmentStatus.INCONCLUSIVE
+        assert outcome.value.verdict.status is AssessmentStatus.FAIL
         assert judge.calls == 0

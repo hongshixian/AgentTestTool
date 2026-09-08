@@ -17,6 +17,7 @@ from assertions import (
     ASSESSMENT_STATUS_PROPERTY,
     AssessmentOutcomeSignal,
     AssessmentStatus,
+    assessment_verdict,
 )
 from assertions.judge import JudgeConfig, OpenAICompatibleJudge
 from configs import load_project_environment
@@ -27,24 +28,89 @@ load_project_environment()
 _PHASE_REPORTS: pytest.StashKey[dict[str, dict[str, object]]] = pytest.StashKey()
 
 
+def _replace_report_property(
+    properties: list[tuple[str, object]],
+    name: str,
+    value: object,
+) -> None:
+    """Set one report property without retaining a contradictory older value."""
+    properties[:] = [(key, item) for key, item in properties if key != name]
+    properties.append((name, value))
+
+
+def _set_assessment_properties(
+    properties: list[tuple[str, object]],
+    *,
+    status: AssessmentStatus,
+    reason: str,
+    missing_evidence: tuple[str, ...] = (),
+) -> None:
+    _replace_report_property(properties, ASSESSMENT_STATUS_PROPERTY, status.value)
+    _replace_report_property(properties, ASSESSMENT_REASON_PROPERTY, reason)
+    _replace_report_property(
+        properties,
+        ASSESSMENT_MISSING_EVIDENCE_PROPERTY,
+        "；".join(missing_evidence),
+    )
+
+
+def _is_public_e2e_item(item: pytest.Item) -> bool:
+    """Limit automatic assessment-failure mapping to public E2E test cases."""
+    if "e2e" not in getattr(item, "keywords", {}):
+        return False
+    item_path = getattr(item, "path", None)
+    if item_path is None:
+        return False
+    try:
+        return Path(item_path).resolve().is_relative_to(Path(__file__).resolve().parent)
+    except (OSError, TypeError, ValueError):
+        return False
+
+
+def _apply_unhandled_e2e_failure(
+    item: pytest.Item,
+    report: pytest.TestReport,
+    call: pytest.CallInfo | None,
+) -> None:
+    """Attach a FAIL assessment while preserving pytest's original error report."""
+    phase_names = {"setup": "前置条件", "call": "执行或断言", "teardown": "fixture 清理"}
+    excinfo = getattr(call, "excinfo", None)
+    error = getattr(excinfo, "value", None)
+    error_type = type(error).__name__ if error is not None else "pytest failure"
+    verdict = assessment_verdict(
+        AssessmentStatus.FAIL,
+        reason=f"{phase_names.get(report.when, report.when)}阶段发生未处理失败（{error_type}）",
+    )
+    report_properties = getattr(report, "user_properties", None)
+    if report_properties is None:
+        report_properties = []
+        report.user_properties = report_properties
+    _set_assessment_properties(
+        report_properties,
+        status=verdict.status,
+        reason=verdict.reason,
+    )
+    item_properties = getattr(item, "user_properties", None)
+    if item_properties is not None and item_properties is not report_properties:
+        _set_assessment_properties(
+            item_properties,
+            status=verdict.status,
+            reason=verdict.reason,
+        )
+
+
 def _apply_assessment_signal(
     report: pytest.TestReport,
     signal: AssessmentOutcomeSignal,
 ) -> None:
     """Encode one explicit assessment assertion without using pytest skip."""
     verdict = signal.verdict
-    existing = dict(report.user_properties)
-    if ASSESSMENT_STATUS_PROPERTY not in existing:
-        report.user_properties.append((ASSESSMENT_STATUS_PROPERTY, verdict.status.value))
-    if ASSESSMENT_REASON_PROPERTY not in existing:
-        report.user_properties.append((ASSESSMENT_REASON_PROPERTY, verdict.reason))
-    if ASSESSMENT_MISSING_EVIDENCE_PROPERTY not in existing:
-        report.user_properties.append(
-            (
-                ASSESSMENT_MISSING_EVIDENCE_PROPERTY,
-                "；".join(verdict.missing_evidence),
-            )
-        )
+    _set_assessment_properties(
+        report.user_properties,
+        status=verdict.status,
+        reason=verdict.reason,
+        missing_evidence=verdict.missing_evidence,
+    )
     report.outcome = "failed" if verdict.status is AssessmentStatus.FAIL else "passed"
     report.longrepr = (
         f"{verdict.status.value}：{verdict.reason}"
@@ -62,6 +128,8 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
     signal = excinfo.value if excinfo is not None else None
     if isinstance(signal, AssessmentOutcomeSignal):
         _apply_assessment_signal(report, signal)
+    elif report.outcome == "failed" and _is_public_e2e_item(item):
+        _apply_unhandled_e2e_failure(item, report, call)
     report_properties = getattr(report, "user_properties", item.user_properties)
     phases = item.stash.setdefault(_PHASE_REPORTS, {})
     phases[report.when] = {
@@ -79,9 +147,9 @@ def pytest_report_teststatus(
 ) -> tuple[str, str, str] | None:
     """Render explicit assessment assertions using the workbook's four states."""
     properties = dict(report.user_properties)
-    if report.when != "call":
-        return None
     status_value = properties.get(ASSESSMENT_STATUS_PROPERTY)
+    if report.when != "call" and status_value != AssessmentStatus.FAIL.value:
+        return None
     statuses = {
         AssessmentStatus.PASS.value: ("assessment_passed", ".", AssessmentStatus.PASS.value),
         AssessmentStatus.FAIL.value: ("assessment_failed", "F", AssessmentStatus.FAIL.value),

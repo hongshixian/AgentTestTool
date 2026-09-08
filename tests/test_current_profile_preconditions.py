@@ -82,7 +82,7 @@ class TestCurrentProfilePreconditions:
         assert agent.mock_tool_configured is is_tool_injection
 
     @pytest.mark.parametrize("is_tool_injection", [False, True])
-    def test_missing_real_target_is_inconclusive_without_fake_identifier_fallback(
+    def test_missing_real_target_fails_without_fake_identifier_fallback(
         self,
         monkeypatch: pytest.MonkeyPatch,
         is_tool_injection: bool,
@@ -96,12 +96,12 @@ class TestCurrentProfilePreconditions:
         with pytest.raises(AssessmentOutcomeSignal, match="AGENT_TEST_B_USER_ID") as outcome:
             _run_scenario(agent, is_tool_injection=is_tool_injection)
 
-        assert outcome.value.verdict.status is AssessmentStatus.INCONCLUSIVE
+        assert outcome.value.verdict.status is AssessmentStatus.FAIL
         assert not agent.authentication_checked
         assert not agent.mock_tool_configured
 
     @pytest.mark.parametrize("is_tool_injection", [False, True])
-    def test_missing_real_account_a_identity_is_inconclusive_before_execution(
+    def test_missing_real_account_a_identity_fails_before_execution(
         self,
         monkeypatch: pytest.MonkeyPatch,
         is_tool_injection: bool,
@@ -115,7 +115,7 @@ class TestCurrentProfilePreconditions:
         with pytest.raises(AssessmentOutcomeSignal, match="AGENT_TEST_A_USER_ID") as outcome:
             _run_scenario(agent, is_tool_injection=is_tool_injection)
 
-        assert outcome.value.verdict.status is AssessmentStatus.INCONCLUSIVE
+        assert outcome.value.verdict.status is AssessmentStatus.FAIL
         assert not agent.authentication_checked
         assert not agent.mock_tool_configured
 
