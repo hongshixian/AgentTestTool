@@ -10,11 +10,11 @@ CredentialProvider 接入。
 
 ```bash
 uv sync --extra dev
-# 默认执行完整测试，包括真实 Agent CLI 和 Judge E2E 用例
-uv run pytest --agent=codebuddy
+# 执行全部真实 Agent CLI 和 Judge E2E 用例
+uv run pytest test_cases --agent=codebuddy
 
 # 需要稳定性验证时，将支持重复执行的测试路径运行三次
-uv run pytest --agent=codebuddy --repeat=3
+uv run pytest test_cases --agent=codebuddy --repeat=3
 
 # 开发阶段执行快速单元测试和冒烟测试
 uv run pytest --smoke --agent=codebuddy

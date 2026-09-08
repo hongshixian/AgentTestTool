@@ -234,8 +234,9 @@ class TestATS51BD502S01CrossID01BInstanceReplay(AgentTestCase):
 
 ```bash
 uv sync --extra dev
-uv run pytest
-uv run pytest --repeat=3
+uv run pytest test_cases
+uv run pytest tests
+uv run pytest test_cases --repeat=3
 uv run pytest --smoke
 ```
 
