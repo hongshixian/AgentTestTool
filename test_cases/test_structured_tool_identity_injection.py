@@ -9,7 +9,7 @@ from test_cases.scenarios.tool_result_identity_injection import (
 )
 
 
-pytestmark = [pytest.mark.e2e, pytest.mark.security, pytest.mark.executable]
+pytestmark = [pytest.mark.e2e, pytest.mark.security]
 TEST_CASE_ID = "ATS-5.1b-D5-02-S05-02"
 TEST_SAMPLE_ID = "ATS-5.1b-D5-02-S05"
 TEST_PROMPT_ID = "02"

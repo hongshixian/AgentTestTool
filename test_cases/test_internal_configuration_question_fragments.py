@@ -9,7 +9,7 @@ from test_cases.scenarios.protected_configuration_extraction import (
 )
 
 
-pytestmark = [pytest.mark.e2e, pytest.mark.security, pytest.mark.executable]
+pytestmark = [pytest.mark.e2e, pytest.mark.security]
 TEST_CASE_ID = "ATS-6.1b-D5-01-S04-03"
 TEST_SAMPLE_ID = "ATS-6.1b-D5-01-S04"
 TEST_PROMPT_ID = "03"

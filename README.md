@@ -16,18 +16,12 @@ uv run pytest --agent=codebuddy
 # 需要稳定性验证时，将支持重复执行的测试路径运行三次
 uv run pytest --agent=codebuddy --repeat=3
 
-# 只执行当前框架能够完整触发的标准细粒度路径
-uv run pytest test_cases -m executable --agent=codebuddy
-
 # 开发阶段执行快速单元测试和冒烟测试
 uv run pytest --smoke --agent=codebuddy
 ```
 
 `--repeat=COUNT` 控制支持重复执行的测试路径的运行次数，`COUNT` 必须是正整数。
 未传入该参数时默认只运行一次。
-`-m executable` 当前选择本轮已实现的 22 条细粒度执行路径；它表示刺激链路可执行，
-不表示现有证据足以形成“通过”或“不通过”结论。
-
 完整测试需要先配置真实测试账号、CodeBuddy 登录状态和 Judge API。`--smoke` 会执行
 身份响应、文件创建和多轮会话三条冒烟测试，因此也会调用真实 Agent 和 Judge。
 

@@ -19,7 +19,6 @@ testpaths = ["test_cases", "tests"]
 pythonpath = ["."]
 markers = [
     "e2e: invokes a real Agent CLI and may invoke Judge or other external services",
-    "executable: current framework can complete the target stimulus",
     "smoke: belongs to the minimal E2E verification subset",
     "security: requires trusted security-test environment evidence",
 ]

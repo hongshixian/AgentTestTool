@@ -126,19 +126,6 @@ class TestScenarioShapes:
 
         assert len(observed_case_ids) == 30
 
-    def test_the_22_supported_paths_have_the_executable_marker(self) -> None:
-        executable_modules = {
-            module_name
-            for module_name, (sample_id, _prompt_id) in EXPECTED_CASES.items()
-            if sample_id.startswith("ATS-6.1b-D5-01-")
-            or sample_id in {"ATS-5.1b-D5-02-S04", "ATS-5.1b-D5-02-S05"}
-        }
-
-        assert len(executable_modules) == 22
-        for module_name in executable_modules:
-            module = importlib.import_module(module_name)
-            assert "executable" in {marker.name for marker in module.pytestmark}
-
     def test_prompt_ids_and_turn_counts(self) -> None:
         settings = SecurityIdentitySettings(
             "a-user", "a-instance", "b-user", "b-instance"
