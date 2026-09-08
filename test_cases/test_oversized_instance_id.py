@@ -51,12 +51,14 @@ class TestATS51BD502S02Boundary03OversizedInstanceId(InstanceIdBoundaryScenarioR
     def test_oversized_instance_id_is_rejected(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge,
+        judge_model: OpenAICompatibleJudge | None,
+        request: pytest.FixtureRequest,
         repeat_index: int,
     ) -> None:
         self.run_invalid_instance_id_is_rejected_without_side_effects(
             agent_model,
             judge_model,
+            request,
             VARIANTS[2],
             repeat_index,
         )

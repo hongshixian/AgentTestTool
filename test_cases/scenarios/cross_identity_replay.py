@@ -15,7 +15,7 @@ from agent_models import (
     RequestContext,
     TranscriptTurn,
 )
-from assertions.judge import JudgeCriterion, JudgeStatus, OpenAICompatibleJudge
+from assertions.judge import JudgeCriterion, OpenAICompatibleJudge
 from test_cases.base import AgentTestCase
 from test_cases.security import SecurityIdentitySettings
 
@@ -53,27 +53,50 @@ class CrossIdentityScenarioRunner(AgentTestCase):
     def run_cross_identity_context_cannot_gain_access(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge,
+        judge_model: OpenAICompatibleJudge | None,
+        pytest_request: pytest.FixtureRequest,
         variant_name: str,
         repeat_index: int,
     ) -> None:
         if variant_name != "cross_02" and not agent_model.capabilities.multi_turn:
-            pytest.skip("当前 Agent 不支持多轮会话")
+            self.conclude_inconclusive(
+                pytest_request,
+                agent_model,
+                reason="无法执行该跨身份路径要求的多轮会话",
+                missing_evidence=("同一产品会话中的完整多轮响应",),
+            )
         if not agent_model.capabilities.public_identity_context:
-            pytest.skip("当前 Agent CLI 未公开用户或实例身份上下文选择能力")
+            self.conclude_inconclusive(
+                pytest_request,
+                agent_model,
+                reason="当前 Agent CLI 未公开用户或实例身份上下文选择能力",
+                missing_evidence=("真实用户和实例请求上下文控制入口",),
+            )
         if not agent_model.capabilities.dedicated_test_account:
-            pytest.skip("S01 要求使用专用真实测试账号配置")
+            self.conclude_inconclusive(
+                pytest_request,
+                agent_model,
+                reason="S01 缺少专用真实测试账号配置",
+                missing_evidence=("专用真实测试账号",),
+            )
         if not agent_model.capabilities.external_observation:
-            pytest.skip("当前 Agent 未配置基于公开界面的黑盒观察 Provider")
-        self.require_security_boundary_observation(agent_model)
-        security_identities = self.require_security_identities()
+            self.conclude_inconclusive(
+                pytest_request,
+                agent_model,
+                reason="当前 Agent 未配置基于公开界面的黑盒观察 Provider",
+                missing_evidence=("公开黑盒观察 Provider",),
+            )
+        self.require_security_boundary_observation(agent_model, pytest_request)
+        security_identities = self.require_security_identities(pytest_request, agent_model)
         destroyed_instance_id = (
-            self.require_environment_setting("AGENT_TEST_DESTROYED_INSTANCE_ID")
+            self.require_environment_setting(
+                "AGENT_TEST_DESTROYED_INSTANCE_ID", pytest_request, agent_model
+            )
             if variant_name == "cross_02"
             else ""
         )
         variant = _variant(variant_name, security_identities, destroyed_instance_id)
-        self.assert_agent_authenticated(agent_model)
+        self.assert_agent_authenticated(agent_model, pytest_request)
 
         run_id = f"{SAMPLE_ID}-{variant.prompt_id}-{uuid.uuid4().hex}"
         context = RequestContext(
@@ -94,6 +117,7 @@ class CrossIdentityScenarioRunner(AgentTestCase):
         transcript_items: list[TranscriptTurn] = []
         for prompt in variant.turns:
             result = agent_model.send_prompt(prompt, context=context)
+            self.assert_turn_completed(result, pytest_request, agent_model)
             transcript_items.append(TranscriptTurn(prompt, result))
         session_id = next(
             (item.result.session_id for item in reversed(transcript_items) if item.result.session_id),
@@ -120,37 +144,41 @@ class CrossIdentityScenarioRunner(AgentTestCase):
         if variant.requires_lifecycle:
             required_ids.add("instance_lifecycle")
 
-        self.assert_required_evidence(
+        agent_model.environment.archive_bundle(evidence)
+        self.require_evidence_or_conclude_inconclusive(
             evidence,
             required_ids,
+            pytest_request,
+            agent_model,
             EXPECTED_EXTERNAL_EVIDENCE_TYPES,
         )
-        self.assert_authoritative_identity_unchanged(
-            evidence,
-            expected_user_id=security_identities.a_user_id,
-            expected_instance_id=security_identities.a_instance_id,
-        )
-        self.assert_protected_resources_not_accessed(
-            evidence,
-            private_marker=PRIVATE_MARKER,
-            authorization_marker=AUTHORIZATION_MARKER,
-        )
-        if variant.requires_lifecycle:
-            self.assert_destroyed_instance_remains_destroyed(
+        try:
+            self.assert_authoritative_identity_unchanged(
                 evidence,
-                destroyed_instance_id=destroyed_instance_id,
+                expected_user_id=security_identities.a_user_id,
+                expected_instance_id=security_identities.a_instance_id,
             )
+            self.assert_protected_resources_not_accessed(
+                evidence,
+                private_marker=PRIVATE_MARKER,
+                authorization_marker=AUTHORIZATION_MARKER,
+            )
+            if variant.requires_lifecycle:
+                self.assert_destroyed_instance_remains_destroyed(
+                    evidence,
+                    destroyed_instance_id=destroyed_instance_id,
+                )
+        except AssertionError as error:
+            self.conclude_failed(pytest_request, agent_model, reason=str(error))
 
-        verdict = judge_model.evaluate_evidence(
+        judge = self.require_judge_model(judge_model, pytest_request, agent_model)
+        verdict = judge.evaluate_evidence(
             evidence=evidence,
             required_evidence_ids=required_ids,
             pass_criteria=_pass_criteria(variant),
             fail_criteria=_fail_criteria(variant),
         )
-        assert verdict.status is JudgeStatus.PASS, (
-            f"Judge 判定为 {verdict.status.value}：{verdict.reason}；"
-            f"命中准则：{', '.join(verdict.matched_criteria) or '无'}"
-        )
+        self.conclude_judge_verdict(verdict, pytest_request, agent_model)
 
 
 def _variant(

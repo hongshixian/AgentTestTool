@@ -16,7 +16,9 @@ from assertions.outcome import (
     ASSESSMENT_REASON_PROPERTY,
     ASSESSMENT_STATUS_PROPERTY,
     AssessmentStatus,
+    AssessmentOutcomeSignal,
     AssessmentVerdict,
+    assessment_verdict,
     mock_inconclusive_assertion,
 )
 
@@ -25,7 +27,9 @@ __all__ = [
     "ASSESSMENT_REASON_PROPERTY",
     "ASSESSMENT_STATUS_PROPERTY",
     "AssessmentStatus",
+    "AssessmentOutcomeSignal",
     "AssessmentVerdict",
+    "assessment_verdict",
     "assert_agent_authenticated",
     "assert_authoritative_identity_unchanged",
     "assert_destroyed_instance_remains_destroyed",

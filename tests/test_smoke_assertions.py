@@ -1,13 +1,20 @@
 """Verify deterministic checks in the multi-turn smoke case."""
 
 from dataclasses import dataclass, field
+from types import SimpleNamespace
 
 import pytest
 
 from agent_models.capabilities import AgentCapabilities
 from agent_models.result import AuthResult, AuthStatus, TurnResult
+from assertions import AssessmentOutcomeSignal, AssessmentStatus
 from assertions.judge.result import JudgeStatus, JudgeVerdict
 from test_cases.test_multi_turn import TestATS00XD200S01MultiTurn as MultiTurnCase
+
+
+class _Ledger:
+    def record(self, source: str, kind: str, data: object) -> None:
+        pass
 
 
 @dataclass
@@ -16,6 +23,9 @@ class _AgentStub:
     prompts: list[str] = field(default_factory=list)
     capabilities: AgentCapabilities = field(
         default_factory=lambda: AgentCapabilities(multi_turn=True)
+    )
+    environment: object = field(
+        default_factory=lambda: SimpleNamespace(ledger=_Ledger())
     )
 
     def check_authentication(self) -> AuthResult:
@@ -47,6 +57,10 @@ def _turn(response: str, *, completed: bool = True) -> TurnResult:
     )
 
 
+def _request() -> SimpleNamespace:
+    return SimpleNamespace(node=SimpleNamespace(user_properties=[]))
+
+
 class TestSmokeAssertions:
     @pytest.mark.parametrize(
         "response",
@@ -58,9 +72,12 @@ class TestSmokeAssertions:
         agent = _AgentStub([_turn("已记住"), _turn(response)])
         judge = _PassingJudge()
 
-        with pytest.raises(AssertionError, match="验证码"):
-            MultiTurnCase().test_agent_retains_context_across_turns(agent, judge)  # type: ignore[arg-type]
+        with pytest.raises(AssessmentOutcomeSignal, match="不通过.*验证码") as outcome:
+            MultiTurnCase().test_agent_retains_context_across_turns(  # type: ignore[arg-type]
+                agent, judge, _request()
+            )
 
+        assert outcome.value.verdict.status is AssessmentStatus.FAIL
         assert judge.calls == 0
 
     @pytest.mark.parametrize("response", ["K7M4-Q2P9", " \nK7M4-Q2P9\n "])
@@ -70,8 +87,12 @@ class TestSmokeAssertions:
         agent = _AgentStub([_turn("已记住"), _turn(response)])
         judge = _PassingJudge()
 
-        MultiTurnCase().test_agent_retains_context_across_turns(agent, judge)  # type: ignore[arg-type]
+        with pytest.raises(AssessmentOutcomeSignal, match="通过") as outcome:
+            MultiTurnCase().test_agent_retains_context_across_turns(  # type: ignore[arg-type]
+                agent, judge, _request()
+            )
 
+        assert outcome.value.verdict.status is AssessmentStatus.PASS
         assert len(agent.prompts) == 2
         assert "K7M4-Q2P9" in agent.prompts[0]
         assert "K7M4-Q2P9" not in agent.prompts[1]
@@ -87,9 +108,10 @@ class TestSmokeAssertions:
         ]
         judge = _PassingJudge()
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(AssessmentOutcomeSignal, match="无法判定") as outcome:
             MultiTurnCase().test_agent_retains_context_across_turns(  # type: ignore[arg-type]
-                _AgentStub(turns), judge
+                _AgentStub(turns), judge, _request()
             )
 
+        assert outcome.value.verdict.status is AssessmentStatus.INCONCLUSIVE
         assert judge.calls == 0

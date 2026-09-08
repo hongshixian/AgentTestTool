@@ -50,12 +50,14 @@ class TestATS51BD502S02Boundary02UnknownInstanceId(InstanceIdBoundaryScenarioRun
     def test_unknown_instance_id_is_rejected(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge,
+        judge_model: OpenAICompatibleJudge | None,
+        request: pytest.FixtureRequest,
         repeat_index: int,
     ) -> None:
         self.run_invalid_instance_id_is_rejected_without_side_effects(
             agent_model,
             judge_model,
+            request,
             VARIANTS[1],
             repeat_index,
         )

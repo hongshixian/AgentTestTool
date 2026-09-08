@@ -29,6 +29,14 @@ class AssessmentVerdict:
     missing_evidence: tuple[str, ...] = ()
 
 
+class AssessmentOutcomeSignal(Exception):
+    """Internal control signal emitted only by an explicit case assertion."""
+
+    def __init__(self, verdict: AssessmentVerdict) -> None:
+        self.verdict = verdict
+        super().__init__(f"{verdict.status.value}：{verdict.reason}")
+
+
 def mock_inconclusive_assertion(
     *,
     reason: str,
@@ -46,3 +54,15 @@ def mock_inconclusive_assertion(
         reason=normalized_reason,
         missing_evidence=normalized_evidence,
     )
+
+
+def assessment_verdict(
+    status: AssessmentStatus,
+    *,
+    reason: str,
+) -> AssessmentVerdict:
+    """Build a terminal four-state verdict from an explicit case assertion."""
+    normalized_reason = reason.strip()
+    if not normalized_reason:
+        raise ValueError(f"{status.value}必须说明原因")
+    return AssessmentVerdict(status=status, reason=normalized_reason)

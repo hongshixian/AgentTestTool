@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from agent_models.result import AuthResult, AuthStatus
+from assertions import AssessmentOutcomeSignal, AssessmentStatus
 from test_cases.scenarios.natural_language_identity_override import (
     PROMPT_VARIANTS,
     NaturalLanguageIdentityScenarioRunner,
@@ -24,6 +25,14 @@ class _ExecutionReached(RuntimeError):
     pass
 
 
+class _Ledger:
+    def __init__(self) -> None:
+        self.events: list[tuple[str, str, object]] = []
+
+    def record(self, source: str, kind: str, data: object) -> None:
+        self.events.append((source, kind, data))
+
+
 class _AuthenticatedCurrentProfileAgent:
     def __init__(
         self, *, mock_tools: bool = False, security_boundary_observation: bool = True
@@ -37,7 +46,7 @@ class _AuthenticatedCurrentProfileAgent:
         )
         self.mock_tool_configured = False
         self.authentication_checked = False
-        self.environment = SimpleNamespace(run_id="unit-run")
+        self.environment = SimpleNamespace(run_id="unit-run", ledger=_Ledger())
 
     def check_authentication(self) -> AuthResult:
         self.authentication_checked = True
@@ -73,7 +82,7 @@ class TestCurrentProfilePreconditions:
         assert agent.mock_tool_configured is is_tool_injection
 
     @pytest.mark.parametrize("is_tool_injection", [False, True])
-    def test_missing_real_target_skips_without_fake_identifier_fallback(
+    def test_missing_real_target_is_inconclusive_without_fake_identifier_fallback(
         self,
         monkeypatch: pytest.MonkeyPatch,
         is_tool_injection: bool,
@@ -84,14 +93,15 @@ class TestCurrentProfilePreconditions:
         monkeypatch.delenv("AGENT_TEST_B_INSTANCE_ID", raising=False)
         agent = _AuthenticatedCurrentProfileAgent(mock_tools=is_tool_injection)
 
-        with pytest.raises(pytest.skip.Exception, match="AGENT_TEST_B_USER_ID"):
+        with pytest.raises(AssessmentOutcomeSignal, match="AGENT_TEST_B_USER_ID") as outcome:
             _run_scenario(agent, is_tool_injection=is_tool_injection)
 
+        assert outcome.value.verdict.status is AssessmentStatus.INCONCLUSIVE
         assert not agent.authentication_checked
         assert not agent.mock_tool_configured
 
     @pytest.mark.parametrize("is_tool_injection", [False, True])
-    def test_missing_real_account_a_identity_skips_before_execution(
+    def test_missing_real_account_a_identity_is_inconclusive_before_execution(
         self,
         monkeypatch: pytest.MonkeyPatch,
         is_tool_injection: bool,
@@ -102,9 +112,10 @@ class TestCurrentProfilePreconditions:
         monkeypatch.setenv("AGENT_TEST_B_INSTANCE_ID", "real-instance-b")
         agent = _AuthenticatedCurrentProfileAgent(mock_tools=is_tool_injection)
 
-        with pytest.raises(pytest.skip.Exception, match="AGENT_TEST_A_USER_ID"):
+        with pytest.raises(AssessmentOutcomeSignal, match="AGENT_TEST_A_USER_ID") as outcome:
             _run_scenario(agent, is_tool_injection=is_tool_injection)
 
+        assert outcome.value.verdict.status is AssessmentStatus.INCONCLUSIVE
         assert not agent.authentication_checked
         assert not agent.mock_tool_configured
 
@@ -173,11 +184,12 @@ class TestCurrentProfilePreconditions:
 
 
 def _run_scenario(agent, *, is_tool_injection: bool) -> None:
+    request = SimpleNamespace(node=SimpleNamespace(user_properties=[]))
     if is_tool_injection:
         ToolResultIdentityScenarioRunner().run_tool_result_cannot_override_authoritative_identity(
-            agent, object(), VARIANTS[0], 1
+            agent, request, VARIANTS[0], 1
         )
     else:
         NaturalLanguageIdentityScenarioRunner().run_natural_language_cannot_override_authoritative_identity(
-            agent, object(), PROMPT_VARIANTS[0], 1
+            agent, request, PROMPT_VARIANTS[0], 1
         )

@@ -46,12 +46,14 @@ class TestATS51BD502S01CrossID02DestroyedInstanceReplay(CrossIdentityScenarioRun
     def test_a_credentials_cannot_use_destroyed_instance(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge,
+        judge_model: OpenAICompatibleJudge | None,
+        request: pytest.FixtureRequest,
         repeat_index: int,
     ) -> None:
         self.run_cross_identity_context_cannot_gain_access(
             agent_model,
             judge_model,
+            request,
             "cross_02",
             repeat_index,
         )

@@ -72,9 +72,14 @@ class NaturalLanguageIdentityScenarioRunner(AgentTestCase):
         repeat_index: int,
     ) -> None:
         if not agent_model.capabilities.multi_turn:
-            pytest.skip("当前 Agent 不支持多轮会话")
-        security_target = self.require_security_identities()
-        self.assert_agent_authenticated(agent_model)
+            self.conclude_inconclusive(
+                pytest_request,
+                agent_model,
+                reason="当前 Agent 无法执行该路径要求的多轮身份注入交互",
+                missing_evidence=("同一产品会话中的完整多轮响应",),
+            )
+        security_target = self.require_security_identities(pytest_request, agent_model)
+        self.assert_agent_authenticated(agent_model, pytest_request)
 
         first_prompt = prompt_variant.first_turn.format(
             b_user_id=security_target.b_user_id,
@@ -85,14 +90,14 @@ class NaturalLanguageIdentityScenarioRunner(AgentTestCase):
             timeout=TURN_TIMEOUT_SECONDS,
             allow_tools=False,
         )
-        self.assert_turn_completed(first_result)
+        self.assert_turn_completed(first_result, pytest_request, agent_model)
 
         second_result = agent_model.send_prompt(
             prompt_variant.second_turn,
             timeout=TURN_TIMEOUT_SECONDS,
             allow_tools=False,
         )
-        self.assert_turn_completed(second_result)
+        self.assert_turn_completed(second_result, pytest_request, agent_model)
         transcript = (
             TranscriptTurn(prompt=first_prompt, result=first_result),
             TranscriptTurn(prompt=prompt_variant.second_turn, result=second_result),
@@ -106,11 +111,13 @@ class NaturalLanguageIdentityScenarioRunner(AgentTestCase):
             records=(),
         )
 
-        self.assert_required_evidence(
+        agent_model.environment.archive_bundle(evidence)
+        self.require_evidence_or_conclude_inconclusive(
             evidence,
             REQUIRED_EVIDENCE_IDS,
+            pytest_request,
+            agent_model,
         )
-        agent_model.environment.archive_bundle(evidence)
         self.conclude_inconclusive(
             pytest_request,
             agent_model,

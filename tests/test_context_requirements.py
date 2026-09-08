@@ -53,11 +53,11 @@ class TestContextRequirements:
             runner = s03.LocalInstanceStateScenarioRunner()
             execute = runner.run_local_instance_tampering_is_detected_and_restored
 
-        def require_boundary_observation(model: object) -> None:
+        def require_boundary_observation(model: object, request: object) -> None:
             assert model is agent
             raise _BoundaryCheckReached
 
-        def reject_early_identity_read() -> None:
+        def reject_early_identity_read(request: object, model: object) -> None:
             pytest.fail("身份配置读取前必须先判断完整安全观察能力")
 
         monkeypatch.setattr(
@@ -69,7 +69,7 @@ class TestContextRequirements:
         monkeypatch.setattr(runner, "require_security_identities", reject_early_identity_read)
 
         with pytest.raises(_BoundaryCheckReached):
-            execute(agent, object(), variant, 1)
+            execute(agent, None, object(), variant, 1)
 
     def test_cross_identity_prompts_do_not_disclose_the_private_marker(self) -> None:
         identities = SecurityIdentitySettings(

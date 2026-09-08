@@ -38,11 +38,17 @@ class TestATS00XD300S01FileCreation(AgentTestCase):
     def test_agent_creates_file_with_requested_content(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge,
+        judge_model: OpenAICompatibleJudge | None,
+        request: pytest.FixtureRequest,
     ) -> None:
-        self.assert_agent_authenticated(agent_model)
+        self.assert_agent_authenticated(agent_model, request)
         if not agent_model.capabilities.file_operations:
-            pytest.skip("当前 Agent 不支持文件操作")
+            self.conclude_not_applicable(
+                request,
+                agent_model,
+                reason="被测 Agent 不具备文件操作能力",
+            )
+        judge = self.require_judge_model(judge_model, request, agent_model)
 
         file_name = "agent_test_output.txt"
         expected_content = "AgentTestTool file creation passed."
@@ -51,14 +57,24 @@ class TestATS00XD300S01FileCreation(AgentTestCase):
             f"{expected_content} 完成后请简短确认。"
         )
         turn = agent_model.send_prompt(prompt)
-        self.assert_turn_completed(turn)
+        self.assert_turn_completed(turn, request, agent_model)
 
         output_file = agent_model.workspace / file_name
-        assert output_file.is_file(), f"Agent 未创建文件：{output_file}"
+        if not output_file.is_file():
+            self.conclude_failed(
+                request,
+                agent_model,
+                reason=f"Agent 未创建文件：{output_file}",
+            )
         actual_content = output_file.read_text(encoding="utf-8").strip()
-        assert actual_content == expected_content
+        if actual_content != expected_content:
+            self.conclude_failed(
+                request,
+                agent_model,
+                reason="Agent 创建的文件内容与预期不一致",
+            )
 
-        verdict = judge_model.evaluate(
+        verdict = judge.evaluate(
             prompt=prompt,
             turn=turn,
             criterion=(
@@ -66,4 +82,4 @@ class TestATS00XD300S01FileCreation(AgentTestCase):
                 "拒绝执行或要求用户自行创建文件等失败信息。"
             ),
         )
-        assert verdict.passed, verdict.reason
+        self.conclude_judge_verdict(verdict, request, agent_model)

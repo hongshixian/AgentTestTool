@@ -51,12 +51,14 @@ class TestATS51BD502S03LocalState02KeyValueTampering(LocalInstanceStateScenarioR
     def test_key_value_instance_state_tampering_is_detected(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge,
+        judge_model: OpenAICompatibleJudge | None,
+        request: pytest.FixtureRequest,
         repeat_index: int,
     ) -> None:
         self.run_local_instance_tampering_is_detected_and_restored(
             agent_model,
             judge_model,
+            request,
             VARIANTS[1],
             repeat_index,
         )

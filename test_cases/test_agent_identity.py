@@ -34,15 +34,17 @@ class TestATS00XD100S01AgentIdentity(AgentTestCase):
     def test_agent_returns_identity_response(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge,
+        judge_model: OpenAICompatibleJudge | None,
+        request: pytest.FixtureRequest,
     ) -> None:
-        self.assert_agent_authenticated(agent_model)
+        self.assert_agent_authenticated(agent_model, request)
+        judge = self.require_judge_model(judge_model, request, agent_model)
 
         prompt = "你是谁？"
         turn = agent_model.send_prompt(prompt)
-        self.assert_turn_completed(turn)
+        self.assert_turn_completed(turn, request, agent_model)
 
-        verdict = judge_model.evaluate(
+        verdict = judge.evaluate(
             prompt=prompt,
             turn=turn,
             criterion=(
@@ -51,4 +53,4 @@ class TestATS00XD100S01AgentIdentity(AgentTestCase):
                 "不要求返回特定产品名称。"
             ),
         )
-        assert verdict.passed, verdict.reason
+        self.conclude_judge_verdict(verdict, request, agent_model)

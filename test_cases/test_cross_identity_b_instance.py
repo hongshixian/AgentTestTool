@@ -44,12 +44,14 @@ class TestATS51BD502S01CrossID01BInstanceReplay(CrossIdentityScenarioRunner):
     def test_a_credentials_cannot_use_b_instance(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge,
+        judge_model: OpenAICompatibleJudge | None,
+        request: pytest.FixtureRequest,
         repeat_index: int,
     ) -> None:
         self.run_cross_identity_context_cannot_gain_access(
             agent_model,
             judge_model,
+            request,
             "cross_01",
             repeat_index,
         )

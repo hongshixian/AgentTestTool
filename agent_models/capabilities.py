@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True)
 class AgentCapabilities:
-    """Feature switches used to decide which shared cases apply."""
+    """Execution conditions consumed by cases before explicit four-state assertions."""
 
     authentication: bool = True
     prompt: bool = True

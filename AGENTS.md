@@ -123,7 +123,7 @@ README.md
 - `agent_models/` 是被测 Agent 的统一领域入口。测试只能通过 `AgentModel` 接口与被测对象交互。
 - 每个产品在 `agent_models/<product>/` 下维护自己的 Model 组装、Driver、Transport 和 CredentialProvider；产品差异不得泄漏到测试用例。
 - 新增 CLI Agent 时，增加对应的产品目录并注册到 `AgentModelFactory`，由统一接口运行已有测试用例。
-- `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；不支持的能力通过统一 capability 机制 skip。
+- `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；capability 仅向用例描述执行条件，测评结果由用例代码显式断言。
 - 最终场景级 JSON 中的每个 `test_prompt` 对应 `test_cases/` 下一个独立 test case 文件；同一 Test Sample 的公共执行逻辑放在 `test_cases/scenarios/`，其文件名不得以 `test_` 开头。
 - `tests/` 只存放测试框架自身的离线回归测试，不属于被测 Agent 的公共 Test Case，也不使用 ATS 用例 ID。
 - `assertions/` 统一维护测试断言；`logical.py` 提供确定性的传统断言，`assertions/judge/` 提供基于 Judge 模型的智能断言。
@@ -131,10 +131,10 @@ README.md
 - 安全测试使用专用真实账号和可清理的真实测试数据；账号 A 是当前登录身份，账号 B 是受保护目标。
 - 黑盒观察 Provider 只能使用第三方可访问的公开 CLI、网页、API、文件系统和工具 I/O；不得把产品内部 Trace、Hook 或私有测试接口作为公共用例的必需能力。
 - 测试用例通过统一 RequestContext、Mock Tool 和 LocalStateController 能力表达产品公开操作；具体 CLI 参数、MCP 和本地配置差异只能由产品 AgentModel 封装。
-- 产品没有公开用户或实例上下文选择能力时，依赖该能力的路径必须通过 capability skip；不得通过猜测或伪造私有 HTTP Header 模拟支持。
+- 产品没有公开用户或实例上下文选择能力时，不得通过猜测或伪造私有 HTTP Header 模拟支持；依赖该能力的路径由用例显式断言为“无法判定”，除非原始用例规定了对应的“不适用”条件。
 - `assets/` 统一存放测试用例使用的静态资源文件，例如输入样本、图片、归档文件和固定的测试工程模板。
 - 测试通过 `agent_model.environment` 管理受控工作区、模拟工具状态、并发编排和证据；产品工具接线仍通过 `configure_mock_tool()` 或 `configure_mock_tools()` 完成。
-- 依赖公共受控环境或多工具的用例分别检查 `controlled_environment`、`multiple_mock_tools` capability，不支持时明确 skip；这些能力不代表完整安全边界观察。
+- 依赖公共受控环境或多工具的用例分别检查 `controlled_environment`、`multiple_mock_tools` capability；不支持时由用例依据原始要求显式断言“不适用”或“无法判定”，这些能力不代表完整安全边界观察。
 - `agent_models/environment/` 只管理第三方可控制的执行环境；产品参数和协议适配留在对应产品目录中。
 - pytest 逐次运行的脱敏证据保存在被 Git 忽略的 `artifacts/<RUN_ID>/`，可通过 `--evidence-dir` 指定父目录；证据目录必须与被测工作区分离。
 - `configs/` 只保存可提交的示例和非敏感配置；真实账号、令牌、认证缓存及本机路径不得提交。
@@ -218,7 +218,7 @@ class TestATS51BD502S01CrossID01BInstanceReplay(AgentTestCase):
 - `AgentTestCase` 为测试用例提供统一的平台判断属性。测试目标本身存在平台差异时，使用 `if` 分支执行对应平台代码。
 - CLI 启动、STDIO/PTY、进程终止、路径、Shell、编码和认证目录等实现差异，由对应产品的 Driver、Transport 或 CredentialProvider 封装。
 - 优先使用 `pathlib`、`tempfile` 和 `shutil.which()` 等跨平台标准库能力。
-- 某个平台不支持测试所需能力时，通过统一 capability 机制标识，并由 pytest skip；测试报告需要说明跳过原因。
+- 某个平台不支持测试所需能力时，通过统一 capability 机制标识；公共 Test Case 依据原始用例的不适用条件显式断言“不适用”，否则断言“无法判定”并说明缺失能力。
 
 ## 版本管理
 
@@ -246,10 +246,13 @@ uv run pytest --smoke
 ## 代码与测试原则
 
 - 保持测试确定性：固定输入，隔离环境，不通过任意等待来同步进程。
-- 测评结论使用原始用例表定义的“通过、不通过、不适用、无法判定”四态；pytest
-  执行状态与测评结论分开记录。
-- 当目标刺激已完整执行但缺少足以覆盖全部预期结果的证据时，调用公共 mock 断言记录
-  “无法判定”及缺失证据；CLI、配置或执行链路失败不得伪装成“无法判定”。
+- 测评结论使用原始用例表定义的“通过、不通过、不适用、无法判定”四态；每条公共 Test
+  Case 的正常结束路径都必须由用例代码显式调用一种结论断言，不得使用 `pytest.skip()`
+  表达测评结果，也不得由 capability 元数据自动生成结论。
+- “不适用”只能用于原始用例明确规定的不适用条件；缺少认证、环境能力、配置、刺激完成
+  证据或断言证据时记录“无法判定”，并列明原因和缺失证据。
+- 框架缺陷、未处理异常、协议错误和证据归档失败保留为 pytest ERROR/失败，不得伪装成
+  四态测评结论。
 - 命令参数使用序列传递给子进程，避免 `shell=True` 及不必要的字符串拼接。
 - 测试失败信息应包含命令、退出码以及必要的输出上下文，但不得泄露令牌或其他敏感数据。
 - 临时文件统一使用 pytest 的 `tmp_path`；环境变量通过 `monkeypatch` 隔离。

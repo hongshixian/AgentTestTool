@@ -11,7 +11,13 @@ from pathlib import Path
 import pytest
 
 from agent_models import AgentModel, AgentModelFactory
-from assertions import ASSESSMENT_STATUS_PROPERTY, AssessmentStatus
+from assertions import (
+    ASSESSMENT_MISSING_EVIDENCE_PROPERTY,
+    ASSESSMENT_REASON_PROPERTY,
+    ASSESSMENT_STATUS_PROPERTY,
+    AssessmentOutcomeSignal,
+    AssessmentStatus,
+)
 from assertions.judge import JudgeConfig, OpenAICompatibleJudge
 from configs import load_project_environment
 
@@ -21,29 +27,76 @@ load_project_environment()
 _PHASE_REPORTS: pytest.StashKey[dict[str, dict[str, object]]] = pytest.StashKey()
 
 
+def _apply_assessment_signal(
+    report: pytest.TestReport,
+    signal: AssessmentOutcomeSignal,
+) -> None:
+    """Encode one explicit assessment assertion without using pytest skip."""
+    verdict = signal.verdict
+    existing = dict(report.user_properties)
+    if ASSESSMENT_STATUS_PROPERTY not in existing:
+        report.user_properties.append((ASSESSMENT_STATUS_PROPERTY, verdict.status.value))
+    if ASSESSMENT_REASON_PROPERTY not in existing:
+        report.user_properties.append((ASSESSMENT_REASON_PROPERTY, verdict.reason))
+    if ASSESSMENT_MISSING_EVIDENCE_PROPERTY not in existing:
+        report.user_properties.append(
+            (
+                ASSESSMENT_MISSING_EVIDENCE_PROPERTY,
+                "；".join(verdict.missing_evidence),
+            )
+        )
+    report.outcome = "failed" if verdict.status is AssessmentStatus.FAIL else "passed"
+    report.longrepr = (
+        f"{verdict.status.value}：{verdict.reason}"
+        if verdict.status is AssessmentStatus.FAIL
+        else None
+    )
+
+
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
-    """Retain pytest phase outcomes for the run-local evidence manifest."""
+    """Translate explicit four-state assertions and retain phase outcomes."""
     outcome = yield
     report = outcome.get_result()
+    excinfo = getattr(call, "excinfo", None)
+    signal = excinfo.value if excinfo is not None else None
+    if isinstance(signal, AssessmentOutcomeSignal):
+        _apply_assessment_signal(report, signal)
+    report_properties = getattr(report, "user_properties", item.user_properties)
     phases = item.stash.setdefault(_PHASE_REPORTS, {})
-    phases[report.when] = {"outcome": report.outcome, "duration_seconds": report.duration}
+    phases[report.when] = {
+        "outcome": report.outcome,
+        "assessment_status": dict(report_properties).get(
+            ASSESSMENT_STATUS_PROPERTY
+        ),
+        "duration_seconds": report.duration,
+    }
 
 
 def pytest_report_teststatus(
     report: pytest.TestReport,
     config: pytest.Config,
 ) -> tuple[str, str, str] | None:
-    """Render evidence-limited cases using the workbook's ‘无法判定’ status."""
+    """Render explicit assessment assertions using the workbook's four states."""
     properties = dict(report.user_properties)
-    if (
-        report.when == "call"
-        and report.skipped
-        and properties.get(ASSESSMENT_STATUS_PROPERTY)
-        == AssessmentStatus.INCONCLUSIVE.value
-    ):
-        return "inconclusive", "I", AssessmentStatus.INCONCLUSIVE.value
-    return None
+    if report.when != "call":
+        return None
+    status_value = properties.get(ASSESSMENT_STATUS_PROPERTY)
+    statuses = {
+        AssessmentStatus.PASS.value: ("assessment_passed", ".", AssessmentStatus.PASS.value),
+        AssessmentStatus.FAIL.value: ("assessment_failed", "F", AssessmentStatus.FAIL.value),
+        AssessmentStatus.NOT_APPLICABLE.value: (
+            "not_applicable",
+            "N",
+            AssessmentStatus.NOT_APPLICABLE.value,
+        ),
+        AssessmentStatus.INCONCLUSIVE.value: (
+            "inconclusive",
+            "I",
+            AssessmentStatus.INCONCLUSIVE.value,
+        ),
+    }
+    return statuses.get(status_value)
 
 
 def _positive_repeat_count(value: str) -> int:
@@ -96,10 +149,16 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
     if not config.getoption("--smoke"):
         return
-    skip_non_smoke_e2e = pytest.mark.skip(reason="smoke 模式仅执行最小 E2E 用例集")
+    selected: list[pytest.Item] = []
+    deselected: list[pytest.Item] = []
     for item in items:
         if "e2e" in item.keywords and "smoke" not in item.keywords:
-            item.add_marker(skip_non_smoke_e2e)
+            deselected.append(item)
+        else:
+            selected.append(item)
+    items[:] = selected
+    if deselected:
+        config.hook.pytest_deselected(items=deselected)
 
 
 @pytest.fixture
@@ -122,9 +181,9 @@ def agent_model(request: pytest.FixtureRequest, tmp_path) -> Iterator[AgentModel
 
 
 @pytest.fixture
-def judge_model() -> OpenAICompatibleJudge:
+def judge_model() -> OpenAICompatibleJudge | None:
     try:
         config = JudgeConfig.from_environment()
-    except ValueError as error:
-        pytest.fail(str(error), pytrace=False)
+    except ValueError:
+        return None
     return OpenAICompatibleJudge(config)

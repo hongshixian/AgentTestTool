@@ -17,6 +17,17 @@ from test_cases.conftest import (
 @dataclass
 class _ConfigStub:
     smoke: bool
+    deselected: list[object] = field(default_factory=list)
+
+    @property
+    def hook(self) -> object:
+        deselected = self.deselected
+
+        class _Hook:
+            def pytest_deselected(self, *, items: list[object]) -> None:
+                deselected.extend(items)
+
+        return _Hook()
 
     def getoption(self, name: str) -> bool:
         assert name == "--smoke"
@@ -26,10 +37,6 @@ class _ConfigStub:
 @dataclass
 class _ItemStub:
     keywords: dict[str, object]
-    markers: list[pytest.MarkDecorator] = field(default_factory=list)
-
-    def add_marker(self, marker: pytest.MarkDecorator) -> None:
-        self.markers.append(marker)
 
 
 @dataclass
@@ -88,25 +95,25 @@ class TestPytestExecutionMode:
         assert metafunc.parameter_values == [1, 2, 3]
         assert metafunc.parameter_ids == ["repeat-1", "repeat-2", "repeat-3"]
 
-    def test_default_mode_does_not_skip_e2e_cases(self) -> None:
+    def test_default_mode_keeps_e2e_cases_selected(self) -> None:
         e2e = _ItemStub({"e2e": True})
+        config = _ConfigStub(smoke=False)
+        items = [e2e]
 
-        pytest_collection_modifyitems(_ConfigStub(smoke=False), [e2e])  # type: ignore[arg-type]
+        pytest_collection_modifyitems(config, items)  # type: ignore[arg-type]
 
-        assert e2e.markers == []
+        assert items == [e2e]
+        assert config.deselected == []
 
     def test_smoke_mode_keeps_unit_and_smoke_e2e_cases(self) -> None:
         unit = _ItemStub({})
         smoke_e2e = _ItemStub({"e2e": True, "smoke": True})
         full_e2e = _ItemStub({"e2e": True})
 
-        pytest_collection_modifyitems(  # type: ignore[arg-type]
-            _ConfigStub(smoke=True),
-            [unit, smoke_e2e, full_e2e],
-        )
+        config = _ConfigStub(smoke=True)
+        items = [unit, smoke_e2e, full_e2e]
 
-        assert unit.markers == []
-        assert smoke_e2e.markers == []
-        assert len(full_e2e.markers) == 1
-        assert full_e2e.markers[0].mark.name == "skip"
-        assert full_e2e.markers[0].mark.kwargs["reason"] == "smoke 模式仅执行最小 E2E 用例集"
+        pytest_collection_modifyitems(config, items)  # type: ignore[arg-type]
+
+        assert items == [unit, smoke_e2e]
+        assert config.deselected == [full_e2e]
