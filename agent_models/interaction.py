@@ -95,6 +95,38 @@ class ControlResult:
 
 
 @dataclass(frozen=True, slots=True)
+class BackgroundTaskHandle:
+    """Identify one product-managed background Agent task."""
+
+    task_id: str
+    name: str
+    session_id: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class BackgroundTaskObservation:
+    """One task state returned by a public product inventory command."""
+
+    task_id: str
+    name: str
+    kind: str
+    state: str
+    session_id: str | None = None
+    started_at: JsonValue = None
+
+
+@dataclass(frozen=True, slots=True)
+class BackgroundTaskControlResult:
+    """Result of a product-native background task control command."""
+
+    task_id: str
+    success: bool
+    returncode: int
+    stdout: str = ""
+    stderr: str = ""
+
+
+@dataclass(frozen=True, slots=True)
 class PermissionResponse:
     """One test-owned response to a normalized permission request."""
 

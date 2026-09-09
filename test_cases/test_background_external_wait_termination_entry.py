@@ -3,7 +3,9 @@
 import pytest
 
 from agent_models import AgentModel
-from test_cases.base import AgentTestCase
+from test_cases.scenarios.background_task_termination import (
+    BackgroundTaskTerminationScenarioRunner,
+)
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.security]
@@ -12,7 +14,9 @@ TEST_SAMPLE_ID = "ATS-7.2c-D1-02-S01"
 TEST_PROMPT_ID = "07"
 
 
-class TestATS72CD102S0107BackgroundExternalWaitTerminationEntry(AgentTestCase):
+class TestATS72CD102S0107BackgroundExternalWaitTerminationEntry(
+    BackgroundTaskTerminationScenarioRunner
+):
     """测试用例 ID：ATS-7.2c-D1-02-S01-07
 
     测试用例名称：后台运行任务在等待外部返回中的终止入口
@@ -39,11 +43,9 @@ class TestATS72CD102S0107BackgroundExternalWaitTerminationEntry(AgentTestCase):
     def test_background_external_wait_termination_entry(
         self, agent_model: AgentModel, request: pytest.FixtureRequest
     ) -> None:
-        self.conclude_not_applicable(
-            request,
+        self.run_background_external_wait_termination(
             agent_model,
-            reason=(
-                "当前 AgentModel 没有产品用户级终止入口、真实任务标识、任务阶段或任务终态控制能力；"
-                "进程超时、关闭 CLI 和测试侧取消不能替代用户立即终止真实产品任务。"
-            ),
+            request,
+            sample_id=TEST_SAMPLE_ID,
+            prompt_id=TEST_PROMPT_ID,
         )

@@ -123,6 +123,7 @@ class EvidenceRequest:
     phase: EvidencePhase
     context: RequestContext | None = None
     session_id: str | None = None
+    task_id: str | None = None
 
     def provider_payload(self) -> dict[str, JsonValue]:
         return {
@@ -134,6 +135,7 @@ class EvidenceRequest:
                 self.context.provider_payload() if self.context is not None else None
             ),
             "session_id": self.session_id,
+            "task_id": self.task_id,
         }
 
 

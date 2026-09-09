@@ -26,6 +26,10 @@ class AgentCapabilities:
     runtime_control: bool = False
     permission_control: bool = False
     background_task_events: bool = False
+    background_tasks: bool = False
+    background_task_control: bool = False
+    background_task_inventory_evidence: bool = False
+    background_task_log_evidence: bool = False
     product_runtime_evidence: bool = False
     session_correlation_evidence: bool = False
     tool_event_evidence: bool = False

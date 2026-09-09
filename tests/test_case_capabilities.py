@@ -40,6 +40,10 @@ class TestSecurityCaseCapabilities:
         assert model.capabilities.streaming_events
         assert model.capabilities.runtime_control
         assert model.capabilities.permission_control
+        assert model.capabilities.background_tasks
+        assert model.capabilities.background_task_control
+        assert model.capabilities.background_task_inventory_evidence
+        assert model.capabilities.background_task_log_evidence
         assert model.capabilities.product_runtime_evidence
         assert model.capabilities.session_correlation_evidence
         assert model.capabilities.tool_event_evidence

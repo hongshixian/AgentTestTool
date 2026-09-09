@@ -475,12 +475,17 @@ def _command_correlation(
         raise RuntimeError("CodeBuddy 黑盒观察记录关联了错误的 session_id")
     if request.session_id:
         sessions = _unique((request.session_id, *sessions))
+    tasks = _string_tuple(value.get("task_ids"))
+    if request.task_id and tasks and request.task_id not in tasks:
+        raise RuntimeError("CodeBuddy 黑盒观察记录关联了错误的 task_id")
+    if request.task_id:
+        tasks = _unique((request.task_id, *tasks))
     return EvidenceCorrelation(
         run_id=run_id,
         session_ids=sessions,
         request_ids=_string_tuple(value.get("request_ids")),
         turn_ids=_string_tuple(value.get("turn_ids")),
-        task_ids=_string_tuple(value.get("task_ids")),
+        task_ids=tasks,
         tool_use_ids=_string_tuple(value.get("tool_use_ids")),
     )
 

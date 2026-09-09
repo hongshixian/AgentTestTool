@@ -190,6 +190,27 @@ class TestCodeBuddyCommandEvidenceProvider:
         with pytest.raises(RuntimeError, match=message):
             provider.capture(request)
 
+    def test_mismatched_task_correlation_fails_closed(self, tmp_path) -> None:
+        script = (
+            "import json; print(json.dumps({'evidence': [{'evidence_id': 'item', "
+            "'type': 'runtime_evidence', 'data': {}, 'correlation': "
+            "{'task_ids': ['other-task']}}]}))"
+        )
+        provider = CodeBuddyCommandEvidenceProvider(
+            workspace=tmp_path,
+            command=(sys.executable, "-c", script),
+        )
+        request = EvidenceRequest(
+            "sample",
+            "prompt",
+            1,
+            EvidencePhase.AFTER,
+            task_id="expected-task",
+        )
+
+        with pytest.raises(RuntimeError, match="task_id"):
+            provider.capture(request)
+
 
 class TestCodeBuddyStreamEvidenceAdapter:
     def test_complete_window_exposes_only_bounded_runtime_claims(self) -> None:

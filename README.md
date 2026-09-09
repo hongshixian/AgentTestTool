@@ -2,7 +2,7 @@
 
 一个基于 pytest、面向多种 Agent CLI 产品的自动化测试项目。测试用例只与统一的
 Agent Model 接口交互，每种产品通过自己的测试驱动接入。测试驱动统一封装 CLI
-启动、STDIO/PTY 交互、认证状态识别、会话管理、运行控制和输出解析。
+启动、STDIO/PTY 交互、认证状态识别、前后台会话管理、运行控制、证据采集和输出解析。
 
 首个计划接入的被测产品是腾讯 **CodeBuddy Code CLI**（命令为 `codebuddy`）。
 
@@ -124,6 +124,12 @@ CodeBuddy 通过 STDIO MCP 桥接访问测试进程中的工具运行时；多�
 对应请求事件。需要在一个回合内持续处理权限窗口时，使用 `session.run_turn()` 并传入返回
 `PermissionResponse` 的处理器；每次决定都按 request ID 记录，不能用全局 bypass 代替。
 
+CodeBuddy 还通过公开 `--bg`、`agents --jobs --all`、`logs` 和 `stop` 入口接入后台任务。
+对应的 `start_background_task()`、`observe_background_tasks()`、
+`read_background_task_logs()` 和 `stop_background_task()` 返回产品任务 ID、会话 ID、运行状态、
+日志及控制结果。后台清单和日志属于产品运行时证据，不代表云端任务真值或安全审计日志；
+`stop` 是否真正生效必须由返回码及终止后的任务状态共同判断。
+
 在测试类的方法中，可以这样设置模拟工具：
 
 ```python
@@ -152,15 +158,18 @@ finally:
 ```
 
 `ToolSuite` 默认响应序列耗尽时报错；需要固定重复返回时使用 `exhaustion="repeat_last"`。
-`ToolResponse` 支持 `is_error`、`delay_seconds`、`gate` 和 `effects`；错误响应不提交模拟
-副作用。`ToolEffect` 支持 `set`、`append`、`increment`，可用 `argument_path` 引用调用参数。
+`ToolResponse` 支持 `is_error`、`delay_seconds`、`gate`、`completion_gate` 和 `effects`；
+`gate` 在提交副作用前阻塞，`completion_gate` 在副作用提交后、响应返回前阻塞，错误响应
+不提交模拟副作用。`ToolEffect` 支持 `set`、`append`、`increment`，可用 `argument_path` 引用调用参数。
 工具输入校验采用明确支持的 JSON Schema 子集，不支持的关键字会在配置时报告错误。
 
 并发场景可由 `env.runner.parallel()` 同时运行发送 prompt 的动作，以及
 `env.runtime.wait_for_call()` 后释放同步门的动作；所有等待必须设置超时。
 `runner.repeat()` 逐次生成新编排 RUN_ID，失败立即报告；恢复回调在活动停止后执行。
-`wait_for_call(..., count=N)` 的计数基于本次环境保留的调用历史，恢复快照不会回退该计数。
-需要独立产品会话时，每次创建新 Model；`pytest --repeat` 的逐次 fixture 已提供这一生命周期。
+`wait_for_call(..., count=N)` 和 `wait_for_effect(..., key=..., count=N)` 的计数基于本次环境
+保留的调用历史，恢复快照不会回退该计数。CodeBuddy Model 可顺序创建多个独立长驻会话，
+但同一时刻只允许一个会话，且不得与单轮执行路径混用；`pytest --repeat` 仍为每次重复创建
+新的 Model、产品会话和 RUN_ID。
 
 恢复前需停止 Agent 操作和其他工作区写入者；恢复失败会明确报错，状态可能部分恢复。
 工作区管理保护路径和快照范围，但不是 OS 沙箱。工具模拟、受控接收端和本地日志只能证明

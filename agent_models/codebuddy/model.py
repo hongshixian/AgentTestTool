@@ -6,6 +6,7 @@ import subprocess
 import threading
 import uuid
 from dataclasses import asdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 from agent_models.base import AgentModel
@@ -17,9 +18,25 @@ from agent_models.codebuddy.evidence import (
 )
 from agent_models.codebuddy.local_state import CodeBuddyCommandLocalStateController
 from agent_models.codebuddy.mock_tool import CodeBuddyMockToolController
-from agent_models.evidence import EvidenceRecord, EvidenceRequest, JsonValue, RequestContext
+from agent_models.evidence import (
+    EvidenceAuthority,
+    EvidenceCorrelation,
+    EvidenceRecord,
+    EvidenceRequest,
+    EvidenceSource,
+    EvidenceStatus,
+    JsonValue,
+    RequestContext,
+)
 from agent_models.environment.session import ControlledEnvironment
-from agent_models.interaction import AgentEvent, InteractiveSession, PermissionPolicy
+from agent_models.interaction import (
+    AgentEvent,
+    BackgroundTaskControlResult,
+    BackgroundTaskHandle,
+    BackgroundTaskObservation,
+    InteractiveSession,
+    PermissionPolicy,
+)
 from agent_models.local_state import LocalStateAction, LocalStateRequest
 from agent_models.result import AuthResult, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
@@ -85,6 +102,10 @@ class CodeBuddyAgentModel(AgentModel):
             permission_control=True,
             background_task_events=True,
             independent_sessions=True,
+            background_tasks=True,
+            background_task_control=True,
+            background_task_inventory_evidence=True,
+            background_task_log_evidence=True,
             product_runtime_evidence=True,
             session_correlation_evidence=True,
             tool_event_evidence=True,
@@ -197,6 +218,74 @@ class CodeBuddyAgentModel(AgentModel):
             raise
         return session
 
+    def start_background_task(
+        self,
+        prompt: str,
+        *,
+        name: str,
+        timeout: float | None = None,
+        allow_tools: bool = True,
+        permission_policy: PermissionPolicy = PermissionPolicy.DENY_UNAPPROVED,
+    ) -> BackgroundTaskHandle:
+        if self._execution_path in {"one_shot", "interactive"}:
+            raise RuntimeError("一个 Agent Model 不能混用后台任务与其他会话执行路径")
+        self._execution_path = "background"
+        self._has_attempted_session = True
+        with self.environment.activity("start_background_task") as correlation:
+            handle = self.driver.start_background_task(
+                prompt,
+                name=name,
+                timeout=timeout,
+                allow_tools=allow_tools,
+                permission_policy=permission_policy,
+                extra_args=self.mock_tool.extra_args if allow_tools else (),
+            )
+            self.environment.ledger.record(
+                "codebuddy_cli",
+                "background_task_started",
+                asdict(handle),
+                correlation,
+            )
+            return handle
+
+    def observe_background_tasks(self) -> tuple[BackgroundTaskObservation, ...]:
+        with self.environment.activity("observe_background_tasks") as correlation:
+            observations = self.driver.observe_background_tasks()
+            self.environment.ledger.record(
+                "codebuddy_cli",
+                "background_task_inventory",
+                {"tasks": [asdict(item) for item in observations]},
+                correlation,
+            )
+            return observations
+
+    def read_background_task_logs(self, task_id: str) -> str:
+        with self.environment.activity("read_background_task_logs") as correlation:
+            logs = self.driver.read_background_task_logs(task_id)
+            self.environment.ledger.record(
+                "codebuddy_cli",
+                "background_task_logs",
+                {"task_id": task_id, "logs": logs},
+                correlation,
+            )
+            return logs
+
+    def stop_background_task(
+        self,
+        task_id: str,
+        *,
+        timeout: float | None = None,
+    ) -> BackgroundTaskControlResult:
+        with self.environment.activity("stop_background_task") as correlation:
+            result = self.driver.stop_background_task(task_id, timeout=timeout)
+            self.environment.ledger.record(
+                "codebuddy_cli",
+                "background_task_control",
+                asdict(result),
+                correlation,
+            )
+            return result
+
     def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:
         with self.environment.activity("capture_evidence"):
             external_records = self.evidence.capture(request) if self.evidence.is_available() else ()
@@ -211,15 +300,108 @@ class CodeBuddyAgentModel(AgentModel):
                 if interactive_events
                 else ()
             )
+            background_records = (
+                self._capture_background_task_evidence(request)
+                if request.task_id is not None
+                else ()
+            )
             records = (
                 external_records
                 + stream_records
+                + background_records
                 + self.mock_tool.capture(request)
                 + self.environment.capture(request)
             )
             self.environment.ledger.save_artifact(f"capture_{uuid.uuid4().hex}",
                                                   [asdict(record) for record in records])
             return records
+
+    def _capture_background_task_evidence(
+        self,
+        request: EvidenceRequest,
+    ) -> tuple[EvidenceRecord, ...]:
+        task_id = request.task_id
+        if task_id is None:
+            return ()
+        observed_at = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+        source = EvidenceSource(
+            provider="codebuddy_cli",
+            channel="agents_jobs",
+            authority=EvidenceAuthority.PRODUCT_RUNTIME,
+            product="codebuddy",
+            observed_at=observed_at,
+        )
+        observations = self.driver.observe_background_tasks()
+        observation = next(
+            (item for item in observations if item.task_id == task_id),
+            None,
+        )
+        correlation = EvidenceCorrelation(
+            run_id=self.environment.run_id,
+            session_ids=(
+                (observation.session_id,)
+                if observation is not None and observation.session_id
+                else ()
+            ),
+            task_ids=(task_id,),
+        )
+        inventory = EvidenceRecord(
+            evidence_id="agent_background_task_state",
+            evidence_type="runtime_evidence",
+            phase=request.phase,
+            data=asdict(observation) if observation is not None else {},
+            status=(
+                EvidenceStatus.AVAILABLE
+                if observation is not None
+                else EvidenceStatus.MISSING
+            ),
+            source=source,
+            correlation=correlation,
+            proves=("CodeBuddy 公开后台任务清单在采集时报告的任务和状态",),
+            limitations=(
+                "本地产品运行时清单不证明云端任务状态、账号身份或安全审计事实。",
+            ),
+        )
+        try:
+            logs = self.driver.read_background_task_logs(task_id)
+        except RuntimeError:
+            log_record = EvidenceRecord(
+                evidence_id="agent_background_task_log",
+                evidence_type="runtime_evidence",
+                phase=request.phase,
+                data={},
+                status=EvidenceStatus.ERROR,
+                source=EvidenceSource(
+                    provider="codebuddy_cli",
+                    channel="logs",
+                    authority=EvidenceAuthority.PRODUCT_RUNTIME,
+                    product="codebuddy",
+                    observed_at=observed_at,
+                ),
+                correlation=correlation,
+                proves=("CodeBuddy 公开日志命令返回的后台任务运行文本",),
+                limitations=("日志命令失败，当前记录不能证明任务过程。",),
+            )
+        else:
+            log_record = EvidenceRecord(
+                evidence_id="agent_background_task_log",
+                evidence_type="runtime_evidence",
+                phase=request.phase,
+                data={"logs": logs},
+                source=EvidenceSource(
+                    provider="codebuddy_cli",
+                    channel="logs",
+                    authority=EvidenceAuthority.PRODUCT_RUNTIME,
+                    product="codebuddy",
+                    observed_at=observed_at,
+                ),
+                correlation=correlation,
+                proves=("CodeBuddy 公开日志命令返回的后台任务运行文本",),
+                limitations=(
+                    "运行日志不等于服务端安全审计日志，也不证明未记录通道没有执行。",
+                ),
+            )
+        return inventory, log_record
 
     def configure_mock_tool(self, profile: MockToolProfile, *, run_id: str) -> None:
         if self._has_attempted_session:

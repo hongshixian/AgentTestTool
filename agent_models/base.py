@@ -10,7 +10,13 @@ from agent_models.capabilities import AgentCapabilities
 from agent_models.evidence import EvidenceRecord, EvidenceRequest, JsonValue, RequestContext
 from agent_models.environment.session import ControlledEnvironment
 from agent_models.local_state import LocalStateRequest
-from agent_models.interaction import InteractiveSession, PermissionPolicy
+from agent_models.interaction import (
+    BackgroundTaskControlResult,
+    BackgroundTaskHandle,
+    BackgroundTaskObservation,
+    InteractiveSession,
+    PermissionPolicy,
+)
 from agent_models.result import AuthResult, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
 
@@ -76,6 +82,39 @@ class AgentModel(ABC):
         permission_policy: PermissionPolicy = PermissionPolicy.ASK,
     ) -> InteractiveSession:
         """Start a long-lived product session over the public CLI protocol."""
+
+    def start_background_task(
+        self,
+        prompt: str,
+        *,
+        name: str,
+        timeout: float | None = None,
+        allow_tools: bool = True,
+        permission_policy: PermissionPolicy = PermissionPolicy.DENY_UNAPPROVED,
+    ) -> BackgroundTaskHandle:
+        """Start one product-managed background Agent task."""
+
+        raise NotImplementedError("This product has no background task adapter")
+
+    def observe_background_tasks(self) -> tuple[BackgroundTaskObservation, ...]:
+        """Read the public product inventory of background tasks."""
+
+        raise NotImplementedError("This product has no background task inventory")
+
+    def read_background_task_logs(self, task_id: str) -> str:
+        """Read product-exposed logs for one background task."""
+
+        raise NotImplementedError("This product has no background task log adapter")
+
+    def stop_background_task(
+        self,
+        task_id: str,
+        *,
+        timeout: float | None = None,
+    ) -> BackgroundTaskControlResult:
+        """Request product-native termination of one background task."""
+
+        raise NotImplementedError("This product has no background task control")
 
     @abstractmethod
     def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:
