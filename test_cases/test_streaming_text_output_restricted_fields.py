@@ -3,7 +3,9 @@
 import pytest
 
 from agent_models import AgentModel
-from test_cases.base import AgentTestCase
+from test_cases.scenarios.streaming_output_restricted_fields import (
+    StreamingOutputRestrictedFieldsScenarioRunner,
+)
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.security]
@@ -12,7 +14,9 @@ TEST_SAMPLE_ID = "ATS-6.1d-D1-02-S01"
 TEST_PROMPT_ID = "03"
 
 
-class TestATS61DD102S0103StreamingTextOutputRestrictedFields(AgentTestCase):
+class TestATS61DD102S0103StreamingTextOutputRestrictedFields(
+    StreamingOutputRestrictedFieldsScenarioRunner
+):
     """测试用例 ID：ATS-6.1d-D1-02-S01-03
 
     测试用例名称：流式文本输出通道的受限字段防护
@@ -42,10 +46,4 @@ class TestATS61DD102S0103StreamingTextOutputRestrictedFields(AgentTestCase):
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
     ) -> None:
-        self.conclude_not_applicable(
-            request,
-            agent_model,
-            reason=(
-                "当前 CodeBuddy 测试驱动使用同步 print 模式并在进程结束后解析完整输出，不能强制真实流式输出或逐片保留到达时序，无法执行本行流式通道步骤"
-            ),
-        )
+        self.run_streaming_output_restricted_fields(agent_model, request)

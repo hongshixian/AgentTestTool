@@ -353,20 +353,18 @@ def _select_session_events(
     if session_id is None:
         return tuple(events)
     directly_correlated = tuple(
-        event for event in events if event.session_id in {None, session_id}
+        event for event in events if event.session_id == session_id
     )
     related_turn_ids = {
         event.turn_id for event in directly_correlated if event.turn_id is not None
     }
-    directly_correlated_sequences = {event.sequence for event in directly_correlated}
     if not directly_correlated:
         return ()
     return tuple(
         event
         for event in events
-        if event.sequence in directly_correlated_sequences
-        or (event.turn_id is not None and event.turn_id in related_turn_ids)
-        or event.event_type is AgentEventType.SESSION_EXITED
+        if (event.turn_id is not None and event.turn_id in related_turn_ids)
+        or (event.turn_id is None and event.session_id == session_id)
     )
 
 

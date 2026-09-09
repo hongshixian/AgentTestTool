@@ -114,6 +114,7 @@ class TestAssessmentOutcomes:
     ) -> None:
         report = SimpleNamespace(
             when=phase,
+            outcome="failed",
             user_properties=[
                 (ASSESSMENT_STATUS_PROPERTY, AssessmentStatus.FAIL.value)
             ],
@@ -124,6 +125,17 @@ class TestAssessmentOutcomes:
             "F",
             "不通过",
         )
+
+    def test_successful_teardown_does_not_repeat_call_failure_status(self) -> None:
+        report = SimpleNamespace(
+            when="teardown",
+            outcome="passed",
+            user_properties=[
+                (ASSESSMENT_STATUS_PROPERTY, AssessmentStatus.FAIL.value)
+            ],
+        )
+
+        assert pytest_report_teststatus(report, None) is None
 
     def test_case_records_inconclusive_before_ending_the_pytest_call(self) -> None:
         events: list[tuple[str, str, object]] = []

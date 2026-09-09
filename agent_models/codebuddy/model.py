@@ -44,6 +44,7 @@ class CodeBuddyAgentModel(AgentModel):
         self._session_id = f"ats-{uuid.uuid4().hex}"
         self._has_started_session = False
         self._has_attempted_session = False
+        self._execution_path: str | None = None
         self._environment = environment
         self._closed = False
         self._interactive_events: list[AgentEvent] = []
@@ -83,6 +84,7 @@ class CodeBuddyAgentModel(AgentModel):
             runtime_control=True,
             permission_control=True,
             background_task_events=True,
+            independent_sessions=True,
             product_runtime_evidence=True,
             session_correlation_evidence=True,
             tool_event_evidence=True,
@@ -127,6 +129,9 @@ class CodeBuddyAgentModel(AgentModel):
     ) -> TurnResult:
         if context is not None:
             raise RuntimeError("CodeBuddy CLI 未公开用户或实例身份上下文选择参数")
+        if self._execution_path == "interactive":
+            raise RuntimeError("一个 Agent Model 不能混用单轮与长驻会话执行路径")
+        self._execution_path = "one_shot"
         with self.environment.activity("send_prompt") as correlation:
             self._has_attempted_session = True
             self.environment.ledger.record("agent_model", "prompt",
@@ -158,10 +163,14 @@ class CodeBuddyAgentModel(AgentModel):
         allow_tools: bool = True,
         permission_policy: PermissionPolicy = PermissionPolicy.ASK,
     ) -> InteractiveSession:
-        if self._has_attempted_session:
-            raise RuntimeError("一个 Agent Model 只能启动一种会话执行路径")
+        if self._execution_path == "one_shot":
+            raise RuntimeError("一个 Agent Model 不能混用单轮与长驻会话执行路径")
+        if self.driver.interactive_sessions:
+            raise RuntimeError("必须先关闭当前长驻会话，再启动新的独立会话")
+        self._execution_path = "interactive"
         lease = self.environment.open_managed_activity("interactive_session")
         self._has_attempted_session = True
+        interactive_session_id = f"ats-{uuid.uuid4().hex}"
 
         def record_event(event: AgentEvent) -> None:
             with self._interactive_events_lock:
@@ -175,7 +184,7 @@ class CodeBuddyAgentModel(AgentModel):
 
         try:
             session = self.driver.start_session(
-                session_id=self._session_id,
+                session_id=interactive_session_id,
                 timeout=timeout,
                 allow_tools=allow_tools,
                 permission_policy=permission_policy,
@@ -224,7 +233,7 @@ class CodeBuddyAgentModel(AgentModel):
         self.mock_tool.configure_suite(suite, run_id=run_id, initial_state=initial_state)
 
     def prepare_local_state(self, request: LocalStateRequest) -> tuple[EvidenceRecord, ...]:
-        if self._has_started_session:
+        if self._has_attempted_session:
             raise RuntimeError("必须在 Agent 会话开始前准备本地状态")
         return self.local_state.execute(LocalStateAction.PREPARE, request)
 

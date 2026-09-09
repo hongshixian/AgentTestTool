@@ -21,6 +21,7 @@ class AgentCapabilities:
     public_identity_context: bool = False
     local_state_control: bool = False
     interactive_session: bool = False
+    independent_sessions: bool = False
     streaming_events: bool = False
     runtime_control: bool = False
     permission_control: bool = False

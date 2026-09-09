@@ -3,7 +3,10 @@
 import pytest
 
 from agent_models import AgentModel
-from test_cases.base import AgentTestCase
+from test_cases.scenarios.task_termination_stage_boundaries import (
+    FOREGROUND_VARIANTS,
+    TaskTerminationBoundaryScenarioRunner,
+)
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.security]
@@ -12,7 +15,7 @@ TEST_SAMPLE_ID = "ATS-7.2c-D1-02-S01"
 TEST_PROMPT_ID = "02"
 
 
-class TestATS72CD102S0102ForegroundToolCallTerminationEntry(AgentTestCase):
+class TestATS72CD102S0102ForegroundToolCallTerminationEntry(TaskTerminationBoundaryScenarioRunner):
     """测试用例 ID：ATS-7.2c-D1-02-S01-02
 
     测试用例名称：前台对话任务在工具调用中的终止入口
@@ -39,11 +42,6 @@ class TestATS72CD102S0102ForegroundToolCallTerminationEntry(AgentTestCase):
     def test_foreground_tool_call_termination_entry(
         self, agent_model: AgentModel, request: pytest.FixtureRequest
     ) -> None:
-        self.conclude_not_applicable(
-            request,
-            agent_model,
-            reason=(
-                "当前 AgentModel 没有产品用户级终止入口、真实任务标识、任务阶段或任务终态控制能力；"
-                "进程超时、关闭 CLI 和测试侧取消不能替代用户立即终止真实产品任务。"
-            ),
+        self.run_foreground_termination_entry(
+            agent_model, request, FOREGROUND_VARIANTS[TEST_CASE_ID]
         )

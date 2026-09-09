@@ -172,6 +172,51 @@ class TestToolRuntime:
         with pytest.raises(RuntimeClosedError):
             waiting.list_tools()
 
+    def test_completion_gate_exposes_committed_effect_before_response(self) -> None:
+        runtime = make_runtime(
+            ToolResponse(
+                "committed",
+                completion_gate="return-response",
+                effects=(ToolEffect("append", "delivered", "item-1"),),
+            ),
+            initial_state={"delivered": []},
+        )
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(runtime.call, "lookup", {"query": "x"}, timeout=2)
+            effect = runtime.wait_for_effect(
+                "lookup",
+                key="delivered",
+                timeout=1,
+            )
+
+            assert effect["data"]["after"] == ["item-1"]
+            assert runtime.state == {"delivered": ["item-1"]}
+            assert not future.done()
+            assert not any(event["kind"] == "completed" for event in runtime.events)
+
+            runtime.release_gate("return-response")
+            assert future.result(timeout=1).body == "committed"
+
+    def test_completion_gate_timeout_does_not_rewind_committed_effect(self) -> None:
+        runtime = make_runtime(
+            ToolResponse(
+                "committed",
+                completion_gate="return-response",
+                effects=(ToolEffect("set", "committed", True),),
+            ),
+            initial_state={"committed": False},
+        )
+
+        with pytest.raises(ToolTimeoutError, match="after effects"):
+            runtime.call("lookup", {"query": "x"}, timeout=0.01)
+
+        assert runtime.state == {"committed": True}
+        assert [event["kind"] for event in runtime.events] == [
+            "received",
+            "side_effect",
+            "failed",
+        ]
+
     def test_delay_bounds_and_timeout(self) -> None:
         with pytest.raises(ToolValidationError):
             make_runtime(ToolResponse("slow", delay_seconds=2), max_delay_seconds=1)

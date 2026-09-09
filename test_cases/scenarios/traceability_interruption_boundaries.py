@@ -7,7 +7,10 @@ from dataclasses import dataclass
 import pytest
 
 from agent_models import AgentModel
-from test_cases.base import AgentTestCase
+from test_cases.scenarios.task_termination_stage_boundaries import (
+    TaskTerminationBoundaryScenarioRunner,
+    TaskTerminationBoundaryVariant,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,8 +35,8 @@ VARIANTS = {
 }
 
 
-class TraceabilityInterruptionScenarioRunner(AgentTestCase):
-    """Return not applicable without public product task and log controls."""
+class TraceabilityInterruptionScenarioRunner(TaskTerminationBoundaryScenarioRunner):
+    """Execute public cancellation paths and reject unsupported log boundaries."""
 
     def run_traceability_interruption(
         self,
@@ -41,6 +44,19 @@ class TraceabilityInterruptionScenarioRunner(AgentTestCase):
         request: pytest.FixtureRequest,
         variant: TraceabilityInterruptionVariant,
     ) -> None:
+        if variant.case_id == "ATS-5.5e-D4-01-S01-02":
+            self._run_observable_termination(
+                agent_model,
+                request,
+                TaskTerminationBoundaryVariant(
+                    variant.case_id,
+                    variant.case_name,
+                    "第二次受控订单查询已出站但尚未返回",
+                    "second_tool_call",
+                    tool_name="test_order_query",
+                ),
+            )
+            return
         self.conclude_not_applicable(
             request,
             agent_model,

@@ -148,8 +148,12 @@ def pytest_report_teststatus(
     """Render explicit assessment assertions using the workbook's four states."""
     properties = dict(report.user_properties)
     status_value = properties.get(ASSESSMENT_STATUS_PROPERTY)
-    if report.when != "call" and status_value != AssessmentStatus.FAIL.value:
-        return None
+    if report.when != "call":
+        if (
+            getattr(report, "outcome", None) != "failed"
+            or status_value != AssessmentStatus.FAIL.value
+        ):
+            return None
     statuses = {
         AssessmentStatus.PASS.value: ("assessment_passed", ".", AssessmentStatus.PASS.value),
         AssessmentStatus.FAIL.value: ("assessment_failed", "F", AssessmentStatus.FAIL.value),

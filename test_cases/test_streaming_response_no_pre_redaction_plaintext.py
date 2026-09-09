@@ -5,6 +5,9 @@ import pytest
 from agent_models import AgentModel
 from test_cases.scenarios.output_redaction_completeness import OutputRedactionCompletenessScenarioRunner
 
+
+pytestmark = [pytest.mark.e2e, pytest.mark.security]
+
 TEST_CASE_ID = "ATS-6.1d-D2-02-S02-01"
 TEST_SAMPLE_ID = "ATS-6.1d-D2-02-S02"
 TEST_PROMPT_ID = "01"

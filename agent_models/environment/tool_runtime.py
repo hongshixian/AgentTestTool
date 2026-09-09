@@ -213,10 +213,11 @@ class ToolRuntime:
                     raise ToolValidationError("Invalid response metadata")
                 if _seconds(response.delay_seconds, "delay") > self._max_delay:
                     raise ToolValidationError("Response delay exceeds configured maximum")
-                if response.gate is not None:
-                    if not isinstance(response.gate, str) or not response.gate:
-                        raise ToolValidationError("Gate name must be nonempty")
-                    self._gates.setdefault(response.gate, threading.Event())
+                for gate in (response.gate, response.completion_gate):
+                    if gate is not None:
+                        if not isinstance(gate, str) or not gate:
+                            raise ToolValidationError("Gate name must be nonempty")
+                        self._gates.setdefault(gate, threading.Event())
                 for effect in response.effects:
                     if effect.operation not in {"set", "append", "increment"} or not isinstance(effect.key, str) or not effect.key:
                         raise ToolValidationError("Invalid in-memory effect")
@@ -291,6 +292,47 @@ class ToolRuntime:
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     raise ToolTimeoutError("No matching tool receipt before deadline")
+                self._condition.wait(remaining)
+
+    def wait_for_effect(
+        self,
+        name: str,
+        *,
+        key: str,
+        count: int = 1,
+        timeout: float = 30,
+    ) -> dict[str, JsonValue]:
+        """Return the Nth committed simulated effect for one tool and state key."""
+
+        if not isinstance(name, str) or not name or name not in self._tools:
+            raise ToolValidationError("Wait requires a configured tool name")
+        if not isinstance(key, str) or not key:
+            raise ToolValidationError("Effect wait requires a nonempty state key")
+        if type(count) is not int or count < 1:
+            raise ToolValidationError("Effect count must be a positive integer")
+        try:
+            duration = _seconds(timeout, "wait timeout", positive=True)
+        except OverflowError as exc:
+            raise ToolValidationError("Wait timeout outside allowed time bounds") from exc
+        deadline = time.monotonic() + duration
+        cursor, observed = 0, 0
+        with self._condition:
+            while True:
+                self._ensure_open()
+                while cursor < len(self._events):
+                    event = self._events[cursor]
+                    cursor += 1
+                    if (
+                        event["kind"] == "side_effect"
+                        and event["data"].get("tool_name") == name
+                        and event["data"].get("key") == key
+                    ):
+                        observed += 1
+                        if observed == count:
+                            return copy.deepcopy(event)
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise ToolTimeoutError("No matching tool effect before deadline")
                 self._condition.wait(remaining)
 
     def _ensure_open(self) -> None:
@@ -442,6 +484,15 @@ class ToolRuntime:
                     self._state = candidate
                     for change in changes:
                         self._emit("side_effect", {**data, **change}, correlation_id)
+                if response.completion_gate is not None:
+                    while not self._gates[response.completion_gate].is_set():
+                        self._ensure_open()
+                        remaining = deadline - time.monotonic()
+                        if remaining <= 0:
+                            raise ToolTimeoutError(
+                                "Tool call exceeded deadline after effects"
+                            )
+                        self._condition.wait(remaining)
                 self._emit("failed" if response.is_error else "completed",
                            {**data, "arguments": args, "body": copy.deepcopy(response.body),
                             "content_type": response.content_type, "is_error": response.is_error}, correlation_id)

@@ -36,6 +36,7 @@ class TestSecurityCaseCapabilities:
         assert model.capabilities.multiple_mock_tools
         assert model.capabilities.controlled_environment
         assert model.capabilities.interactive_session
+        assert model.capabilities.independent_sessions
         assert model.capabilities.streaming_events
         assert model.capabilities.runtime_control
         assert model.capabilities.permission_control

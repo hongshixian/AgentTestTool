@@ -407,6 +407,103 @@ class TestCodeBuddyStreamEvidenceAdapter:
             "product-session",
         )
 
+    def test_sequential_session_windows_do_not_include_other_session_exit(self) -> None:
+        events = (
+            _event(
+                1,
+                AgentEventType.USER_INPUT,
+                session_id="requested-1",
+                turn_id="turn-1",
+            ),
+            _event(
+                2,
+                AgentEventType.SESSION_STARTED,
+                session_id="product-1",
+                turn_id="turn-1",
+            ),
+            _event(
+                3,
+                AgentEventType.TURN_COMPLETED,
+                session_id="product-1",
+                turn_id="turn-1",
+            ),
+            _event(
+                4,
+                AgentEventType.SESSION_EXITED,
+                session_id="requested-1",
+                data={"returncode": 0},
+            ),
+            _event(
+                1,
+                AgentEventType.USER_INPUT,
+                session_id="requested-2",
+                turn_id="turn-2",
+            ),
+            _event(
+                2,
+                AgentEventType.SESSION_STARTED,
+                session_id="requested-2",
+                turn_id="turn-2",
+            ),
+            _event(
+                3,
+                AgentEventType.TURN_COMPLETED,
+                session_id="product-2",
+                turn_id="turn-2",
+            ),
+            _event(
+                4,
+                AgentEventType.SESSION_EXITED,
+                session_id="requested-2",
+                data={"returncode": 0},
+            ),
+        )
+
+        runtime = CodeBuddyStreamEvidenceAdapter().capture(
+            EvidenceRequest(
+                "sample",
+                "prompt",
+                1,
+                EvidencePhase.AFTER,
+                session_id="requested-2",
+            ),
+            events=events,
+            run_id="run-1",
+        )[0]
+
+        assert runtime.status is EvidenceStatus.AVAILABLE
+        assert runtime.correlation.session_ids == ("requested-2", "product-2")
+        assert runtime.correlation.turn_ids == ("turn-2",)
+        assert runtime.data["observation_window"]["session_exit_observed"] is True
+
+    def test_requested_session_id_disambiguates_reused_product_session_id(self) -> None:
+        events = (
+            _event(1, AgentEventType.USER_INPUT, session_id="requested-1", turn_id="turn-1"),
+            _event(2, AgentEventType.SESSION_STARTED, session_id="product", turn_id="turn-1"),
+            _event(3, AgentEventType.TURN_COMPLETED, session_id="product", turn_id="turn-1"),
+            _event(4, AgentEventType.SESSION_EXITED, session_id="requested-1", data={"returncode": 0}),
+            _event(1, AgentEventType.USER_INPUT, session_id="requested-2", turn_id="turn-2"),
+            _event(2, AgentEventType.SESSION_STARTED, session_id="product", turn_id="turn-2"),
+            _event(3, AgentEventType.TURN_COMPLETED, session_id="product", turn_id="turn-2"),
+            _event(4, AgentEventType.SESSION_EXITED, session_id="requested-2", data={"returncode": 0}),
+        )
+
+        runtime = CodeBuddyStreamEvidenceAdapter().capture(
+            EvidenceRequest(
+                "sample",
+                "prompt",
+                1,
+                EvidencePhase.AFTER,
+                session_id="requested-2",
+            ),
+            events=events,
+            run_id="run-1",
+        )[0]
+
+        assert runtime.status is EvidenceStatus.AVAILABLE
+        assert runtime.correlation.session_ids == ("requested-2", "product")
+        assert runtime.correlation.turn_ids == ("turn-2",)
+
 
 def _request() -> EvidenceRequest:
     return EvidenceRequest(

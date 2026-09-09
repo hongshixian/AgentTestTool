@@ -27,13 +27,18 @@ class ToolEffect:
 
 @dataclass(frozen=True, slots=True)
 class ToolResponse:
-    """A scripted response; error responses never apply their effects."""
+    """A scripted response; error responses never apply their effects.
+
+    ``gate`` blocks before effects are applied. ``completion_gate`` blocks after
+    successful effects are committed but before the tool response is returned.
+    """
 
     body: JsonValue
     content_type: str = "application/json"
     is_error: bool = False
     delay_seconds: float = 0
     gate: str | None = None
+    completion_gate: str | None = None
     effects: tuple[ToolEffect, ...] = ()
 
 

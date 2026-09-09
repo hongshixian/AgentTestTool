@@ -175,3 +175,44 @@ def test_factory_interactive_session_archives_standard_runtime_evidence(
         assert runtime.source.channel == "stdio_stream_json"
     assert len(launches) == 1
     assert EvidenceLedger.verify_archive(evidence_directory)["healthy"]
+
+
+def test_model_starts_two_sequential_independent_interactive_sessions(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setenv("CODEBUDDY_CONFIG_DIR", str(tmp_path / "test-account"))
+    monkeypatch.delenv("CODEBUDDY_OBSERVATION_COMMAND", raising=False)
+    monkeypatch.delenv("CODEBUDDY_LOCAL_STATE_COMMAND", raising=False)
+    original_popen = subprocess.Popen
+    probe = (
+        Path(__file__).resolve().parents[1]
+        / "assets"
+        / "framework_fixtures"
+        / "interactive_cli_protocol_probe.py"
+    )
+
+    def popen_local(command, **kwargs):
+        assert command[0] == "codebuddy"
+        return original_popen([sys.executable, "-u", str(probe)], **kwargs)
+
+    monkeypatch.setattr(subprocess, "Popen", popen_local)
+    with AgentModelFactory.create(
+        "codebuddy",
+        workspace=tmp_path / "workspace",
+        evidence_directory=tmp_path / "evidence",
+    ) as model:
+        first = model.start_session(allow_tools=False)
+        first_result = first.run_turn("first", timeout=2)
+        first_requested_id = first.session_id
+        with pytest.raises(RuntimeError, match="先关闭"):
+            model.start_session(allow_tools=False)
+        first.close()
+
+        second = model.start_session(allow_tools=False)
+        second_result = second.run_turn("second", timeout=2)
+        second_requested_id = second.session_id
+        second.close()
+
+        assert first_result.completed and second_result.completed
+        assert first_requested_id != second_requested_id
+        assert model.capabilities.independent_sessions
