@@ -91,6 +91,13 @@ class TestCodeBuddyInteractiveSession:
         assert sent_decision.data["decision"] == decision.value
         assert result.response == f"permission:{expected}"
 
+        with pytest.raises(ValueError, match="already been answered"):
+            session.respond_to_confirmation(
+                request,
+                decision,
+                reason="duplicate decision",
+            )
+
     def test_steer_controls_an_active_turn(self, session: CodeBuddyInteractiveSession) -> None:
         turn = session.send_input("WAIT")
         session.wait_for_event(
@@ -136,6 +143,19 @@ class TestCodeBuddyInteractiveSession:
         assert control.data["interrupted"] is True
         assert not result.completed
         assert "interrupted" in result.stderr
+
+    @pytest.mark.parametrize("action", ["steer", "interrupt"])
+    def test_idle_control_response_is_not_reported_as_success(
+        self, session: CodeBuddyInteractiveSession, action: str
+    ) -> None:
+        control = (
+            session.steer("nothing is running")
+            if action == "steer"
+            else session.interrupt_task(reason="nothing is running")
+        )
+
+        assert not control.success
+        assert control.error == "idle"
 
     def test_background_terminal_state_is_normalized(
         self, session: CodeBuddyInteractiveSession
@@ -208,5 +228,6 @@ class TestCodeBuddyInteractiveSession:
         session.close()
 
         assert not session.is_running
+        assert session.events[-1].event_type is AgentEventType.SESSION_EXITED
         with pytest.raises(RuntimeError, match="closed"):
             session.send_input("after-close")

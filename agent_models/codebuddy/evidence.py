@@ -152,20 +152,37 @@ class CodeBuddyStreamEvidenceAdapter:
         run_id: str,
         product_version: str | None = None,
     ) -> tuple[EvidenceRecord, ...]:
-        selected = tuple(
-            event
-            for event in events
-            if request.session_id is None or event.session_id in {None, request.session_id}
-        )
+        selected = _select_session_events(events, request.session_id)
         started = any(
             event.event_type is AgentEventType.SESSION_STARTED for event in selected
         )
-        terminal = any(
-            event.event_type is AgentEventType.TURN_COMPLETED for event in selected
+        input_turn_ids = {
+            event.turn_id
+            for event in selected
+            if event.event_type is AgentEventType.USER_INPUT and event.turn_id
+        }
+        terminal_turn_ids = {
+            event.turn_id
+            for event in selected
+            if event.event_type is AgentEventType.TURN_COMPLETED and event.turn_id
+        }
+        incomplete_turn_ids = tuple(sorted(input_turn_ids - terminal_turn_ids))
+        terminal = bool(terminal_turn_ids)
+        protocol_failed = any(
+            event.event_type is AgentEventType.PROTOCOL_ERROR for event in selected
         )
+        abnormal_exits = [
+            event
+            for event in selected
+            if event.event_type is AgentEventType.SESSION_EXITED
+            and isinstance(event.data, dict)
+            and event.data.get("returncode") != 0
+        ]
         if not selected:
             status = EvidenceStatus.MISSING
-        elif started and terminal:
+        elif protocol_failed or abnormal_exits:
+            status = EvidenceStatus.ERROR
+        elif started and input_turn_ids and not incomplete_turn_ids:
             status = EvidenceStatus.AVAILABLE
         else:
             status = EvidenceStatus.UNVERIFIED
@@ -184,6 +201,11 @@ class CodeBuddyStreamEvidenceAdapter:
             "last_sequence": selected[-1].sequence if selected else None,
             "session_started": started,
             "turn_terminal_observed": terminal,
+            "input_turn_count": len(input_turn_ids),
+            "terminal_turn_count": len(terminal_turn_ids),
+            "incomplete_turn_ids": list(incomplete_turn_ids),
+            "protocol_error_observed": protocol_failed,
+            "abnormal_exit_observed": bool(abnormal_exits),
             "session_exit_observed": any(
                 event.event_type is AgentEventType.SESSION_EXITED for event in selected
             ),
@@ -288,6 +310,30 @@ def _event_payload(event: AgentEvent) -> dict[str, JsonValue]:
     }
 
 
+def _select_session_events(
+    events: Sequence[AgentEvent],
+    session_id: str | None,
+) -> tuple[AgentEvent, ...]:
+    if session_id is None:
+        return tuple(events)
+    directly_correlated = tuple(
+        event for event in events if event.session_id in {None, session_id}
+    )
+    related_turn_ids = {
+        event.turn_id for event in directly_correlated if event.turn_id is not None
+    }
+    directly_correlated_sequences = {event.sequence for event in directly_correlated}
+    if not directly_correlated:
+        return ()
+    return tuple(
+        event
+        for event in events
+        if event.sequence in directly_correlated_sequences
+        or (event.turn_id is not None and event.turn_id in related_turn_ids)
+        or event.event_type is AgentEventType.SESSION_EXITED
+    )
+
+
 def _event_correlation(
     events: Sequence[AgentEvent], *, run_id: str
 ) -> EvidenceCorrelation:
@@ -387,7 +433,12 @@ def _command_correlation(
     )
     if run_id is not None and not isinstance(run_id, str):
         raise RuntimeError("CodeBuddy 黑盒观察记录的 correlation.run_id 必须是字符串")
+    expected_run_id = request.context.run_id if request.context is not None else None
+    if expected_run_id is not None and run_id != expected_run_id:
+        raise RuntimeError("CodeBuddy 黑盒观察记录关联了错误的 run_id")
     sessions = _string_tuple(value.get("session_ids"))
+    if request.session_id and sessions and request.session_id not in sessions:
+        raise RuntimeError("CodeBuddy 黑盒观察记录关联了错误的 session_id")
     if request.session_id:
         sessions = _unique((request.session_id, *sessions))
     return EvidenceCorrelation(

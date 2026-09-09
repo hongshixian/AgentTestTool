@@ -79,6 +79,7 @@ class CodeBuddyInteractiveSession(InteractiveSession):
         self._stderr: list[tuple[int, str]] = []
         self._next_sequence = 1
         self._active_turn: TurnHandle | None = None
+        self._answered_permission_requests: set[str] = set()
         self._collector_error: BaseException | None = None
         self._closed = False
         self._close_callback_called = False
@@ -189,6 +190,7 @@ class CodeBuddyInteractiveSession(InteractiveSession):
                 self._emit(
                     AgentEventType.USER_INPUT,
                     text=prompt,
+                    session_id=self._session_id,
                     turn_id=handle.turn_id,
                     data={"turn_id": handle.turn_id},
                 )
@@ -307,6 +309,8 @@ class CodeBuddyInteractiveSession(InteractiveSession):
             raise ValueError("decision must be a PermissionDecision")
         if not event.request_id:
             raise ValueError("permission request has no request_id")
+        if event.session_id not in {None, self._session_id}:
+            raise ValueError("permission request belongs to another session")
         request = event.data if isinstance(event.data, dict) else {}
         tool_use_id = request.get("tool_use_id")
         if not isinstance(tool_use_id, str) or not tool_use_id:
@@ -324,6 +328,8 @@ class CodeBuddyInteractiveSession(InteractiveSession):
         if updated_input is not None:
             response["updatedInput"] = updated_input
         with self._condition:
+            if event.request_id in self._answered_permission_requests:
+                raise ValueError("permission request has already been answered")
             self._write_message(
                 {
                     "type": "control_response",
@@ -336,6 +342,7 @@ class CodeBuddyInteractiveSession(InteractiveSession):
             )
             self._emit(
                 AgentEventType.PERMISSION_DECISION,
+                session_id=self._session_id,
                 request_id=event.request_id,
                 turn_id=event.turn_id,
                 data={
@@ -345,6 +352,7 @@ class CodeBuddyInteractiveSession(InteractiveSession):
                     "updated_input": updated_input,
                 },
             )
+            self._answered_permission_requests.add(event.request_id)
 
     def steer(
         self,
@@ -400,9 +408,16 @@ class CodeBuddyInteractiveSession(InteractiveSession):
                     self._kill_process()
                     self._process.wait(timeout=self.close_timeout)
         finally:
+            self._wait_thread.join(timeout=self.close_timeout)
             self._stdout_thread.join(timeout=self.close_timeout)
             self._stderr_thread.join(timeout=self.close_timeout)
-            self._call_close_callback()
+            try:
+                if self._wait_thread.is_alive():
+                    raise RuntimeError(
+                        "CodeBuddy process exit observer did not stop after cleanup"
+                    )
+            finally:
+                self._call_close_callback()
 
     def _send_control(
         self,
@@ -425,6 +440,7 @@ class CodeBuddyInteractiveSession(InteractiveSession):
             )
             self._emit(
                 AgentEventType.CONTROL_REQUEST,
+                session_id=self._session_id,
                 request_id=request_id,
                 turn_id=self._active_turn.turn_id if self._active_turn else None,
                 data=cast(JsonValue, _safe_control_request(request)),
@@ -436,14 +452,23 @@ class CodeBuddyInteractiveSession(InteractiveSession):
             predicate=lambda item: item.request_id == request_id,
         )
         data = event.data if isinstance(event.data, dict) else {}
-        success = data.get("subtype") == "success"
         response = data.get("response")
         normalized = cast(JsonValue, response if isinstance(response, dict) else {})
+        success = data.get("subtype") == "success"
+        if success and subtype == "steer":
+            success = isinstance(response, dict) and response.get("steered") is True
+        if success and subtype == "interrupt":
+            success = (
+                isinstance(response, dict) and response.get("interrupted") is True
+            )
+        error = str(data.get("error") or "")
+        if not success and not error and isinstance(response, dict):
+            error = str(response.get("reason") or f"{subtype} was not applied")
         return ControlResult(
             request_id=request_id,
             success=success,
             data=normalized,
-            error=str(data.get("error") or ""),
+            error=error,
         )
 
     def _write_message(self, payload: Mapping[str, Any]) -> None:
@@ -509,6 +534,7 @@ class CodeBuddyInteractiveSession(InteractiveSession):
         try:
             self._emit(
                 AgentEventType.SESSION_EXITED,
+                session_id=self._session_id,
                 data={"returncode": returncode},
             )
         except BaseException as error:

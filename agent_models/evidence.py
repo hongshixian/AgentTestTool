@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import TypeAlias
@@ -171,6 +172,59 @@ class EvidenceRecord:
             "limitations": list(self.limitations),
         }
 
+    def diagnostic_payload(self) -> dict[str, JsonValue]:
+        """Describe unavailable evidence without exposing it as an observed fact."""
+
+        return {
+            "evidence_id": self.evidence_id,
+            "type": self.evidence_type,
+            "phase": self.phase.value,
+            "status": self.status.value,
+            "source": self.source.judge_payload() if self.source is not None else None,
+            "correlation": self.correlation.judge_payload(),
+            "limitations": list(self.limitations),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class EvidenceRequirement:
+    """Quality constraints that evidence must meet before Judge evaluation."""
+
+    evidence_id: str
+    phases: tuple[EvidencePhase, ...] = ()
+    authorities: tuple[EvidenceAuthority, ...] = ()
+    require_source: bool = False
+    require_run_correlation: bool = False
+    require_session_correlation: bool = False
+    require_observed_at: bool = False
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.evidence_id, str) or not self.evidence_id.strip():
+            raise ValueError("evidence requirement id must be nonempty")
+        if not all(isinstance(phase, EvidencePhase) for phase in self.phases):
+            raise ValueError("evidence requirement phases must use EvidencePhase")
+        if not all(
+            isinstance(authority, EvidenceAuthority) for authority in self.authorities
+        ):
+            raise ValueError(
+                "evidence requirement authorities must use EvidenceAuthority"
+            )
+        if len(set(self.phases)) != len(self.phases):
+            raise ValueError("evidence requirement phases must be unique")
+        if len(set(self.authorities)) != len(self.authorities):
+            raise ValueError("evidence requirement authorities must be unique")
+
+    def judge_payload(self) -> dict[str, JsonValue]:
+        return {
+            "evidence_id": self.evidence_id,
+            "phases": [phase.value for phase in self.phases],
+            "authorities": [authority.value for authority in self.authorities],
+            "require_source": self.require_source,
+            "require_run_correlation": self.require_run_correlation,
+            "require_session_correlation": self.require_session_correlation,
+            "require_observed_at": self.require_observed_at,
+        }
+
 
 @dataclass(frozen=True, slots=True)
 class TranscriptTurn:
@@ -213,6 +267,51 @@ class EvidenceBundle:
     def missing_evidence(self, required_ids: set[str]) -> frozenset[str]:
         return frozenset(required_ids - self.available_evidence_ids)
 
+    def unmet_requirements(
+        self,
+        requirements: Sequence[EvidenceRequirement],
+    ) -> tuple[str, ...]:
+        """Return deterministic reasons for evidence that fails quality gates."""
+
+        failures: list[str] = []
+        built_in_ids = {"conversation_transcript", "api_cli_runtime_result"}
+        for requirement in requirements:
+            if requirement.evidence_id in built_in_ids:
+                if requirement.evidence_id not in self.available_evidence_ids:
+                    failures.append(f"{requirement.evidence_id}（缺少 available 证据）")
+                elif _has_record_quality_constraints(requirement):
+                    failures.append(
+                        f"{requirement.evidence_id}（内建转录证据不提供外部来源质量元数据）"
+                    )
+                continue
+
+            available = tuple(
+                record
+                for record in self.records
+                if record.evidence_id == requirement.evidence_id and record.available
+            )
+            if not available:
+                failures.append(f"{requirement.evidence_id}（缺少 available 证据）")
+                continue
+
+            phases = requirement.phases or tuple(
+                dict.fromkeys(record.phase for record in available)
+            )
+            failed_phases: list[str] = []
+            for phase in phases:
+                candidates = tuple(record for record in available if record.phase is phase)
+                if not any(
+                    _record_meets_requirement(record, requirement, self.run_id)
+                    for record in candidates
+                ):
+                    failed_phases.append(phase.value)
+            if failed_phases:
+                failures.append(
+                    f"{requirement.evidence_id}（阶段 {', '.join(failed_phases)} "
+                    "缺失或来源、关联、时间质量不满足）"
+                )
+        return tuple(failures)
+
     def judge_payload(self) -> dict[str, JsonValue]:
         turns = [turn.judge_payload() for turn in self.transcript]
         return {
@@ -221,5 +320,46 @@ class EvidenceBundle:
             "run_id": self.run_id,
             "conversation_transcript": turns,
             "api_cli_runtime_result": turns,
-            "external_evidence": [record.judge_payload() for record in self.records],
+            "external_evidence": [
+                record.judge_payload() for record in self.records if record.available
+            ],
+            "unavailable_evidence": [
+                record.diagnostic_payload()
+                for record in self.records
+                if not record.available
+            ],
         }
+
+
+def _has_record_quality_constraints(requirement: EvidenceRequirement) -> bool:
+    return bool(
+        requirement.phases
+        or requirement.authorities
+        or requirement.require_source
+        or requirement.require_run_correlation
+        or requirement.require_session_correlation
+        or requirement.require_observed_at
+    )
+
+
+def _record_meets_requirement(
+    record: EvidenceRecord,
+    requirement: EvidenceRequirement,
+    run_id: str,
+) -> bool:
+    source = record.source
+    if requirement.require_source and source is None:
+        return False
+    if requirement.authorities and (
+        source is None or source.authority not in requirement.authorities
+    ):
+        return False
+    if requirement.require_observed_at and (
+        source is None or not source.observed_at
+    ):
+        return False
+    if requirement.require_run_correlation and record.correlation.run_id != run_id:
+        return False
+    if requirement.require_session_correlation and not record.correlation.session_ids:
+        return False
+    return True

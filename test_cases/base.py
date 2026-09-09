@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-from agent_models import AgentModel, EvidenceBundle, TurnResult
+from agent_models import AgentModel, EvidenceBundle, EvidenceRequirement, TurnResult
 from assertions import (
     ASSESSMENT_MISSING_EVIDENCE_PROPERTY,
     ASSESSMENT_REASON_PROPERTY,
@@ -274,11 +274,13 @@ class AgentTestCase:
         evidence: EvidenceBundle,
         required_evidence_ids: set[str],
         expected_external_types: dict[str, str] | None = None,
+        evidence_requirements: tuple[EvidenceRequirement, ...] = (),
     ) -> None:
         check_required_evidence(
             evidence,
             required_evidence_ids,
             expected_external_types,
+            evidence_requirements,
         )
 
     def require_evidence_or_conclude_inconclusive(
@@ -288,6 +290,7 @@ class AgentTestCase:
         request: pytest.FixtureRequest,
         agent_model: AgentModel,
         expected_external_types: dict[str, str] | None = None,
+        evidence_requirements: tuple[EvidenceRequirement, ...] = (),
     ) -> None:
         """Require assessment evidence or explicitly return unable to determine."""
         try:
@@ -295,8 +298,10 @@ class AgentTestCase:
                 evidence,
                 required_evidence_ids,
                 expected_external_types,
+                evidence_requirements,
             )
         except AssertionError as error:
+            unmet = evidence.unmet_requirements(evidence_requirements)
             self.conclude_inconclusive(
                 request,
                 agent_model,
@@ -304,6 +309,7 @@ class AgentTestCase:
                 missing_evidence=tuple(
                     sorted(evidence.missing_evidence(required_evidence_ids))
                 )
+                or unmet
                 or ("符合类型要求的完整外部证据",),
                 execution_completed=True,
             )

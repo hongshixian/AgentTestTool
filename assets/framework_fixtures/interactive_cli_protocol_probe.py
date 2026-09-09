@@ -77,7 +77,11 @@ for line in sys.stdin:
                     "response": {
                         "subtype": "success",
                         "request_id": request_id,
-                        "response": {"session_id": SESSION_ID, "steered": pending_turn},
+                        "response": {
+                            "session_id": SESSION_ID,
+                            "steered": pending_turn,
+                            **({} if pending_turn else {"reason": "idle"}),
+                        },
                     },
                 }
             )
@@ -95,7 +99,9 @@ for line in sys.stdin:
                         "response": {
                             "session_id": SESSION_ID,
                             "interrupted": pending_turn,
-                            "reason": request.get("reason", ""),
+                            "reason": (
+                                request.get("reason", "") if pending_turn else "idle"
+                            ),
                         },
                     },
                 }

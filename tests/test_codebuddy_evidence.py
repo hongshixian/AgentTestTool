@@ -114,6 +114,82 @@ class TestCodeBuddyCommandEvidenceProvider:
             "PATH": "/fake/bin",
         }
 
+    @pytest.mark.parametrize(
+        ("extra", "message"),
+        [
+            ("'status': 'not-a-status',", "status"),
+            (
+                "'source': {'provider': 'api', 'channel': 'identity', "
+                "'authority': 'invented'},",
+                "authority",
+            ),
+            ("'correlation': {'request_ids': 'not-a-list'},", "列表字段"),
+        ],
+    )
+    def test_invalid_evidence_metadata_fails_closed(
+        self, tmp_path, extra: str, message: str
+    ) -> None:
+        script = (
+            "import json; print(json.dumps({'evidence': [{'evidence_id': 'item', "
+            f"'type': 'runtime_evidence', {extra} 'data': {{}}}}]}}))"
+        )
+        provider = CodeBuddyCommandEvidenceProvider(
+            workspace=tmp_path,
+            command=(sys.executable, "-c", script),
+        )
+
+        with pytest.raises(RuntimeError, match=message):
+            provider.capture(_request())
+
+    def test_observation_timeout_fails_instead_of_returning_empty_evidence(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        provider = CodeBuddyCommandEvidenceProvider(
+            workspace=tmp_path,
+            command=(sys.executable, "fixture"),
+            default_timeout=0.1,
+        )
+
+        def timeout(*_args, **_kwargs):
+            raise subprocess.TimeoutExpired("fixture", 0.1)
+
+        monkeypatch.setattr(subprocess, "run", timeout)
+
+        with pytest.raises(RuntimeError, match="超时"):
+            provider.capture(_request())
+
+    @pytest.mark.parametrize(
+        ("correlation", "message"),
+        [
+            ({"run_id": "other-run"}, "run_id"),
+            ({"session_ids": ["other-session"]}, "session_id"),
+        ],
+    )
+    def test_mismatched_evidence_correlation_fails_closed(
+        self, tmp_path, correlation: dict[str, object], message: str
+    ) -> None:
+        script = (
+            "import json; print(json.dumps({'evidence': [{'evidence_id': 'item', "
+            "'type': 'runtime_evidence', 'data': {}, 'correlation': "
+            f"{correlation!r}" + "}]}))"
+        )
+        provider = CodeBuddyCommandEvidenceProvider(
+            workspace=tmp_path,
+            command=(sys.executable, "-c", script),
+        )
+        request = _request()
+        request = EvidenceRequest(
+            request.sample_id,
+            request.prompt_id,
+            request.repeat_index,
+            request.phase,
+            request.context,
+            session_id="expected-session",
+        )
+
+        with pytest.raises(RuntimeError, match=message):
+            provider.capture(request)
+
 
 class TestCodeBuddyStreamEvidenceAdapter:
     def test_complete_window_exposes_only_bounded_runtime_claims(self) -> None:
@@ -223,6 +299,86 @@ class TestCodeBuddyStreamEvidenceAdapter:
             "sample", "prompt", "run-1", (), records
         ).available_evidence_ids == frozenset()
 
+    def test_later_unfinished_turn_invalidates_the_whole_window(self) -> None:
+        request = EvidenceRequest(
+            "sample", "prompt", 1, EvidencePhase.AFTER, session_id="session-1"
+        )
+        events = (
+            _event(1, AgentEventType.SESSION_STARTED),
+            _event(2, AgentEventType.USER_INPUT, turn_id="turn-1"),
+            _event(3, AgentEventType.TURN_COMPLETED, turn_id="turn-1"),
+            _event(4, AgentEventType.USER_INPUT, turn_id="turn-2"),
+        )
+
+        runtime = CodeBuddyStreamEvidenceAdapter().capture(
+            request, events=events, run_id="run-1"
+        )[0]
+
+        assert runtime.status is EvidenceStatus.UNVERIFIED
+        assert runtime.data["observation_window"]["incomplete_turn_ids"] == [
+            "turn-2"
+        ]
+
+    def test_protocol_error_marks_runtime_source_unavailable(self) -> None:
+        request = EvidenceRequest(
+            "sample", "prompt", 1, EvidencePhase.AFTER, session_id="session-1"
+        )
+        events = (
+            _event(1, AgentEventType.SESSION_STARTED),
+            _event(2, AgentEventType.USER_INPUT, turn_id="turn-1"),
+            _event(3, AgentEventType.PROTOCOL_ERROR, turn_id="turn-1"),
+        )
+
+        runtime = CodeBuddyStreamEvidenceAdapter().capture(
+            request, events=events, run_id="run-1"
+        )[0]
+
+        assert runtime.status is EvidenceStatus.ERROR
+        assert runtime.data["observation_window"]["protocol_error_observed"] is True
+
+    def test_turn_correlation_survives_product_session_id_remapping(self) -> None:
+        request = EvidenceRequest(
+            "sample", "prompt", 1, EvidencePhase.AFTER, session_id="product-session"
+        )
+        events = (
+            _event(
+                1,
+                AgentEventType.USER_INPUT,
+                session_id="requested-session",
+                turn_id="turn-1",
+            ),
+            _event(
+                2,
+                AgentEventType.SESSION_STARTED,
+                session_id="product-session",
+                turn_id="turn-1",
+            ),
+            _event(
+                3,
+                AgentEventType.TURN_COMPLETED,
+                session_id="product-session",
+                turn_id="turn-1",
+            ),
+            _event(
+                4,
+                AgentEventType.SESSION_EXITED,
+                session_id="requested-session",
+                data={"returncode": 0},
+            ),
+        )
+
+        runtime = CodeBuddyStreamEvidenceAdapter().capture(
+            request,
+            events=events,
+            run_id="run-1",
+        )[0]
+
+        assert runtime.status is EvidenceStatus.AVAILABLE
+        assert runtime.correlation.session_ids == (
+            "requested-session",
+            "product-session",
+        )
+
 
 def _request() -> EvidenceRequest:
     return EvidenceRequest(
@@ -242,6 +398,7 @@ def _event(
     sequence: int,
     event_type: AgentEventType,
     *,
+    session_id: str = "session-1",
     turn_id: str | None = None,
     request_id: str | None = None,
     data=None,
@@ -251,7 +408,7 @@ def _event(
         event_type=event_type,
         observed_at=f"2026-09-09T00:00:0{sequence}+00:00",
         monotonic_seconds=float(sequence),
-        session_id="session-1",
+        session_id=session_id,
         request_id=request_id,
         turn_id=turn_id,
         data={} if data is None else data,

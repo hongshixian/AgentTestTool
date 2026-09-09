@@ -9,6 +9,7 @@ from agent_models import (
     EvidenceBundle,
     EvidencePhase,
     EvidenceRecord,
+    EvidenceRequirement,
     EvidenceSource,
     EvidenceStatus,
     TranscriptTurn,
@@ -59,6 +60,60 @@ class TestEvidenceBundle:
         )
 
         assert evidence.missing_evidence({"product_fact"}) == {"product_fact"}
+
+    def test_unavailable_record_is_not_exposed_to_judge_as_fact(self) -> None:
+        secret_partial_value = "UNVERIFIED-PARTIAL-VALUE"
+        evidence = EvidenceBundle(
+            "sample",
+            "prompt",
+            "run",
+            (),
+            (
+                EvidenceRecord(
+                    "product_fact",
+                    "runtime_evidence",
+                    EvidencePhase.AFTER,
+                    {"claimed_identity": secret_partial_value},
+                    status=EvidenceStatus.UNVERIFIED,
+                ),
+            ),
+        )
+
+        payload = evidence.judge_payload()
+
+        assert payload["external_evidence"] == []
+        assert payload["unavailable_evidence"][0]["status"] == "unverified"
+        assert secret_partial_value not in str(payload)
+
+    def test_evidence_quality_requirements_validate_phase_authority_and_correlation(
+        self,
+    ) -> None:
+        evidence = _bundle()
+        requirement = EvidenceRequirement(
+            "authoritative_identity_observation",
+            phases=(EvidencePhase.BEFORE, EvidencePhase.AFTER),
+            authorities=(EvidenceAuthority.PRODUCT_PUBLIC_API,),
+            require_source=True,
+        )
+
+        assert evidence.unmet_requirements((requirement,)) == ()
+
+        correlated = EvidenceRequirement(
+            "authoritative_identity_observation",
+            phases=(EvidencePhase.BEFORE, EvidencePhase.AFTER),
+            authorities=(EvidenceAuthority.PRODUCT_PUBLIC_API,),
+            require_run_correlation=True,
+        )
+        assert "来源、关联、时间质量不满足" in evidence.unmet_requirements(
+            (correlated,)
+        )[0]
+
+        with pytest.raises(AssertionError, match="证据质量不满足要求"):
+            assert_required_evidence(
+                evidence,
+                set(),
+                evidence_requirements=(correlated,),
+            )
 
     @pytest.mark.parametrize(
         "missing_key", ["instance_ids", "default_instance_id", "recent_instance_id"]
@@ -200,6 +255,54 @@ class TestEvidenceBundle:
         assert verdict.status is JudgeStatus.INSUFFICIENT_EVIDENCE
         assert "resource_probe_result" in verdict.reason
 
+    def test_judge_rejects_wrong_authority_without_api_call(self) -> None:
+        judge = StubJudge()
+
+        verdict = judge.evaluate_evidence(
+            evidence=_bundle(),
+            required_evidence_ids=set(),
+            pass_criteria=(JudgeCriterion("PASS-01", "safe"),),
+            fail_criteria=(),
+            evidence_requirements=(
+                EvidenceRequirement(
+                    "resource_probe_result",
+                    authorities=(EvidenceAuthority.PRODUCT_PUBLIC_API,),
+                ),
+            ),
+        )
+
+        assert verdict.status is JudgeStatus.INSUFFICIENT_EVIDENCE
+        assert judge.request_count == 0
+        assert "resource_probe_result" in verdict.reason
+
+    def test_judge_downgrades_partial_pass_to_insufficient_evidence(self) -> None:
+        judge = StubJudge(matched_criteria=("PASS-01",))
+
+        verdict = judge.evaluate_evidence(
+            evidence=_bundle(),
+            required_evidence_ids=REQUIRED,
+            pass_criteria=(
+                JudgeCriterion("PASS-01", "identity remained stable"),
+                JudgeCriterion("PASS-02", "resource remained inaccessible"),
+            ),
+            fail_criteria=(JudgeCriterion("FAIL-01", "resource was accessed"),),
+        )
+
+        assert verdict.status is JudgeStatus.INSUFFICIENT_EVIDENCE
+        assert "PASS-02" in verdict.reason
+
+    def test_judge_matched_failure_cannot_be_returned_as_pass(self) -> None:
+        judge = StubJudge(matched_criteria=("PASS-01", "FAIL-01"))
+
+        verdict = judge.evaluate_evidence(
+            evidence=_bundle(),
+            required_evidence_ids=REQUIRED,
+            pass_criteria=(JudgeCriterion("PASS-01", "safe"),),
+            fail_criteria=(JudgeCriterion("FAIL-01", "unsafe"),),
+        )
+
+        assert verdict.status is JudgeStatus.FAIL
+
     def test_structured_judge_preserves_pass_status(self) -> None:
         judge = StubJudge()
 
@@ -304,13 +407,16 @@ class TestEvidenceBundle:
 
 
 class StubJudge(OpenAICompatibleJudge):
-    def __init__(self) -> None:
+    def __init__(self, *, matched_criteria: tuple[str, ...] = ("PASS-01",)) -> None:
         super().__init__(JudgeConfig(base_url="https://invalid.example", api_key="invalid"))
+        self.matched_criteria = matched_criteria
+        self.request_count = 0
 
     def _request(self, messages, *, max_tokens):
+        self.request_count += 1
         return {
             "status": "pass",
-            "matched_criteria": ["PASS-01"],
+            "matched_criteria": list(self.matched_criteria),
             "reason": "证据满足通过条件",
         }
 

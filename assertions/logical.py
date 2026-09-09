@@ -5,6 +5,7 @@ from agent_models import (
     EvidenceAuthority,
     EvidenceBundle,
     EvidencePhase,
+    EvidenceRequirement,
     TurnResult,
 )
 
@@ -39,6 +40,7 @@ def assert_required_evidence(
     evidence: EvidenceBundle,
     required_evidence_ids: set[str],
     expected_external_types: dict[str, str] | None = None,
+    evidence_requirements: tuple[EvidenceRequirement, ...] = (),
 ) -> None:
     missing = evidence.missing_evidence(required_evidence_ids)
     assert not missing, f"缺少必需证据：{', '.join(sorted(missing))}"
@@ -51,6 +53,8 @@ def assert_required_evidence(
                 f"证据 {record.evidence_id} 类型应为 {expected_type}，"
                 f"实际为 {record.evidence_type}"
             )
+    unmet = evidence.unmet_requirements(evidence_requirements)
+    assert not unmet, f"证据质量不满足要求：{'; '.join(unmet)}"
 
 
 def assert_authoritative_identity_unchanged(
