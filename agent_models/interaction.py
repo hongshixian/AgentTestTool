@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable, Collection
 from dataclasses import dataclass, field
 from enum import Enum
+import time
 from typing import TypeAlias
 
 from agent_models.evidence import JsonValue
@@ -93,7 +94,23 @@ class ControlResult:
     error: str = ""
 
 
+@dataclass(frozen=True, slots=True)
+class PermissionResponse:
+    """One test-owned response to a normalized permission request."""
+
+    decision: PermissionDecision
+    reason: str
+    updated_input: dict[str, JsonValue] | None = None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.decision, PermissionDecision):
+            raise ValueError("permission response decision must use PermissionDecision")
+        if not isinstance(self.reason, str) or not self.reason.strip():
+            raise ValueError("permission response reason must be nonempty")
+
+
 EventPredicate: TypeAlias = Callable[[AgentEvent], bool]
+PermissionHandler: TypeAlias = Callable[[AgentEvent], PermissionResponse]
 
 
 class InteractiveSession(ABC):
@@ -171,6 +188,50 @@ class InteractiveSession(ABC):
     @abstractmethod
     def close(self) -> None:
         """Close stdin and prove that the child process has terminated."""
+
+    def run_turn(
+        self,
+        prompt: str,
+        *,
+        timeout: float,
+        permission_handler: PermissionHandler | None = None,
+    ) -> TurnResult:
+        """Run one turn while deterministically servicing permission requests."""
+
+        if timeout <= 0:
+            raise ValueError("turn timeout must be positive")
+        turn = self.send_input(prompt)
+        cursor = turn.after_sequence
+        deadline = time.monotonic() + timeout
+        while True:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("timed out while driving interactive Agent turn")
+            event = self.wait_for_event(
+                {
+                    AgentEventType.PERMISSION_REQUEST,
+                    AgentEventType.TURN_COMPLETED,
+                },
+                timeout=remaining,
+                after_sequence=cursor,
+                predicate=lambda item: item.turn_id in {None, turn.turn_id},
+            )
+            cursor = event.sequence
+            if event.event_type is AgentEventType.TURN_COMPLETED:
+                return self.wait_for_completion(turn, timeout=remaining)
+            if permission_handler is None:
+                raise RuntimeError(
+                    "interactive Agent turn requires an explicit permission handler"
+                )
+            response = permission_handler(event)
+            if not isinstance(response, PermissionResponse):
+                raise TypeError("permission handler must return PermissionResponse")
+            self.respond_to_confirmation(
+                event,
+                response.decision,
+                reason=response.reason,
+                updated_input=response.updated_input,
+            )
 
     def __enter__(self) -> InteractiveSession:
         return self

@@ -22,6 +22,7 @@ from agent_models.interaction import (
     ControlResult,
     InteractiveSession,
     PermissionDecision,
+    PermissionResponse,
     PermissionPolicy,
     TurnHandle,
 )
@@ -39,6 +40,7 @@ __all__ = [
     "ControlResult",
     "InteractiveSession",
     "PermissionDecision",
+    "PermissionResponse",
     "PermissionPolicy",
     "TurnHandle",
     "EvidenceBundle",

@@ -336,6 +336,34 @@ class TestCodeBuddyStreamEvidenceAdapter:
         assert runtime.status is EvidenceStatus.ERROR
         assert runtime.data["observation_window"]["protocol_error_observed"] is True
 
+    @pytest.mark.parametrize("corruption", ["out_of_order", "duplicate_terminal"])
+    def test_corrupted_event_order_or_duplicate_terminal_is_unavailable(
+        self, corruption: str
+    ) -> None:
+        events = (
+            (
+                _event(1, AgentEventType.USER_INPUT, turn_id="turn-1"),
+                _event(3, AgentEventType.SESSION_STARTED, turn_id="turn-1"),
+                _event(2, AgentEventType.TURN_COMPLETED, turn_id="turn-1"),
+            )
+            if corruption == "out_of_order"
+            else (
+                _event(1, AgentEventType.SESSION_STARTED, turn_id="turn-1"),
+                _event(2, AgentEventType.USER_INPUT, turn_id="turn-1"),
+                _event(3, AgentEventType.TURN_COMPLETED, turn_id="turn-1"),
+                _event(4, AgentEventType.TURN_COMPLETED, turn_id="turn-1"),
+            )
+        )
+        runtime = CodeBuddyStreamEvidenceAdapter().capture(
+            EvidenceRequest(
+                "sample", "prompt", 1, EvidencePhase.AFTER, session_id="session-1"
+            ),
+            events=events,
+            run_id="run-1",
+        )[0]
+
+        assert runtime.status is EvidenceStatus.ERROR
+
     def test_turn_correlation_survives_product_session_id_remapping(self) -> None:
         request = EvidenceRequest(
             "sample", "prompt", 1, EvidencePhase.AFTER, session_id="product-session"

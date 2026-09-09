@@ -7,7 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from agent_models import AgentEventType, PermissionDecision
+from agent_models import (
+    AgentEventType,
+    PermissionDecision,
+    PermissionResponse,
+)
 from agent_models.codebuddy.interactive import CodeBuddyInteractiveSession
 
 
@@ -97,6 +101,33 @@ class TestCodeBuddyInteractiveSession:
                 decision,
                 reason="duplicate decision",
             )
+
+    def test_run_turn_services_permissions_without_global_bypass(
+        self, session: CodeBuddyInteractiveSession
+    ) -> None:
+        handled = []
+
+        result = session.run_turn(
+            "NEED_PERMISSION",
+            timeout=2.0,
+            permission_handler=lambda event: (
+                handled.append(event.request_id)
+                or PermissionResponse(
+                    PermissionDecision.ALLOW,
+                    "allow controlled fixture tool",
+                )
+            ),
+        )
+
+        assert result.completed
+        assert result.response == "permission:allow"
+        assert handled == ["perm-1"]
+
+    def test_run_turn_requires_explicit_handler_for_permission_request(
+        self, session: CodeBuddyInteractiveSession
+    ) -> None:
+        with pytest.raises(RuntimeError, match="explicit permission handler"):
+            session.run_turn("NEED_PERMISSION", timeout=2.0)
 
     def test_steer_controls_an_active_turn(self, session: CodeBuddyInteractiveSession) -> None:
         turn = session.send_input("WAIT")

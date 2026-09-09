@@ -130,6 +130,7 @@ README.md
 - 每个产品在 `agent_models/<product>/` 下维护自己的 Model 组装和测试驱动；产品差异不得泄漏到测试用例。
 - 测试驱动是产品接入的唯一公开概念，统一负责 CLI 启动、STDIO/PTY、进程终止、认证状态、配置目录、会话和输出解析；进程交互和认证适配只是驱动内部职责，不作为独立架构层。
 - 长驻交互统一通过 `AgentModel.start_session()` 返回产品无关的 `InteractiveSession`；测试用例只等待标准事件，不解析产品原始协议。
+- 交互回合可能产生权限请求时使用 `InteractiveSession.run_turn()` 和显式 `PermissionResponse` 处理器；不得一边使用 `ASK` 模式一边直接阻塞等待终态，也不得用全局权限绕过代替逐次决定。
 - 开启工具与绕过授权是两个独立选择。`allow_tools=True` 不得隐式启用权限绕过；无人值守单轮默认拒绝未预先授权的操作，绕过或允许工作区编辑必须通过 `PermissionPolicy` 显式声明。
 - 新增 CLI Agent 时，增加对应的产品目录并注册到 `AgentModelFactory`，由统一接口运行已有测试用例。
 - `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；capability 仅向用例描述执行条件，测评结果由用例代码显式断言。

@@ -167,7 +167,28 @@ class CodeBuddyStreamEvidenceAdapter:
             if event.event_type is AgentEventType.TURN_COMPLETED and event.turn_id
         }
         incomplete_turn_ids = tuple(sorted(input_turn_ids - terminal_turn_ids))
+        orphan_terminal_turn_ids = tuple(sorted(terminal_turn_ids - input_turn_ids))
+        terminal_counts = {
+            turn_id: sum(
+                1
+                for event in selected
+                if event.event_type is AgentEventType.TURN_COMPLETED
+                and event.turn_id == turn_id
+            )
+            for turn_id in terminal_turn_ids
+        }
+        duplicate_terminal_turn_ids = tuple(
+            sorted(turn_id for turn_id, count in terminal_counts.items() if count != 1)
+        )
         terminal = bool(terminal_turn_ids)
+        sequence_integrity = all(
+            current.sequence < following.sequence
+            for current, following in zip(selected, selected[1:])
+        )
+        monotonic_integrity = all(
+            current.monotonic_seconds <= following.monotonic_seconds
+            for current, following in zip(selected, selected[1:])
+        )
         protocol_failed = any(
             event.event_type is AgentEventType.PROTOCOL_ERROR for event in selected
         )
@@ -180,9 +201,20 @@ class CodeBuddyStreamEvidenceAdapter:
         ]
         if not selected:
             status = EvidenceStatus.MISSING
-        elif protocol_failed or abnormal_exits:
+        elif (
+            protocol_failed
+            or abnormal_exits
+            or not sequence_integrity
+            or not monotonic_integrity
+            or duplicate_terminal_turn_ids
+        ):
             status = EvidenceStatus.ERROR
-        elif started and input_turn_ids and not incomplete_turn_ids:
+        elif (
+            started
+            and input_turn_ids
+            and not incomplete_turn_ids
+            and not orphan_terminal_turn_ids
+        ):
             status = EvidenceStatus.AVAILABLE
         else:
             status = EvidenceStatus.UNVERIFIED
@@ -204,6 +236,10 @@ class CodeBuddyStreamEvidenceAdapter:
             "input_turn_count": len(input_turn_ids),
             "terminal_turn_count": len(terminal_turn_ids),
             "incomplete_turn_ids": list(incomplete_turn_ids),
+            "orphan_terminal_turn_ids": list(orphan_terminal_turn_ids),
+            "duplicate_terminal_turn_ids": list(duplicate_terminal_turn_ids),
+            "sequence_integrity": sequence_integrity,
+            "monotonic_integrity": monotonic_integrity,
             "protocol_error_observed": protocol_failed,
             "abnormal_exit_observed": bool(abnormal_exits),
             "session_exit_observed": any(

@@ -12,7 +12,9 @@ from agent_models import (
     EvidenceBundle,
     EvidencePhase,
     EvidenceRequest,
+    PermissionDecision,
     PermissionPolicy,
+    PermissionResponse,
     ToolDefinition,
     ToolEffect,
     ToolResponse,
@@ -167,8 +169,14 @@ class TaskProcessReconstructionScenarioRunner(AgentTestCase):
             permission_policy=PermissionPolicy.ASK,
         )
         try:
-            handle = session.send_input(TASK_PROMPT)
-            turn = session.wait_for_completion(handle, timeout=180.0)
+            turn = session.run_turn(
+                TASK_PROMPT,
+                timeout=180.0,
+                permission_handler=lambda _event: PermissionResponse(
+                    PermissionDecision.ALLOW,
+                    "允许本用例预先配置的评测方受控 Mock Tool",
+                ),
+            )
         finally:
             session.close()
         self.assert_turn_completed(turn, request, agent_model)

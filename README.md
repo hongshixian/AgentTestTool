@@ -121,7 +121,8 @@ CodeBuddy 通过 STDIO MCP 桥接访问测试进程中的工具运行时；多�
 `allow_tools=True` 只表示工具可见，不代表绕过产品权限。无人值守的 `send_prompt()` 默认
 使用 `PermissionPolicy.DENY_UNAPPROVED`；仅工作区文件冒烟用例显式使用
 `ALLOW_WORKSPACE_EDITS`。需要允许、拒绝或取消单次真实权限请求时，应在长驻会话中响应
-对应请求事件。
+对应请求事件。需要在一个回合内持续处理权限窗口时，使用 `session.run_turn()` 并传入返回
+`PermissionResponse` 的处理器；每次决定都按 request ID 记录，不能用全局 bypass 代替。
 
 在测试类的方法中，可以这样设置模拟工具：
 
