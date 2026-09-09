@@ -9,16 +9,14 @@ from pathlib import Path
 
 from agent_models.base import AgentModel
 from agent_models.capabilities import AgentCapabilities
-from agent_models.codebuddy.credentials import CodeBuddyCredentialProvider
 from agent_models.codebuddy.driver import CodeBuddyDriver
 from agent_models.codebuddy.evidence import CodeBuddyCommandEvidenceProvider
 from agent_models.codebuddy.local_state import CodeBuddyCommandLocalStateController
 from agent_models.codebuddy.mock_tool import CodeBuddyMockToolController
-from agent_models.codebuddy.transport import CodeBuddyStdioTransport
 from agent_models.evidence import EvidenceRecord, EvidenceRequest, JsonValue, RequestContext
 from agent_models.environment.session import ControlledEnvironment
 from agent_models.local_state import LocalStateAction, LocalStateRequest
-from agent_models.result import AuthResult, AuthStatus, TurnResult
+from agent_models.result import AuthResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
 
 
@@ -28,8 +26,6 @@ class CodeBuddyAgentModel(AgentModel):
         *,
         workspace: Path,
         driver: CodeBuddyDriver,
-        transport: CodeBuddyStdioTransport,
-        credentials: CodeBuddyCredentialProvider,
         evidence: CodeBuddyCommandEvidenceProvider,
         mock_tool: CodeBuddyMockToolController,
         local_state: CodeBuddyCommandLocalStateController,
@@ -37,8 +33,6 @@ class CodeBuddyAgentModel(AgentModel):
     ) -> None:
         self._workspace = workspace
         self.driver = driver
-        self.transport = transport
-        self.credentials = credentials
         self.evidence = evidence
         self.mock_tool = mock_tool
         self.local_state = local_state
@@ -69,7 +63,7 @@ class CodeBuddyAgentModel(AgentModel):
         return AgentCapabilities(
             multi_turn=True,
             file_operations=True,
-            dedicated_test_account=self.credentials.is_dedicated_test_account,
+            dedicated_test_account=self.driver.is_dedicated_test_account,
             external_observation=self.evidence.is_available(),
             security_boundary_observation=False,
             mock_tools=True,
@@ -85,25 +79,11 @@ class CodeBuddyAgentModel(AgentModel):
             return result
 
     def _check_authentication(self) -> AuthResult:
-        if not self.transport.is_available():
-            return AuthResult(AuthStatus.ERROR, "找不到 codebuddy 命令")
-        if not self.credentials.has_local_login_state():
-            return AuthResult(AuthStatus.UNAUTHENTICATED, "未发现 CodeBuddy 本地登录状态")
-
-        try:
-            probe = self.transport.request(self.driver.AUTHENTICATION_PROBE, timeout=60.0)
-        except subprocess.TimeoutExpired:
-            return AuthResult(AuthStatus.ERROR, "CodeBuddy 认证探测超时")
-
-        turn = self.driver.parse_turn(probe)
-        if turn.completed:
-            return AuthResult(AuthStatus.AUTHENTICATED, "CodeBuddy 认证探测成功")
-        detail = turn.stderr.strip() or turn.response.strip() or "CodeBuddy 认证探测失败"
-        return AuthResult(AuthStatus.UNAUTHENTICATED, detail[-500:])
+        return self.driver.check_authentication()
 
     def login(self) -> AuthResult:
         with self.environment.activity("login") as correlation:
-            result = self.credentials.login()
+            result = self.driver.login()
             self.environment.ledger.record("agent_model", "login", asdict(result), correlation)
             return result
 
@@ -123,7 +103,7 @@ class CodeBuddyAgentModel(AgentModel):
                                            {"prompt": prompt, "session_id": self._session_id,
                                             "allow_tools": allow_tools}, correlation)
             try:
-                response = self.transport.request(
+                turn = self.driver.send_prompt(
                     prompt, timeout=timeout, session_id=self._session_id,
                     resume=self._has_started_session, allow_tools=allow_tools,
                     extra_args=self.mock_tool.extra_args if allow_tools else (),
@@ -134,7 +114,6 @@ class CodeBuddyAgentModel(AgentModel):
                 self.environment.ledger.record("agent_model", "turn_timeout",
                     {"stdout": decode(error.stdout), "stderr": decode(error.stderr)}, correlation)
                 raise
-            turn = self.driver.parse_turn(response)
             self.environment.record_turn(prompt, turn, correlation_id=correlation)
             if turn.completed:
                 self._has_started_session = True
@@ -173,8 +152,8 @@ class CodeBuddyAgentModel(AgentModel):
         if self._environment is not None:
             self._environment.begin_shutdown()
         errors: list[BaseException] = []
-        for cleanup in (self.transport.close, self.mock_tool.close,
-                        lambda: self.credentials.remove_test_session(self._session_id),
+        for cleanup in (lambda: self.driver.close(session_id=self._session_id),
+                        self.mock_tool.close,
                         self._environment.close if self._environment is not None else lambda: None):
             try:
                 cleanup()

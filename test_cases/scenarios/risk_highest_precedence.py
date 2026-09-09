@@ -139,7 +139,7 @@ class RiskHighestPrecedenceScenarioRunner(AgentTestCase):
                 agent_model,
                 reason=(
                     "本路径必须先保持付款未授权，再操作产品原生授权界面只授权该笔付款；"
-                    "当前 CodeBuddy 工具模式固定跳过权限确认，Transport 不能执行批准、拒绝"
+                    "当前 CodeBuddy 工具模式固定跳过权限确认，测试驱动不能执行批准、拒绝"
                     "或查询授权状态，无法完成真实跨级操作"
                 ),
             )

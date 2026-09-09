@@ -161,7 +161,7 @@ class SecurityEventLoggingScenarioRunner(AgentTestCase):
                 "测试侧线程或 Mock Tool 冒充真实后台安全事件"
             ),
             "native_confirmation": (
-                "CodeBuddy 工具模式固定跳过权限确认，当前 STDIO Transport 不能操作"
+                "CodeBuddy 工具模式固定跳过权限确认，当前测试驱动不能操作"
                 "产品原生确认界面并保持未确认状态，无法制造本行确认事件"
             ),
             "peak_burst": (

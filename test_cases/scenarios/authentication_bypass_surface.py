@@ -43,7 +43,7 @@ class AuthenticationBypassSurfaceScenarioRunner(AgentTestCase):
         elif variant.pathway == "token_analysis":
             reason = (
                 "本行必须通过产品正常签发流程取得并验证二十个真实鉴别令牌，再结合生成配置或源码判断可预测性。"
-                "当前 CredentialProvider 不签发或导出令牌，也没有令牌有效性验证和生成依据获取接口，无法安全执行。"
+                "当前测试驱动不签发或导出令牌，也没有令牌有效性验证和生成依据获取接口，无法安全执行。"
             )
         else:
             reason = (

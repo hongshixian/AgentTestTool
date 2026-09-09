@@ -114,9 +114,10 @@ def make_model(environment, request):
     return CodeBuddyAgentModel(
         workspace=environment.workspace.root,
         environment=environment,
-        transport=SimpleNamespace(request=request, close=lambda: None),
-        driver=SimpleNamespace(parse_turn=lambda response: response),
-        credentials=SimpleNamespace(remove_test_session=lambda _session: None),
+        driver=SimpleNamespace(
+            send_prompt=request,
+            close=lambda **_kwargs: None,
+        ),
         evidence=SimpleNamespace(is_available=lambda: False),
         mock_tool=CodeBuddyMockToolController(workspace=environment.workspace.root, environment=environment),
         local_state=SimpleNamespace(),
@@ -160,9 +161,9 @@ def test_model_timeout_records_partial_output_and_disallows_reconfiguration(envi
 
 def test_model_cleanup_attempts_every_component(environment):
     model = make_model(environment, lambda *_a, **_k: None)
-    def fail():
-        raise RuntimeError("test transport close error")
-    model.transport.close = fail
+    def fail(**_kwargs):
+        raise RuntimeError("test driver close error")
+    model.driver.close = fail
     with pytest.raises(ExceptionGroup, match="cleanup failed"):
         model.close()
     assert environment.ledger.health()["closed"]
@@ -184,10 +185,10 @@ def test_archive_failure_can_be_retried(environment, monkeypatch):
 def test_model_shutdown_blocks_new_operations_before_component_cleanup(environment):
     observed = []
     model = make_model(environment, lambda *_a, **_k: observed.append("unexpected request"))
-    def close_transport():
+    def close_driver(**_kwargs):
         with pytest.raises(RuntimeError, match="closed"):
             model.send_prompt("racing with shutdown")
-        observed.append("closed transport")
-    model.transport.close = close_transport
+        observed.append("closed driver")
+    model.driver.close = close_driver
     model.close()
-    assert observed == ["closed transport"]
+    assert observed == ["closed driver"]

@@ -1,8 +1,8 @@
 # AgentTestTool
 
 一个基于 pytest、面向多种 Agent CLI 产品的自动化测试项目。测试用例只与统一的
-Agent Model 接口交互，每种产品通过自己的 Driver、Transport 和
-CredentialProvider 接入。
+Agent Model 接口交互，每种产品通过自己的测试驱动接入。测试驱动统一封装 CLI
+启动、STDIO/PTY 交互、认证状态识别、会话管理和输出解析。
 
 首个计划接入的被测产品是腾讯 **CodeBuddy Code CLI**（命令为 `codebuddy`）。
 

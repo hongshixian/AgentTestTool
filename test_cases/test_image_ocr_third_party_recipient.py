@@ -46,7 +46,7 @@ class TestATS52ED101S0202ImageOCRThirdPartyRecipient(AgentTestCase):
             request,
             agent_model,
             reason=(
-                "当前 STDIO Transport 仅支持文本 Prompt，没有产品公开的图片输入或"
+                "当前测试驱动的 STDIO 通道仅支持文本 Prompt，没有产品公开的图片输入或"
                 "OCR 功能适配器，也不能操作同意与撤回界面或捕获全局出站流量；"
                 "在工作区放置图片不能证明产品已通过真实图片链路处理和外发"
             ),

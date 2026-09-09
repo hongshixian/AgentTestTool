@@ -4,11 +4,11 @@ import os
 from pathlib import Path
 import subprocess
 
-from agent_models.codebuddy.transport import CodeBuddyStdioTransport
+from agent_models.codebuddy.driver import CodeBuddyDriver
 from configs.environment import agent_process_environment, sensitive_environment_values
 
 
-def test_transport_does_not_inherit_judge_or_orchestration_variables(tmp_path, monkeypatch):
+def test_driver_does_not_inherit_judge_or_orchestration_variables(tmp_path, monkeypatch):
     fake_environment = {
         "JUDGE_API_KEY": "fake-judge-key-not-valid",
         "JUDGE_API_URL": "https://judge.invalid",
@@ -25,8 +25,8 @@ def test_transport_does_not_inherit_judge_or_orchestration_variables(tmp_path, m
         return subprocess.CompletedProcess(command, 0, stdout="ok", stderr="")
 
     monkeypatch.setattr(subprocess, "run", run)
-    response = CodeBuddyStdioTransport(workspace=tmp_path).request("test")
-    assert response.stdout == "ok"
+    response = CodeBuddyDriver(workspace=tmp_path).send_prompt("test")
+    assert response.raw_output == "ok"
     assert calls[0][1]["encoding"] == "utf-8"
     assert calls[0][1]["errors"] == "replace"
     child = calls[0][1]["env"]
@@ -107,7 +107,7 @@ def test_helpers_do_not_read_configuration_files(monkeypatch):
     assert agent_process_environment({"JUDGE_API_KEY": "fake-key", "PATH": "/fake/bin"}) == {"PATH": "/fake/bin"}
 
 
-def test_transport_retains_explicit_product_config_and_permission_mode(tmp_path, monkeypatch):
+def test_driver_retains_explicit_product_config_and_permission_mode(tmp_path, monkeypatch):
     monkeypatch.setattr(os, "environ", {"JUDGE_API_KEY": "fake-judge-key", "CODEBUDDY_API_KEY": "fake-product-key"})
     calls = []
 
@@ -117,8 +117,8 @@ def test_transport_retains_explicit_product_config_and_permission_mode(tmp_path,
 
     monkeypatch.setattr(subprocess, "run", run)
     config = tmp_path / "fake-product-config"
-    transport = CodeBuddyStdioTransport(workspace=tmp_path, config_dir=config)
-    transport.request("test", allow_tools=True)
+    driver = CodeBuddyDriver(workspace=tmp_path, config_dir=config)
+    driver.send_prompt("test", allow_tools=True)
     command, options = calls[0]
     assert "--dangerously-skip-permissions" in command
     assert options["env"] == {
@@ -126,6 +126,6 @@ def test_transport_retains_explicit_product_config_and_permission_mode(tmp_path,
         "CODEBUDDY_CONFIG_DIR": str(config),
         "CODEBUDDY_IS_SANDBOX": "1",
     }
-    transport.request("test", allow_tools=False)
+    driver.send_prompt("test", allow_tools=False)
     assert "--dangerously-skip-permissions" not in calls[1][0]
     assert "CODEBUDDY_IS_SANDBOX" not in calls[1][1]["env"]

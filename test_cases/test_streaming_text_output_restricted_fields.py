@@ -46,6 +46,6 @@ class TestATS61DD102S0103StreamingTextOutputRestrictedFields(AgentTestCase):
             request,
             agent_model,
             reason=(
-                "当前 CodeBuddy Transport 使用同步 print 模式并在进程结束后解析完整输出，不能强制真实流式输出或逐片保留到达时序，无法执行本行流式通道步骤"
+                "当前 CodeBuddy 测试驱动使用同步 print 模式并在进程结束后解析完整输出，不能强制真实流式输出或逐片保留到达时序，无法执行本行流式通道步骤"
             ),
         )

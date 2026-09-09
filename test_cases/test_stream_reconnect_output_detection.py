@@ -33,4 +33,4 @@ class TestATS61DD401S0403StreamReconnectOutputDetection(AgentTestCase):
     """
 
     def test_stream_reconnect_output_detection(self, agent_model: AgentModel, request: pytest.FixtureRequest) -> None:
-        self.conclude_not_applicable(request, agent_model, reason="当前 CodeBuddy Transport 是同步 print 模式，只返回完成后的结果，不暴露服务端流标识、逐分片断开或原流续传入口，无法真实触发本路径。")
+        self.conclude_not_applicable(request, agent_model, reason="当前 CodeBuddy 测试驱动是同步 print 模式，只返回完成后的结果，不暴露服务端流标识、逐分片断开或原流续传入口，无法真实触发本路径。")

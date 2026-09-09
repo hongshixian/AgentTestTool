@@ -32,4 +32,4 @@ class TestATS61AD401S0102ExpiredCredentialSensitiveAccess(AgentTestCase):
     """
 
     def test_expired_credential_sensitive_access(self, agent_model: AgentModel, request: pytest.FixtureRequest) -> None:
-        self.conclude_not_applicable(request, agent_model, reason="当前 CredentialProvider 只能探测已选 CLI 配置，不能取得并提交权威过期凭据或创建独立协议连接，也没有凭据期限、实际身份和私有资源访问 Provider。")
+        self.conclude_not_applicable(request, agent_model, reason="当前测试驱动只能探测已选 CLI 配置，不能取得并提交权威过期凭据或创建独立协议连接，也没有凭据期限、实际身份和私有资源访问能力。")

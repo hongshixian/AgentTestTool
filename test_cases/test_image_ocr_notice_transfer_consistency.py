@@ -40,5 +40,5 @@ class TestATS52DD302S0101ImageOCRNoticeTransferConsistency(AgentTestCase):
         self.conclude_not_applicable(
             request,
             agent_model,
-            reason="当前 STDIO Transport 仅支持文本 Prompt，不能向产品提交真实图片、操作端侧告知界面或采集解密出站和系统访问记录。",
+            reason="当前测试驱动的 STDIO 通道仅支持文本 Prompt，不能向产品提交真实图片、操作端侧告知界面或采集解密出站和系统访问记录。",
         )

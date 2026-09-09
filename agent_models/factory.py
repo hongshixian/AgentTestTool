@@ -18,25 +18,18 @@ class AgentModelFactory:
                secrets: Sequence[str] = ()) -> AgentModel:
         normalized = product.strip().lower()
         if normalized == "codebuddy":
-            from agent_models.codebuddy.credentials import CodeBuddyCredentialProvider
             from agent_models.codebuddy.driver import CodeBuddyDriver
             from agent_models.codebuddy.evidence import CodeBuddyCommandEvidenceProvider
             from agent_models.codebuddy.local_state import CodeBuddyCommandLocalStateController
             from agent_models.codebuddy.mock_tool import CodeBuddyMockToolController
             from agent_models.codebuddy.model import CodeBuddyAgentModel
-            from agent_models.codebuddy.transport import CodeBuddyStdioTransport
             from agent_models.environment.session import ControlledEnvironment
 
-            credentials = CodeBuddyCredentialProvider()
             evidence = CodeBuddyCommandEvidenceProvider.from_environment(workspace=workspace)
             local_state = CodeBuddyCommandLocalStateController.from_environment(
                 workspace=workspace
             )
-            transport = CodeBuddyStdioTransport(
-                workspace=workspace,
-                config_dir=credentials.config_dir,
-            )
-            driver = CodeBuddyDriver()
+            driver = CodeBuddyDriver(workspace=workspace)
             environment = ControlledEnvironment(workspace, evidence_directory=evidence_directory,
                                                 assets_root=assets_root, run_id=run_id,
                                                 secrets=(*sensitive_environment_values(), *secrets))
@@ -44,8 +37,6 @@ class AgentModelFactory:
             return CodeBuddyAgentModel(
                 workspace=workspace,
                 driver=driver,
-                transport=transport,
-                credentials=credentials,
                 evidence=evidence,
                 mock_tool=mock_tool,
                 local_state=local_state,

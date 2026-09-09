@@ -25,9 +25,7 @@ class TestSecurityCaseCapabilities:
     ) -> None:
         model = CodeBuddyAgentModel(
             workspace=tmp_path,
-            driver=SimpleNamespace(),
-            transport=SimpleNamespace(),
-            credentials=SimpleNamespace(is_dedicated_test_account=True),
+            driver=SimpleNamespace(is_dedicated_test_account=True),
             evidence=SimpleNamespace(is_available=lambda: True),
             mock_tool=SimpleNamespace(),
             local_state=SimpleNamespace(is_available=lambda: True),

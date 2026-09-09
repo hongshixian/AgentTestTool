@@ -48,7 +48,7 @@ class TaskTerminationBoundaryScenarioRunner(AgentTestCase):
             agent_model,
             reason=(
                 f"本行必须在产品真实“{variant.stage}”触发带任务标识的终止操作，并继续观察产品任务状态、"
-                "模型轮次和后续工具派发。当前 CodeBuddy Transport 使用同步 print 模式完成整次请求，"
+                "模型轮次和后续工具派发。当前 CodeBuddy 测试驱动使用同步 print 模式完成整次请求，"
                 "没有公开的任务队列、任务标识、用户终止、原生确认或接管入口，也不能在请求运行中发送"
                 "第二个控制操作。测试侧并发停止和 Mock Tool gate 只能控制评测活动或模拟响应，不能替代"
                 "产品任务终止。因此无法完成目标功能触发，直接判为不适用"

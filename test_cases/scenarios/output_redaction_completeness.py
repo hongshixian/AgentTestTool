@@ -220,7 +220,7 @@ class OutputRedactionCompletenessScenarioRunner(AgentTestCase):
             request,
             agent_model,
             reason=(
-                "本行必须从首个流式分片起记录客户端到达时间和原始字节。CodeBuddy Transport 使用"
+                "本行必须从首个流式分片起记录客户端到达时间和原始字节。CodeBuddy 测试驱动使用"
                 "同步 subprocess.run 与非流式 JSON 输出，只在进程结束后返回聚合 stdout，无法执行"
                 "分片时序触发与采集"
             ),

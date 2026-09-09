@@ -3,8 +3,8 @@
 ## 项目定位
 
 本项目是基于 pytest 的多产品 Agent CLI 自动化测试项目。所有测试用例只与统一的
-Agent Model 接口交互；每种 CLI 产品通过自己的 Driver、Transport 和
-CredentialProvider 接入。新增产品时通过对应的产品实现接入已有测试体系。
+Agent Model 接口交互；每种 CLI 产品通过自己的测试驱动接入。测试驱动统一封装产品的
+进程交互、认证状态、会话管理和输出解析。新增产品时通过对应的测试驱动接入已有测试体系。
 
 本项目按第三方黑盒 E2E 定位运行真实应用和真实网络服务。认证使用专门准备的真实测试
 账号；断言只依赖第三方可从公开 CLI、网页、API、文件系统和工具 I/O 观察到的证据。
@@ -48,13 +48,11 @@ agent_models/
 └── codebuddy/
     ├── __init__.py
     ├── model.py            # CodeBuddy AgentModel 的组件组装
-    ├── driver.py           # 产品命令、状态识别和输出解析
-    ├── transport.py        # 产品使用的 STDIO/PTY 交互
+    ├── driver.py           # CodeBuddy 测试驱动：进程、认证、会话和输出解析
     ├── evidence.py         # 产品公开界面的黑盒观察证据适配
     ├── mock_tool.py        # CodeBuddy Mock Tool 会话组装与证据采集
     ├── mock_mcp_server.py  # 确定性 stdio MCP 测试服务
-    ├── local_state.py      # 隔离配置的快照、篡改、重启与恢复适配
-    └── credentials.py      # 产品认证信息适配
+    └── local_state.py      # 隔离配置的快照、篡改、重启与恢复适配
 
 assertions/
 ├── __init__.py
@@ -97,7 +95,7 @@ test_cases/
 tests/
 ├── test_evidence.py          # 证据模型与断言的离线回归测试
 ├── test_scenario_shapes.py   # ATS 场景结构的离线回归测试
-├── test_codebuddy_credentials.py
+├── test_codebuddy_driver.py
 ├── test_codebuddy_evidence.py
 ├── test_codebuddy_local_state.py
 ├── test_codebuddy_mock_tool.py
@@ -121,7 +119,8 @@ README.md
 ### 编排约束
 
 - `agent_models/` 是被测 Agent 的统一领域入口。测试只能通过 `AgentModel` 接口与被测对象交互。
-- 每个产品在 `agent_models/<product>/` 下维护自己的 Model 组装、Driver、Transport 和 CredentialProvider；产品差异不得泄漏到测试用例。
+- 每个产品在 `agent_models/<product>/` 下维护自己的 Model 组装和测试驱动；产品差异不得泄漏到测试用例。
+- 测试驱动是产品接入的唯一公开概念，统一负责 CLI 启动、STDIO/PTY、进程终止、认证状态、配置目录、会话和输出解析；进程交互和认证适配只是驱动内部职责，不作为独立架构层。
 - 新增 CLI Agent 时，增加对应的产品目录并注册到 `AgentModelFactory`，由统一接口运行已有测试用例。
 - `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；capability 仅向用例描述执行条件，测评结果由用例代码显式断言。
 - 最终场景级 JSON 中的每个 `test_prompt` 对应 `test_cases/` 下一个独立 test case 文件；同一 Test Sample 的公共执行逻辑放在 `test_cases/scenarios/`，其文件名不得以 `test_` 开头。
@@ -216,7 +215,7 @@ class TestATS51BD502S01CrossID01BInstanceReplay(AgentTestCase):
 - 项目支持 Windows、macOS 和 Linux，新增实现和测试用例时必须考虑这三个目标平台。
 - 平台识别通过公共方法统一完成，返回明确的平台枚举；不得在各处重复读取或解析平台信息。
 - `AgentTestCase` 为测试用例提供统一的平台判断属性。测试目标本身存在平台差异时，使用 `if` 分支执行对应平台代码。
-- CLI 启动、STDIO/PTY、进程终止、路径、Shell、编码和认证目录等实现差异，由对应产品的 Driver、Transport 或 CredentialProvider 封装。
+- CLI 启动、STDIO/PTY、进程终止、路径、Shell、编码和认证目录等实现差异，由对应产品的测试驱动封装。
 - 优先使用 `pathlib`、`tempfile` 和 `shutil.which()` 等跨平台标准库能力。
 - 某个平台不支持测试所需的必要触发能力时，通过统一 capability 机制标识，公共 Test Case 显式断言“不适用”。
 
@@ -225,7 +224,7 @@ class TestATS51BD502S01CrossID01BInstanceReplay(AgentTestCase):
 - 开发过程中按功能完整、可以独立说明和回滚的节点积极创建 Git 提交。
 - 每个提交只包含当前功能相关的改动，提交信息应简短、明确地描述变更目的。
 - 完成一个经测试可用的版本节点后，应及时将提交推送到当前分支对应的远端分支。
-- 提交前根据变更范围选择测试：如果本次提交只新增或修改独立 test case，且未改动公共基类、fixture、Agent Model、Driver、Transport、CredentialProvider、断言等公共组件，仅需单独执行新增或改动的 test case。
+- 提交前根据变更范围选择测试：如果本次提交只新增或修改独立 test case，且未改动公共基类、fixture、Agent Model、测试驱动、断言等公共组件，仅需单独执行新增或改动的 test case。
 - 如果改动了公共类或公共组件，提交前必须分析可能受到影响的 test case，并执行所有可能受影响的 test case；影响范围较广或无法准确界定时执行全量测试。
 - 所选测试未通过或无法执行时，在提交和交付说明中记录具体情况，不得声称未经实际执行的测试已经通过。
 - 提交和推送前检查暂存内容，确认 `.env`、访问令牌、认证缓存和测试产生的敏感数据未被纳入版本管理。

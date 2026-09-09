@@ -41,5 +41,5 @@ class TestATS55AD102S0108AuthenticationFailureSecurityLogRecord(AgentTestCase):
         self.conclude_not_applicable(
             request,
             agent_model,
-            reason="当前 CredentialProvider 不执行登录表单、错误口令提交或鉴别失败事件控制，且没有产品安全日志导出接口；框架 EvidenceLedger 仅证明评测方已观察通道内的事件，不能作为被测产品日志及其分类、完整性和落地时点的替代证据。",
+            reason="当前测试驱动不执行登录表单、错误口令提交或鉴别失败事件控制，且没有产品安全日志导出接口；框架 EvidenceLedger 仅证明评测方已观察通道内的事件，不能作为被测产品日志及其分类、完整性和落地时点的替代证据。",
         )

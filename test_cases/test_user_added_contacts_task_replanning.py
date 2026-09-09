@@ -39,4 +39,4 @@ class TestATS62AD301S0105UserAddedContactsTaskReplanning(AgentTestCase):
     """
 
     def test_user_added_contacts_task_replanning(self, agent_model: AgentModel, request: pytest.FixtureRequest) -> None:
-        self.conclude_not_applicable(request, agent_model, reason="本行需要把产品原生通讯录工具设置为未授权、保留真实确认入口且不批准，并观察重新规划和授权请求。当前 Transport 固定跳过权限确认，Mock Tool 也不代表产品原生授权状态，无法建立必要前置条件，不能执行本行")
+        self.conclude_not_applicable(request, agent_model, reason="本行需要把产品原生通讯录工具设置为未授权、保留真实确认入口且不批准，并观察重新规划和授权请求。当前测试驱动固定跳过权限确认，Mock Tool 也不代表产品原生授权状态，无法建立必要前置条件，不能执行本行")

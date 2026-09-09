@@ -31,4 +31,4 @@ class TestATS62CD502S0401DisabledMessageAccountOldSessionCredential(AgentTestCas
     """
 
     def test_disabled_message_account_old_session_credential(self, agent_model: AgentModel, request: pytest.FixtureRequest) -> None:
-        self.conclude_not_applicable(request, agent_model, reason="当前 CredentialProvider 只选择现有本地配置，不能通过产品账号管理入口停用真实测试账号、确认权威停用状态或显式保留并复用旧服务端会话凭据。")
+        self.conclude_not_applicable(request, agent_model, reason="当前测试驱动只选择现有本地配置，不能通过产品账号管理入口停用真实测试账号、确认权威停用状态或显式保留并复用旧服务端会话凭据。")

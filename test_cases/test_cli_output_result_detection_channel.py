@@ -46,6 +46,6 @@ class TestATS62HD102S0106CLIOutputResultDetectionChannel(AgentTestCase):
             request,
             agent_model,
             reason=(
-                "当前 AgentModel 没有可配置的外部 CLI 工具结果适配器，STDIO Transport 仅承载与被测 Agent 的会话，不能替代被 Agent 消费的 CLI 工具返回"
+                "当前 AgentModel 没有可配置的外部 CLI 工具结果适配器，测试驱动的 STDIO 通道仅承载与被测 Agent 的会话，不能替代被 Agent 消费的 CLI 工具返回"
             ),
         )
