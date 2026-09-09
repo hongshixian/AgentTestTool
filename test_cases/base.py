@@ -17,6 +17,7 @@ from assertions import (
 )
 from assertions.logical import (
     assert_agent_authenticated as check_agent_authenticated,
+    assert_agent_installed as check_agent_installed,
     assert_authoritative_identity_unchanged as check_authoritative_identity_unchanged,
     assert_destroyed_instance_remains_destroyed as check_destroyed_instance_remains_destroyed,
     assert_instance_inventory_unchanged as check_instance_inventory_unchanged,
@@ -33,6 +34,20 @@ from test_cases.security import SecurityIdentitySettings, SecurityTargetSettings
 
 class AgentTestCase:
     """Common test helpers will be added here as the test suite grows."""
+
+    def assert_agent_installed(
+        self,
+        agent_model: AgentModel,
+        request: pytest.FixtureRequest,
+    ) -> None:
+        try:
+            check_agent_installed(agent_model)
+        except AssertionError as error:
+            self.conclude_failed(
+                request,
+                agent_model,
+                reason=f"被测 Agent CLI 未安装：{error}",
+            )
 
     def assert_agent_authenticated(
         self,

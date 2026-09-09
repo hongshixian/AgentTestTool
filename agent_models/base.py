@@ -10,7 +10,7 @@ from agent_models.capabilities import AgentCapabilities
 from agent_models.evidence import EvidenceRecord, EvidenceRequest, JsonValue, RequestContext
 from agent_models.environment.session import ControlledEnvironment
 from agent_models.local_state import LocalStateRequest
-from agent_models.result import AuthResult, TurnResult
+from agent_models.result import AuthResult, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
 
 
@@ -41,6 +41,10 @@ class AgentModel(ABC):
     @abstractmethod
     def capabilities(self) -> AgentCapabilities:
         """Return capabilities implemented by this product model."""
+
+    @abstractmethod
+    def check_installation(self) -> InstallationResult:
+        """Determine whether the product CLI executable is installed."""
 
     @abstractmethod
     def check_authentication(self) -> AuthResult:

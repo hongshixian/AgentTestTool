@@ -202,6 +202,22 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
+def pytest_configure(config: pytest.Config) -> None:
+    """Register public markers even when tests run from an installed package."""
+    config.addinivalue_line(
+        "markers",
+        "e2e: invokes a real Agent CLI and may invoke external services",
+    )
+    config.addinivalue_line(
+        "markers",
+        "smoke: belongs to the minimal E2E verification subset",
+    )
+    config.addinivalue_line(
+        "markers",
+        "security: requires trusted security-test environment evidence",
+    )
+
+
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if "repeat_index" not in metafunc.fixturenames:
         return

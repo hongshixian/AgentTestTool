@@ -13,6 +13,15 @@ class AuthStatus(str, Enum):
 
 
 @dataclass(frozen=True, slots=True)
+class InstallationResult:
+    """Product-neutral result of resolving the target CLI executable."""
+
+    installed: bool
+    detail: str = ""
+    executable: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class AuthResult:
     status: AuthStatus
     detail: str = ""
@@ -31,4 +40,3 @@ class TurnResult:
     completed: bool
     duration_seconds: float
     session_id: str | None = None
-

@@ -11,7 +11,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from agent_models.result import AuthResult, AuthStatus, TurnResult
+from agent_models.result import AuthResult, AuthStatus, InstallationResult, TurnResult
 from configs.environment import agent_process_environment
 
 
@@ -43,6 +43,18 @@ class CodeBuddyDriver:
         """Return whether the CodeBuddy executable can be resolved."""
 
         return shutil.which(self.executable) is not None
+
+    def check_installation(self) -> InstallationResult:
+        """Resolve the configured CodeBuddy executable without starting a session."""
+
+        executable = shutil.which(self.executable)
+        if executable is None:
+            return InstallationResult(False, "找不到 codebuddy 命令")
+        return InstallationResult(
+            True,
+            "CodeBuddy CLI 命令已安装",
+            executable=executable,
+        )
 
     def check_authentication(self) -> AuthResult:
         """Actively verify the selected CodeBuddy profile can use the model service."""

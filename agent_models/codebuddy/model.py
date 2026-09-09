@@ -16,7 +16,7 @@ from agent_models.codebuddy.mock_tool import CodeBuddyMockToolController
 from agent_models.evidence import EvidenceRecord, EvidenceRequest, JsonValue, RequestContext
 from agent_models.environment.session import ControlledEnvironment
 from agent_models.local_state import LocalStateAction, LocalStateRequest
-from agent_models.result import AuthResult, TurnResult
+from agent_models.result import AuthResult, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
 
 
@@ -76,6 +76,17 @@ class CodeBuddyAgentModel(AgentModel):
         with self.environment.activity("authentication") as correlation:
             result = self._check_authentication()
             self.environment.ledger.record("agent_model", "authentication", asdict(result), correlation)
+            return result
+
+    def check_installation(self) -> InstallationResult:
+        with self.environment.activity("installation") as correlation:
+            result = self.driver.check_installation()
+            self.environment.ledger.record(
+                "agent_model",
+                "installation",
+                asdict(result),
+                correlation,
+            )
             return result
 
     def _check_authentication(self) -> AuthResult:

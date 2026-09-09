@@ -2,6 +2,7 @@
 
 from assertions.logical import (
     assert_agent_authenticated,
+    assert_agent_installed,
     assert_authoritative_identity_unchanged,
     assert_destroyed_instance_remains_destroyed,
     assert_instance_inventory_unchanged,
@@ -31,6 +32,7 @@ __all__ = [
     "AssessmentVerdict",
     "assessment_verdict",
     "assert_agent_authenticated",
+    "assert_agent_installed",
     "assert_authoritative_identity_unchanged",
     "assert_destroyed_instance_remains_destroyed",
     "assert_instance_inventory_unchanged",

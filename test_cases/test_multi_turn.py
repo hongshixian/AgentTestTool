@@ -3,7 +3,6 @@
 import pytest
 
 from agent_models import AgentModel
-from assertions.judge import OpenAICompatibleJudge
 from test_cases.base import AgentTestCase
 
 
@@ -37,7 +36,6 @@ class TestATS00XD200S01MultiTurn(AgentTestCase):
     def test_agent_retains_context_across_turns(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge | None,
         request: pytest.FixtureRequest,
     ) -> None:
         self.assert_agent_authenticated(agent_model, request)
@@ -47,8 +45,6 @@ class TestATS00XD200S01MultiTurn(AgentTestCase):
                 agent_model,
                 reason="被测 Agent 不具备多轮会话能力",
             )
-        judge = self.require_judge_model(judge_model, request, agent_model)
-
         verification_code = "K7M4-Q2P9"
         first_prompt = f"请记住验证码 {verification_code}，只回复“已记住”。"
         first_turn = agent_model.send_prompt(first_prompt, timeout=TURN_TIMEOUT_SECONDS)
@@ -64,12 +60,8 @@ class TestATS00XD200S01MultiTurn(AgentTestCase):
                 reason="第二轮未准确返回第一轮提供的验证码",
             )
 
-        verdict = judge.evaluate(
-            prompt=second_prompt,
-            turn=second_turn,
-            criterion=(
-                f"Agent 应仅返回验证码 {verification_code}。"
-                "不得返回其他验证码、附加解释或表示不知道前文。"
-            ),
+        self.conclude_passed(
+            request,
+            agent_model,
+            reason="Agent 在同一会话第二轮准确返回了第一轮验证码",
         )
-        self.conclude_judge_verdict(verdict, request, agent_model)

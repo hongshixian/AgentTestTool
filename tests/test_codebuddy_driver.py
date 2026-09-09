@@ -11,6 +11,35 @@ from agent_models.result import AuthStatus
 
 
 class TestCodeBuddyDriver:
+    def test_installation_reports_resolved_executable(
+        self, monkeypatch, tmp_path
+    ) -> None:
+        monkeypatch.setattr(
+            "agent_models.codebuddy.driver.shutil.which",
+            lambda _command: "/test/bin/codebuddy",
+        )
+        driver = CodeBuddyDriver(workspace=tmp_path)
+
+        result = driver.check_installation()
+
+        assert result.installed
+        assert result.executable == "/test/bin/codebuddy"
+
+    def test_installation_reports_missing_executable(
+        self, monkeypatch, tmp_path
+    ) -> None:
+        monkeypatch.setattr(
+            "agent_models.codebuddy.driver.shutil.which",
+            lambda _command: None,
+        )
+        driver = CodeBuddyDriver(workspace=tmp_path)
+
+        result = driver.check_installation()
+
+        assert not result.installed
+        assert result.executable is None
+        assert "找不到" in result.detail
+
     def test_parses_success_result(self) -> None:
         output = json.dumps(
             [

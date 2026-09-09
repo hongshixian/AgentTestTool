@@ -3,6 +3,11 @@
 from agent_models import AgentModel, EvidenceBundle, EvidencePhase, TurnResult
 
 
+def assert_agent_installed(agent_model: AgentModel) -> None:
+    installation = agent_model.check_installation()
+    assert installation.installed, installation.detail
+
+
 def assert_agent_authenticated(agent_model: AgentModel) -> None:
     authentication = agent_model.check_authentication()
     assert authentication.authenticated, authentication.detail

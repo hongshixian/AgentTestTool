@@ -29,6 +29,12 @@ Agent Model 接口交互；每种 CLI 产品通过自己的测试驱动接入。
 项目采用以下目录编排：
 
 ```text
+agent_test_tool/
+├── cli.py                  # 唯一正式测评命令入口
+├── runner.py               # 冒烟门禁、业务执行和报告编排
+├── result_plugin.py        # pytest 四态结构化结果采集
+└── reporting/              # ReportLab PDF 数据模型、统计和渲染
+
 agent_models/
 ├── __init__.py
 ├── base.py                 # AgentModel 抽象接口
@@ -233,11 +239,17 @@ class TestATS51BD502S01CrossID01BInstanceReplay(AgentTestCase):
 
 ```bash
 uv sync --extra dev
+uv run agent-test --agent codebuddy
 uv run pytest test_cases
 uv run pytest tests
 uv run pytest test_cases --repeat=3
 uv run pytest --smoke
 ```
+
+`uv run agent-test --agent codebuddy` 是正式测评的唯一入口，依次执行冒烟测试、业务测试和
+PDF 报告生成。冒烟测试只有在非空、无收集或框架错误且每条用例均返回“通过”时才通过；
+冒烟未通过时不得执行业务测试，但仍须生成只包含冒烟结果的报告。正式 PDF 由 ReportLab
+直接生成，不依赖浏览器、Office 或 LaTeX。
 
 开发过程中可运行 `uv run pytest --smoke`，它执行快速单元测试和最小 E2E 用例集。
 需要重复执行测试路径时显式传入 `--repeat=COUNT`；默认不传，按 1 次执行。

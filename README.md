@@ -10,20 +10,36 @@ Agent Model 接口交互，每种产品通过自己的测试驱动接入。测�
 
 ```bash
 uv sync --extra dev
-# 执行全部真实 Agent CLI 和 Judge E2E 用例
-uv run pytest test_cases --agent=codebuddy
+
+# 正式测评入口：冒烟测试 -> 业务测试 -> PDF 报告
+uv run agent-test --agent codebuddy
 
 # 需要稳定性验证时，将支持重复执行的测试路径运行三次
-uv run pytest test_cases --agent=codebuddy --repeat=3
+uv run agent-test --agent codebuddy --repeat 3
 
-# 开发阶段执行快速单元测试和冒烟测试
+# 指定报告及证据产物的父目录
+uv run agent-test --agent codebuddy --output-dir artifacts
+
+# 仅用于框架开发的离线回归
+uv run pytest tests -q
+
+# 仅用于开发调试的 pytest 冒烟入口
 uv run pytest --smoke --agent=codebuddy
 ```
 
 `--repeat=COUNT` 控制支持重复执行的测试路径的运行次数，`COUNT` 必须是正整数。
 未传入该参数时默认只运行一次。
-完整测试需要先配置真实测试账号、CodeBuddy 登录状态和 Judge API。`--smoke` 会执行
-身份响应、文件创建和多轮会话三条冒烟测试，因此也会调用真实 Agent 和 Judge。
+正式入口先执行 CLI 安装、基础交互、多轮交互、文件创建和文件编辑五条冒烟测试。
+五条用例必须全部返回“通过”才会继续执行业务测试；否则立即停止业务测试并生成只含
+冒烟章节的报告。冒烟用例采用确定性逻辑断言，不依赖 Judge。
+
+每次运行在 `artifacts/<RUN_ID>/` 下生成 `report.pdf`、`report.json`、两阶段结构化结果、
+控制台日志及脱敏证据。PDF 由 ReportLab 直接生成，不依赖浏览器、Office 或 LaTeX。
+报告包含封面、冒烟测试结果，以及在冒烟通过时生成的业务测试四态占比、饼图和用例明细。
+即使测试失败，工具也会尽力生成报告；PDF 渲染失败时保留 JSON、日志和
+`report-error.txt`。
+
+完整测试需要先配置真实测试账号、CodeBuddy 登录状态和业务用例所需的 Judge API。
 
 Judge 使用 OpenAI 兼容的 Chat Completions API，并从项目根目录的 `.env` 读取：
 
@@ -189,6 +205,7 @@ uv run pytest tests/test_environment_model_integration.py -q
 ## 目录结构
 
 ```text
+agent_test_tool/ 正式工作流入口、四态结果采集及 ReportLab PDF 报告
 agent_models/   Agent Model 抽象与各 CLI 产品实现
 assertions/      传统逻辑断言及 Judge 智能断言
 test_cases/     pytest 公共测试用例

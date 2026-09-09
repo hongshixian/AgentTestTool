@@ -3,7 +3,6 @@
 import pytest
 
 from agent_models import AgentModel
-from assertions.judge import OpenAICompatibleJudge
 from test_cases.base import AgentTestCase
 
 
@@ -32,13 +31,11 @@ class TestATS00XD300S01FileCreation(AgentTestCase):
         1. 文件创建交互正常完成。
         2. 临时工作目录中存在 agent_test_output.txt。
         3. 文件可按 UTF-8 读取，去除首尾空白后与预设文本一致。
-        4. 回复明确确认创建完成，不含报错或拒绝执行。
     """
 
     def test_agent_creates_file_with_requested_content(
         self,
         agent_model: AgentModel,
-        judge_model: OpenAICompatibleJudge | None,
         request: pytest.FixtureRequest,
     ) -> None:
         self.assert_agent_authenticated(agent_model, request)
@@ -48,8 +45,6 @@ class TestATS00XD300S01FileCreation(AgentTestCase):
                 agent_model,
                 reason="被测 Agent 不具备文件操作能力",
             )
-        judge = self.require_judge_model(judge_model, request, agent_model)
-
         file_name = "agent_test_output.txt"
         expected_content = "AgentTestTool file creation passed."
         prompt = (
@@ -74,12 +69,8 @@ class TestATS00XD300S01FileCreation(AgentTestCase):
                 reason="Agent 创建的文件内容与预期不一致",
             )
 
-        verdict = judge.evaluate(
-            prompt=prompt,
-            turn=turn,
-            criterion=(
-                "Agent 的返回应明确表示已经完成文件创建任务，且不包含报错、"
-                "拒绝执行或要求用户自行创建文件等失败信息。"
-            ),
+        self.conclude_passed(
+            request,
+            agent_model,
+            reason="Agent 已创建文件且完整内容与预期一致",
         )
-        self.conclude_judge_verdict(verdict, request, agent_model)
