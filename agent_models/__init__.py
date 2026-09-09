@@ -3,14 +3,27 @@
 from agent_models.base import AgentModel
 from agent_models.evidence import (
     EvidenceBundle,
+    EvidenceAuthority,
+    EvidenceCorrelation,
     EvidencePhase,
     EvidenceRecord,
     EvidenceRequest,
+    EvidenceSource,
+    EvidenceStatus,
     RequestContext,
     TranscriptTurn,
 )
 from agent_models.factory import AgentModelFactory
 from agent_models.local_state import LocalStateAction, LocalStateKind, LocalStateRequest
+from agent_models.interaction import (
+    AgentEvent,
+    AgentEventType,
+    ControlResult,
+    InteractiveSession,
+    PermissionDecision,
+    PermissionPolicy,
+    TurnHandle,
+)
 from agent_models.result import AuthResult, AuthStatus, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolDefinition, ToolEffect, ToolResponse, ToolSuite
 
@@ -20,10 +33,21 @@ __all__ = [
     "AuthResult",
     "AuthStatus",
     "InstallationResult",
+    "AgentEvent",
+    "AgentEventType",
+    "ControlResult",
+    "InteractiveSession",
+    "PermissionDecision",
+    "PermissionPolicy",
+    "TurnHandle",
     "EvidenceBundle",
+    "EvidenceAuthority",
+    "EvidenceCorrelation",
     "EvidencePhase",
     "EvidenceRecord",
     "EvidenceRequest",
+    "EvidenceSource",
+    "EvidenceStatus",
     "RequestContext",
     "MockToolProfile",
     "ToolDefinition",

@@ -5,8 +5,20 @@ from pathlib import Path
 import subprocess
 import sys
 
-from agent_models import (AgentModelFactory, EvidenceBundle, EvidencePhase, EvidenceRequest,
-                          ToolDefinition, ToolEffect, ToolResponse, ToolSuite, TranscriptTurn)
+import pytest
+
+from agent_models import (
+    AgentModelFactory,
+    EvidenceBundle,
+    EvidencePhase,
+    EvidenceRequest,
+    PermissionPolicy,
+    ToolDefinition,
+    ToolEffect,
+    ToolResponse,
+    ToolSuite,
+    TranscriptTurn,
+)
 from agent_models.environment import EvidenceLedger
 from assertions.environment import assert_tool_call_count, assert_simulated_effect
 
@@ -98,3 +110,68 @@ def test_model_prompt_and_controlled_gate_synchronize_through_public_api(tmp_pat
         assert results["prompt"].completed
         assert_simulated_effect(env.ledger, "submit", "submitted", False, True,
                                 correlation_id=results["release"])
+
+
+def test_factory_interactive_session_archives_standard_runtime_evidence(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setenv("CODEBUDDY_CONFIG_DIR", str(tmp_path / "test-account"))
+    monkeypatch.setenv("JUDGE_API_KEY", "fake-judge-secret-not-valid")
+    monkeypatch.delenv("CODEBUDDY_OBSERVATION_COMMAND", raising=False)
+    monkeypatch.delenv("CODEBUDDY_LOCAL_STATE_COMMAND", raising=False)
+    original_popen = subprocess.Popen
+    probe = (
+        Path(__file__).resolve().parents[1]
+        / "assets"
+        / "framework_fixtures"
+        / "interactive_cli_protocol_probe.py"
+    )
+    launches = []
+
+    def popen_local(command, **kwargs):
+        assert command[0] == "codebuddy", "this test must never launch a real product"
+        assert "JUDGE_API_KEY" not in kwargs["env"]
+        launches.append(tuple(command))
+        return original_popen([sys.executable, "-u", str(probe)], **kwargs)
+
+    monkeypatch.setattr(subprocess, "Popen", popen_local)
+    evidence_directory = tmp_path / "interactive-evidence"
+    with AgentModelFactory.create(
+        "codebuddy",
+        workspace=tmp_path / "workspace",
+        evidence_directory=evidence_directory,
+    ) as model:
+        session = model.start_session(
+            allow_tools=False,
+            permission_policy=PermissionPolicy.ASK,
+        )
+        with pytest.raises(RuntimeError, match="stop Agent"):
+            model.environment.snapshot()
+        first = session.send_input("one")
+        first_result = session.wait_for_completion(first)
+        second = session.send_input("two")
+        second_result = session.wait_for_completion(second)
+        session.close()
+
+        records = model.capture_evidence(
+            EvidenceRequest(
+                "fixture",
+                "interactive",
+                1,
+                EvidencePhase.AFTER,
+                session_id=first_result.session_id,
+            )
+        )
+        available = {record.evidence_id for record in records if record.available}
+        assert first_result.completed and second_result.completed
+        assert "agent_runtime_stream" in available
+        assert "agent_session_correlation" in available
+        runtime = next(
+            record for record in records if record.evidence_id == "agent_runtime_stream"
+        )
+        assert runtime.correlation.run_id == model.environment.run_id
+        assert len(runtime.correlation.turn_ids) == 2
+        assert runtime.source is not None
+        assert runtime.source.channel == "stdio_stream_json"
+    assert len(launches) == 1
+    assert EvidenceLedger.verify_archive(evidence_directory)["healthy"]

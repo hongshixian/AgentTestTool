@@ -53,6 +53,22 @@ def test_restore_and_close_refuse_active_agent_operation(environment):
                 pass
 
 
+def test_long_lived_activity_lease_blocks_state_changes_until_closed(environment):
+    snapshot = environment.snapshot()
+    lease = environment.open_managed_activity("interactive_session")
+
+    assert environment.health()["active_operations"] == 1
+    with pytest.raises(RuntimeError, match="stop Agent"):
+        environment.restore(snapshot)
+    environment.begin_shutdown(allow_active=True)
+    with pytest.raises(RuntimeError, match="closed"):
+        environment.open_managed_activity("late operation")
+
+    lease.close()
+    lease.close()
+    assert environment.health()["active_operations"] == 0
+
+
 def test_checkpoint_from_another_run_is_rejected(environment):
     snapshot = environment.snapshot()
     with pytest.raises(ValueError, match="different environment"):

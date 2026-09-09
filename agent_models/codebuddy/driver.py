@@ -7,10 +7,13 @@ import os
 import shutil
 import subprocess
 import time
+import threading
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
+from agent_models.codebuddy.interactive import CodeBuddyInteractiveSession
+from agent_models.interaction import AgentEvent, PermissionPolicy
 from agent_models.result import AuthResult, AuthStatus, InstallationResult, TurnResult
 from configs.environment import agent_process_environment
 
@@ -38,6 +41,8 @@ class CodeBuddyDriver:
             if configured_dir
             else Path.home() / ".codebuddy"
         )
+        self._interactive_sessions: list[CodeBuddyInteractiveSession] = []
+        self._interactive_lock = threading.RLock()
 
     def is_available(self) -> bool:
         """Return whether the CodeBuddy executable can be resolved."""
@@ -90,15 +95,25 @@ class CodeBuddyDriver:
         session_id: str | None = None,
         resume: bool = False,
         allow_tools: bool = False,
+        permission_policy: PermissionPolicy = PermissionPolicy.DENY_UNAPPROVED,
         extra_args: Sequence[str] = (),
     ) -> TurnResult:
         """Execute one CodeBuddy turn over STDIO and normalize its output."""
 
         command = [self.executable, "--print", "--output-format", "json"]
-        if allow_tools:
-            command.append("--dangerously-skip-permissions")
-        else:
+        if not allow_tools:
             command.extend(["--tools", ""])
+        permission_modes = {
+            PermissionPolicy.ASK: "default",
+            PermissionPolicy.DENY_UNAPPROVED: "dontAsk",
+            PermissionPolicy.ALLOW_WORKSPACE_EDITS: "acceptEdits",
+            PermissionPolicy.BYPASS: "bypassPermissions",
+        }
+        try:
+            permission_mode = permission_modes[permission_policy]
+        except KeyError as error:
+            raise ValueError("unsupported permission policy") from error
+        command.extend(("--permission-mode", permission_mode))
         if session_id:
             command.extend(["--resume" if resume else "--session-id", session_id])
         else:
@@ -129,6 +144,79 @@ class CodeBuddyDriver:
             returncode=completed.returncode,
             duration_seconds=time.monotonic() - started,
         )
+
+    def start_session(
+        self,
+        *,
+        session_id: str,
+        timeout: float | None = None,
+        allow_tools: bool = True,
+        permission_policy: PermissionPolicy = PermissionPolicy.ASK,
+        extra_args: Sequence[str] = (),
+        event_sink: Callable[[AgentEvent], None] | None = None,
+        close_callback: Callable[[], None] | None = None,
+    ) -> CodeBuddyInteractiveSession:
+        """Start the public persistent STDIO stream-json protocol."""
+
+        command = [
+            self.executable,
+            "--print",
+            "--input-format",
+            "stream-json",
+            "--output-format",
+            "stream-json",
+            "--include-partial-messages",
+            "--session-id",
+            session_id,
+            "--no-session-persistence",
+        ]
+        if not allow_tools:
+            command.extend(("--tools", ""))
+        permission_modes = {
+            PermissionPolicy.ASK: "default",
+            PermissionPolicy.DENY_UNAPPROVED: "dontAsk",
+            PermissionPolicy.ALLOW_WORKSPACE_EDITS: "acceptEdits",
+            PermissionPolicy.BYPASS: "bypassPermissions",
+        }
+        try:
+            permission_mode = permission_modes[permission_policy]
+        except KeyError as error:
+            raise ValueError("unsupported permission policy") from error
+        command.extend(("--permission-mode", permission_mode))
+        command.extend(extra_args)
+
+        process_environment = agent_process_environment()
+        process_environment["CODEBUDDY_CONFIG_DIR"] = str(self.config_dir)
+
+        session: CodeBuddyInteractiveSession | None = None
+
+        def closed() -> None:
+            if session is not None:
+                with self._interactive_lock:
+                    if session in self._interactive_sessions:
+                        self._interactive_sessions.remove(session)
+            if close_callback is not None:
+                close_callback()
+
+        session = CodeBuddyInteractiveSession(
+            command=command,
+            workspace=self.workspace,
+            environment=process_environment,
+            session_id=session_id,
+            default_timeout=self.default_timeout if timeout is None else timeout,
+            event_sink=event_sink,
+            close_callback=closed,
+        )
+        with self._interactive_lock:
+            self._interactive_sessions.append(session)
+        return session
+
+    @property
+    def interactive_sessions(self) -> tuple[CodeBuddyInteractiveSession, ...]:
+        """Return sessions retained for runtime evidence until Model cleanup."""
+
+        with self._interactive_lock:
+            return tuple(self._interactive_sessions)
 
     @staticmethod
     def parse_output(
@@ -183,17 +271,26 @@ class CodeBuddyDriver:
     def close(self, *, session_id: str | None = None) -> None:
         """Release driver-owned resources and remove the test session record."""
 
-        if session_id is None:
-            return
-        projects = self.config_dir / "projects"
-        if not projects.is_dir():
-            return
-        for session_file in projects.rglob(f"{session_id}.jsonl"):
-            session_file.unlink(missing_ok=True)
+        with self._interactive_lock:
+            sessions = tuple(self._interactive_sessions)
+        errors: list[BaseException] = []
+        for session in sessions:
             try:
-                session_file.parent.rmdir()
-            except OSError:
-                pass
+                session.close()
+            except BaseException as error:
+                errors.append(error)
+
+        if session_id is not None:
+            projects = self.config_dir / "projects"
+            if projects.is_dir():
+                for session_file in projects.rglob(f"{session_id}.jsonl"):
+                    session_file.unlink(missing_ok=True)
+                    try:
+                        session_file.parent.rmdir()
+                    except OSError:
+                        pass
+        if errors:
+            raise BaseExceptionGroup("CodeBuddy interactive session cleanup failed", errors)
 
     def _has_local_login_state(self) -> bool:
         storage = self.config_dir / "local_storage"

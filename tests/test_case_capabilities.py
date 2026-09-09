@@ -35,6 +35,18 @@ class TestSecurityCaseCapabilities:
         assert model.capabilities.local_state_control
         assert model.capabilities.multiple_mock_tools
         assert model.capabilities.controlled_environment
+        assert model.capabilities.interactive_session
+        assert model.capabilities.streaming_events
+        assert model.capabilities.runtime_control
+        assert model.capabilities.permission_control
+        assert model.capabilities.product_runtime_evidence
+        assert model.capabilities.session_correlation_evidence
+        assert model.capabilities.tool_event_evidence
+        assert model.capabilities.permission_event_evidence
+        assert model.capabilities.task_event_evidence
+        assert not model.capabilities.authoritative_identity_evidence
+        assert not model.capabilities.authorization_evidence
+        assert not model.capabilities.security_event_evidence
         assert not model.capabilities.security_boundary_observation
 
     def test_external_helper_alone_does_not_enable_boundary_observation(self) -> None:

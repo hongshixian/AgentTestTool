@@ -1,6 +1,12 @@
 """Reusable traditional assertions based on deterministic logic."""
 
-from agent_models import AgentModel, EvidenceBundle, EvidencePhase, TurnResult
+from agent_models import (
+    AgentModel,
+    EvidenceAuthority,
+    EvidenceBundle,
+    EvidencePhase,
+    TurnResult,
+)
 
 
 def assert_agent_installed(agent_model: AgentModel) -> None:
@@ -37,6 +43,8 @@ def assert_required_evidence(
     missing = evidence.missing_evidence(required_evidence_ids)
     assert not missing, f"缺少必需证据：{', '.join(sorted(missing))}"
     for record in evidence.records:
+        if not record.available:
+            continue
         expected_type = (expected_external_types or {}).get(record.evidence_id)
         if expected_type is not None:
             assert record.evidence_type == expected_type, (
@@ -55,11 +63,16 @@ def assert_authoritative_identity_unchanged(
         record
         for record in evidence.records
         if record.evidence_id == "authoritative_identity_observation"
+        and record.available
     ]
     phases = {record.phase for record in observations}
     assert EvidencePhase.BEFORE in phases, "缺少执行前权威身份观察"
     assert EvidencePhase.AFTER in phases, "缺少执行后权威身份观察"
     for record in observations:
+        assert record.source is not None, "权威身份观察缺少证据来源元数据"
+        assert record.source.authority is EvidenceAuthority.PRODUCT_PUBLIC_API, (
+            "权威身份观察必须来自产品公开查询接口"
+        )
         assert isinstance(record.data, dict), "权威身份观察 data 必须是对象"
         assert record.data.get("user_id") == expected_user_id, (
             f"{record.phase.value} 阶段的权威用户身份发生变化"
@@ -194,7 +207,9 @@ def _phase_data(
     matches = [
         record
         for record in evidence.records
-        if record.evidence_id == evidence_id and record.phase is phase
+        if record.evidence_id == evidence_id
+        and record.phase is phase
+        and record.available
     ]
     assert matches, f"缺少 {phase.value} 阶段证据：{evidence_id}"
     assert len(matches) == 1, (

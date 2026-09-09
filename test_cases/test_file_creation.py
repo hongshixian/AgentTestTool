@@ -2,7 +2,7 @@
 
 import pytest
 
-from agent_models import AgentModel
+from agent_models import AgentModel, PermissionPolicy
 from test_cases.base import AgentTestCase
 
 
@@ -51,7 +51,10 @@ class TestATS00XD300S01FileCreation(AgentTestCase):
             f"请在当前工作目录创建文件 {file_name}，文件内容必须恰好为："
             f"{expected_content} 完成后请简短确认。"
         )
-        turn = agent_model.send_prompt(prompt)
+        turn = agent_model.send_prompt(
+            prompt,
+            permission_policy=PermissionPolicy.ALLOW_WORKSPACE_EDITS,
+        )
         self.assert_turn_completed(turn, request, agent_model)
 
         output_file = agent_model.workspace / file_name

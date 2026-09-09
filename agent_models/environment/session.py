@@ -16,7 +16,15 @@ from agent_models.environment.orchestration import ScenarioRunner
 from agent_models.environment.receiver import HttpToolReceiver
 from agent_models.environment.tool_runtime import ToolRuntime, ToolRuntimeSnapshot
 from agent_models.environment.workspace import WorkspaceManager, WorkspaceSnapshot
-from agent_models.evidence import EvidenceBundle, EvidenceRecord, EvidenceRequest, JsonValue
+from agent_models.evidence import (
+    EvidenceAuthority,
+    EvidenceBundle,
+    EvidenceCorrelation,
+    EvidenceRecord,
+    EvidenceRequest,
+    EvidenceSource,
+    JsonValue,
+)
 from agent_models.result import TurnResult
 from agent_models.tools import ToolSuite
 
@@ -28,6 +36,31 @@ class EnvironmentSnapshot:
     run_id: str
     workspace: WorkspaceSnapshot
     tools: ToolRuntimeSnapshot | None
+
+
+class ManagedActivity:
+    """Keep the controlled environment leased while an external process is live."""
+
+    def __init__(
+        self,
+        environment: ControlledEnvironment,
+        name: str,
+        correlation_id: str,
+    ) -> None:
+        self.environment = environment
+        self.name = name
+        self.correlation_id = correlation_id
+        self._closed = False
+
+    def close(self, error: BaseException | None = None) -> None:
+        if self._closed:
+            return
+        self._closed = True
+        self.environment._finish_activity(
+            self.name,
+            self.correlation_id,
+            error=error,
+        )
 
 
 class ControlledEnvironment:
@@ -74,6 +107,24 @@ class ControlledEnvironment:
     @contextmanager
     def activity(self, name: str) -> Iterator[str]:
         """Prevent state restoration while a synchronous Agent operation is active."""
+        lease = self.open_managed_activity(name)
+        correlation = lease.correlation_id
+        try:
+            yield correlation
+        except BaseException as error:
+            try:
+                lease.close(error)
+            except BaseException as collector_error:
+                raise BaseExceptionGroup("Agent operation and evidence recording failed",
+                                         [error, collector_error]) from None
+            raise
+        else:
+            lease.close()
+
+    def open_managed_activity(self, name: str) -> ManagedActivity:
+        """Lease the environment until a long-lived product operation is closed."""
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("activity name must be nonempty")
         correlation = uuid.uuid4().hex
         with self._lock:
             self._ensure_open()
@@ -83,20 +134,36 @@ class ControlledEnvironment:
             self._active += 1
             if name == "send_prompt":
                 self._session_attempted = True
+            if name == "interactive_session":
+                self._session_attempted = True
+        return ManagedActivity(self, name, correlation)
+
+    def _finish_activity(
+        self,
+        name: str,
+        correlation_id: str,
+        *,
+        error: BaseException | None,
+    ) -> None:
         try:
-            yield correlation
-        except BaseException as error:
-            try:
-                self.ledger.record("agent_model", "operation_failed",
-                                   {"name": name, "error_type": type(error).__name__}, correlation)
-            except BaseException as collector_error:
-                raise BaseExceptionGroup("Agent operation and evidence recording failed",
-                                         [error, collector_error]) from None
-            raise
-        else:
-            self.ledger.record("agent_model", "operation_completed", {"name": name}, correlation)
+            if error is None:
+                self.ledger.record(
+                    "agent_model",
+                    "operation_completed",
+                    {"name": name},
+                    correlation_id,
+                )
+            else:
+                self.ledger.record(
+                    "agent_model",
+                    "operation_failed",
+                    {"name": name, "error_type": type(error).__name__},
+                    correlation_id,
+                )
         finally:
             with self._lock:
+                if self._active <= 0:
+                    raise RuntimeError("managed activity accounting underflow")
                 self._active -= 1
 
     def configure_tools(self, suite: ToolSuite, *,
@@ -147,8 +214,24 @@ class ControlledEnvironment:
                                        "request": request.provider_payload(),
                                        "health": self.health(), "events": self.ledger.events,
                                        "simulated_state": state})
-            return (EvidenceRecord("controlled_environment", "runtime_evidence",
-                                   request.phase, data),)
+            return (
+                EvidenceRecord(
+                    "controlled_environment",
+                    "runtime_evidence",
+                    request.phase,
+                    data,
+                    source=EvidenceSource(
+                        provider="controlled_environment",
+                        channel="workspace_and_mock_runtime",
+                        authority=EvidenceAuthority.EVALUATOR_CONTROLLED,
+                    ),
+                    correlation=EvidenceCorrelation(run_id=self.run_id),
+                    proves=("评测方受控工作区和模拟工具在观察窗口内的状态",),
+                    limitations=(
+                        "不代表被测产品服务端身份、授权状态或内部安全日志。",
+                    ),
+                ),
+            )
 
     def archive_bundle(self, bundle: EvidenceBundle, *, name: str = "evidence_bundle") -> Path:
         with self._lock:
@@ -186,10 +269,15 @@ class ControlledEnvironment:
                 self._errors.append("state restoration failed; state may be partially restored")
                 raise
 
-    def begin_shutdown(self) -> None:
-        """Atomically reject new Agent operations before product cleanup begins."""
+    def begin_shutdown(self, *, allow_active: bool = False) -> None:
+        """Atomically reject new operations before product cleanup begins.
+
+        A model may first close a long-lived product session while that session
+        still owns the environment lease.  Other callers retain the stricter
+        default and cannot begin shutdown while synchronous work is active.
+        """
         with self._lock:
-            if self._active:
+            if self._active and not allow_active:
                 raise RuntimeError("cannot close during an Agent operation")
             self._closing = True
 

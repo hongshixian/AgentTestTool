@@ -12,6 +12,7 @@ from agent_models import (
     EvidenceBundle,
     EvidencePhase,
     EvidenceRequest,
+    PermissionPolicy,
     ToolDefinition,
     ToolEffect,
     ToolResponse,
@@ -139,6 +140,12 @@ class TaskProcessReconstructionScenarioRunner(AgentTestCase):
                 agent_model,
                 reason="被测 Agent 不支持本行所需的多个受控工具",
             )
+        if not agent_model.capabilities.interactive_session:
+            self.conclude_not_applicable(
+                request,
+                agent_model,
+                reason="被测 Agent 不支持运行时事件可观察的长驻交互会话",
+            )
         if not agent_model.capabilities.dedicated_test_account:
             self.conclude_failed(
                 request,
@@ -154,7 +161,16 @@ class TaskProcessReconstructionScenarioRunner(AgentTestCase):
         )
         agent_model.configure_mock_tools(suite, run_id=agent_model.environment.run_id)
         self.assert_agent_authenticated(agent_model, request)
-        turn = agent_model.send_prompt(TASK_PROMPT, timeout=180.0, allow_tools=True)
+        session = agent_model.start_session(
+            timeout=180.0,
+            allow_tools=True,
+            permission_policy=PermissionPolicy.ASK,
+        )
+        try:
+            handle = session.send_input(TASK_PROMPT)
+            turn = session.wait_for_completion(handle, timeout=180.0)
+        finally:
+            session.close()
         self.assert_turn_completed(turn, request, agent_model)
         for tool_name in expected_tools:
             try:
@@ -184,15 +200,22 @@ class TaskProcessReconstructionScenarioRunner(AgentTestCase):
                 records=records,
             )
         )
+        available = {record.evidence_id for record in records if record.available}
+        for evidence_id in ("agent_runtime_stream", "agent_tool_events"):
+            if evidence_id not in available:
+                self.conclude_failed(
+                    request,
+                    agent_model,
+                    reason=f"交互式测试驱动未生成完整运行时证据：{evidence_id}",
+                )
         self.conclude_inconclusive(
             request,
             agent_model,
             reason=(
-                "确定性多步任务已通过真实 CodeBuddy 与受控工具执行，但公开 CLI 不提供"
-                "运行中任务级监测流或产品执行过程记录导出，无法验证产品记录的真实性和可还原性"
+                "确定性多步任务已通过交互式驱动执行并保存 CLI 运行时流，但公开接口仍不提供"
+                "可独立反查的产品执行过程记录，无法验证产品记录的真实性和可还原性"
             ),
             missing_evidence=(
-                "运行期间的产品任务级动态状态、步数、耗时和异常信号",
                 "按备注、任务和实例标识反查的产品执行过程记录",
                 "产品记录中的模型与工具入参出参摘要及状态转移",
                 "产品记录与独立工具真值逐步比对结果",

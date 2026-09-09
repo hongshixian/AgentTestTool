@@ -39,8 +39,9 @@ agent_models/
 ├── __init__.py
 ├── base.py                 # AgentModel 抽象接口
 ├── factory.py              # AgentModelFactory 与产品注册
-├── result.py               # TurnResult、AuthResult 和统一事件类型
-├── evidence.py             # 请求上下文、证据记录和 EvidenceBundle
+├── result.py               # TurnResult、AuthResult 等同步结果
+├── interaction.py          # 长驻会话、权限决定、运行控制和统一事件
+├── evidence.py             # 证据来源、状态、关联关系和 EvidenceBundle
 ├── tools.py                # 产品无关的确定性 Mock Tool 配置
 ├── local_state.py          # 本地状态篡改与恢复请求模型
 ├── capabilities.py         # 产品能力声明
@@ -55,6 +56,7 @@ agent_models/
     ├── __init__.py
     ├── model.py            # CodeBuddy AgentModel 的组件组装
     ├── driver.py           # CodeBuddy 测试驱动：进程、认证、会话和输出解析
+    ├── interactive.py      # CodeBuddy 公开 stream-json 长驻会话适配
     ├── evidence.py         # 产品公开界面的黑盒观察证据适配
     ├── mock_tool.py        # CodeBuddy Mock Tool 会话组装与证据采集
     ├── mock_mcp_server.py  # 确定性 stdio MCP 测试服务
@@ -127,6 +129,8 @@ README.md
 - `agent_models/` 是被测 Agent 的统一领域入口。测试只能通过 `AgentModel` 接口与被测对象交互。
 - 每个产品在 `agent_models/<product>/` 下维护自己的 Model 组装和测试驱动；产品差异不得泄漏到测试用例。
 - 测试驱动是产品接入的唯一公开概念，统一负责 CLI 启动、STDIO/PTY、进程终止、认证状态、配置目录、会话和输出解析；进程交互和认证适配只是驱动内部职责，不作为独立架构层。
+- 长驻交互统一通过 `AgentModel.start_session()` 返回产品无关的 `InteractiveSession`；测试用例只等待标准事件，不解析产品原始协议。
+- 开启工具与绕过授权是两个独立选择。`allow_tools=True` 不得隐式启用权限绕过；无人值守单轮默认拒绝未预先授权的操作，绕过或允许工作区编辑必须通过 `PermissionPolicy` 显式声明。
 - 新增 CLI Agent 时，增加对应的产品目录并注册到 `AgentModelFactory`，由统一接口运行已有测试用例。
 - `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；capability 仅向用例描述执行条件，测评结果由用例代码显式断言。
 - 最终场景级 JSON 中的每个 `test_prompt` 对应 `test_cases/` 下一个独立 test case 文件；同一 Test Sample 的公共执行逻辑放在 `test_cases/scenarios/`，其文件名不得以 `test_` 开头。
@@ -135,6 +139,9 @@ README.md
 - `assertions/judge/` 独立于具体 Agent 产品，只消费标准化的交互结果、工作区产物和用例评价准则。
 - 安全测试使用专用真实账号和可清理的真实测试数据；账号 A 是当前登录身份，账号 B 是受保护目标。
 - 黑盒观察 Provider 只能使用第三方可访问的公开 CLI、网页、API、文件系统和工具 I/O；不得把产品内部 Trace、Hook 或私有测试接口作为公共用例的必需能力。
+- 每条标准化证据必须区分采集状态、来源通道、权威边界、关联标识、可证明事实和限制；只有状态为 `available` 的记录可以满足必需证据。
+- 产品公开 CLI 运行时流只对该进程发出的会话、工具、权限、任务和终态事件具有权威性，不得据此推断云端账号身份、服务端授权状态、安全审计事件或所有未观察通道均无副作用。
+- 权威身份断言必须使用独立的产品公开查询接口证据；Agent 自述、初始化响应中的账号对象、本地认证缓存和测试侧状态不能替代。
 - 测试用例通过统一 RequestContext、Mock Tool 和 LocalStateController 能力表达产品公开操作；具体 CLI 参数、MCP 和本地配置差异只能由产品 AgentModel 封装。
 - 产品没有公开用户或实例上下文选择能力时，不得通过猜测或伪造私有 HTTP Header 模拟支持；该能力属于必要功能触发条件时，用例直接断言为“不适用”。
 - `assets/` 统一存放测试用例使用的静态资源文件，例如输入样本、图片、归档文件和固定的测试工程模板。
@@ -277,6 +284,8 @@ PDF 报告生成。冒烟测试只有在非空、无收集或框架错误且每�
 - 工具通过 `ToolSuite` 定义输入约束、响应序列、延迟、同步门及模拟副作用；配置在首次发送会话 prompt 前完成。
 - 原有单工具 `MockToolProfile` 继续可用。CodeBuddy 的 STDIO MCP 子进程只转发请求，测试进程负责接收、状态和证据持久化。
 - 使用有界事件同步；测试侧任务超时后必须确认停止才能恢复状态。恢复只影响受控工作区和模拟业务状态，不改变产品账号或服务端数据。
+- 长驻会话存活期间必须持有环境活动租约；会话关闭并确认子进程退出前禁止快照、恢复或关闭受控环境。
+- CodeBuddy 交互会话使用公开 `stream-json` STDIO 协议；产品原生 `interrupt` 响应是中断结果证据，进程终止只用于清理，不能替代产品取消成功证据。
 - 重复的真实 Agent 运行应逐次创建新 Model，使用新会话和 RUN_ID；编排器自身生成新运行标识不等于自动重建产品会话。
 - 零调用断言必须提供指定工具的完整观察窗口、正常成功调用基线和前后接收端健康探测；采集异常或缺少证据时不能判通过。
 - 测试侧接收日志只证明所观察端点的请求和模拟副作用。工作区分离不是 OS 沙箱，模拟服务的拒绝结果不能代替产品原生鉴权或取消证据。

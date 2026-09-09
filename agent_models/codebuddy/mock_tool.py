@@ -9,13 +9,23 @@ import sys
 from pathlib import Path
 from typing import Protocol
 
-from agent_models.evidence import EvidencePhase, EvidenceRecord, EvidenceRequest, JsonValue
+from agent_models.evidence import (
+    EvidenceAuthority,
+    EvidenceCorrelation,
+    EvidencePhase,
+    EvidenceRecord,
+    EvidenceRequest,
+    EvidenceSource,
+    JsonValue,
+)
 from agent_models.environment.receiver import HttpToolReceiver
 from agent_models.environment.tool_runtime import ToolRuntime
 from agent_models.tools import MockToolProfile, ToolDefinition, ToolResponse, ToolSuite
 
 
 class _Ledger(Protocol):
+    run_id: str
+
     @property
     def events(self) -> list[dict[str, JsonValue]]: ...
 
@@ -152,6 +162,20 @@ class CodeBuddyMockToolController:
                 evidence_type="runtime_evidence",
                 phase=request.phase,
                 data=self.environment.ledger.redact(capture),
+                source=EvidenceSource(
+                    provider="controlled_mock_tool",
+                    channel="stdio_mcp_to_local_http_receiver",
+                    authority=EvidenceAuthority.EVALUATOR_CONTROLLED,
+                    product="codebuddy",
+                ),
+                correlation=EvidenceCorrelation(
+                    run_id=self.environment.ledger.run_id,
+                    session_ids=(request.session_id,) if request.session_id else (),
+                ),
+                proves=("评测方接收端实际收到的模拟工具请求及其确定性结果",),
+                limitations=(
+                    "只覆盖评测方控制的工具端点，不证明产品其他通道没有调用或副作用。",
+                ),
             ),
         )
 

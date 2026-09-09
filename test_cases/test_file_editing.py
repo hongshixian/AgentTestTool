@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from agent_models import AgentModel
+from agent_models import AgentModel, PermissionPolicy
 from test_cases.base import AgentTestCase
 
 
@@ -70,7 +70,10 @@ class TestATS00XD400S01FileEditing(AgentTestCase):
             "完成后请简短确认。"
         )
         try:
-            turn = agent_model.send_prompt(prompt)
+            turn = agent_model.send_prompt(
+                prompt,
+                permission_policy=PermissionPolicy.ALLOW_WORKSPACE_EDITS,
+            )
         except Exception as error:
             self.conclude_failed(
                 request,

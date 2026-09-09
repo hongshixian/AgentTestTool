@@ -10,8 +10,16 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import cast
 
-from agent_models.evidence import EvidencePhase, EvidenceRecord, JsonValue
+from agent_models.evidence import (
+    EvidenceAuthority,
+    EvidenceCorrelation,
+    EvidencePhase,
+    EvidenceRecord,
+    EvidenceSource,
+    JsonValue,
+)
 from agent_models.local_state import LocalStateAction, LocalStateRequest
+from configs.environment import agent_process_environment
 
 
 class CodeBuddyCommandLocalStateController:
@@ -72,7 +80,7 @@ class CodeBuddyCommandLocalStateController:
                 )
                 + "\n",
                 cwd=self.workspace,
-                env=os.environ.copy(),
+                env=agent_process_environment(),
                 capture_output=True,
                 check=False,
                 text=True,
@@ -82,8 +90,7 @@ class CodeBuddyCommandLocalStateController:
             raise RuntimeError("CodeBuddy 本地状态控制命令执行超时") from error
         if completed.returncode != 0:
             raise RuntimeError(
-                f"CodeBuddy 本地状态控制命令失败（退出码 {completed.returncode}）："
-                f"{completed.stderr.strip()[-500:]}"
+                f"CodeBuddy 本地状态控制命令失败（退出码 {completed.returncode}）"
             )
         try:
             payload = json.loads(completed.stdout)
@@ -109,6 +116,17 @@ class CodeBuddyCommandLocalStateController:
                     evidence_type=evidence_type,
                     phase=phase,
                     data=cast(JsonValue, item.get("data")),
+                    source=EvidenceSource(
+                        provider="codebuddy_local_state_controller",
+                        channel="configured_local_command",
+                        authority=EvidenceAuthority.EVALUATOR_CONTROLLED,
+                        product="codebuddy",
+                    ),
+                    correlation=EvidenceCorrelation(run_id=request.run_id),
+                    proves=("评测方隔离配置目录的本地状态变更与恢复结果",),
+                    limitations=(
+                        "本地配置状态不等同于产品服务端身份、实例或授权真值。",
+                    ),
                 )
             )
         return tuple(records)

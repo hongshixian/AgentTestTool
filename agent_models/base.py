@@ -10,6 +10,7 @@ from agent_models.capabilities import AgentCapabilities
 from agent_models.evidence import EvidenceRecord, EvidenceRequest, JsonValue, RequestContext
 from agent_models.environment.session import ControlledEnvironment
 from agent_models.local_state import LocalStateRequest
+from agent_models.interaction import InteractiveSession, PermissionPolicy
 from agent_models.result import AuthResult, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
 
@@ -62,8 +63,19 @@ class AgentModel(ABC):
         context: RequestContext | None = None,
         timeout: float | None = None,
         allow_tools: bool = True,
+        permission_policy: PermissionPolicy = PermissionPolicy.DENY_UNAPPROVED,
     ) -> TurnResult:
-        """Send one prompt over the product's standard input channel."""
+        """Send one prompt with an explicit unattended permission policy."""
+
+    @abstractmethod
+    def start_session(
+        self,
+        *,
+        timeout: float | None = None,
+        allow_tools: bool = True,
+        permission_policy: PermissionPolicy = PermissionPolicy.ASK,
+    ) -> InteractiveSession:
+        """Start a long-lived product session over the public CLI protocol."""
 
     @abstractmethod
     def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+import threading
 import uuid
 from dataclasses import asdict
 from pathlib import Path
@@ -10,11 +11,15 @@ from pathlib import Path
 from agent_models.base import AgentModel
 from agent_models.capabilities import AgentCapabilities
 from agent_models.codebuddy.driver import CodeBuddyDriver
-from agent_models.codebuddy.evidence import CodeBuddyCommandEvidenceProvider
+from agent_models.codebuddy.evidence import (
+    CodeBuddyCommandEvidenceProvider,
+    CodeBuddyStreamEvidenceAdapter,
+)
 from agent_models.codebuddy.local_state import CodeBuddyCommandLocalStateController
 from agent_models.codebuddy.mock_tool import CodeBuddyMockToolController
 from agent_models.evidence import EvidenceRecord, EvidenceRequest, JsonValue, RequestContext
 from agent_models.environment.session import ControlledEnvironment
+from agent_models.interaction import AgentEvent, InteractiveSession, PermissionPolicy
 from agent_models.local_state import LocalStateAction, LocalStateRequest
 from agent_models.result import AuthResult, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
@@ -41,6 +46,9 @@ class CodeBuddyAgentModel(AgentModel):
         self._has_attempted_session = False
         self._environment = environment
         self._closed = False
+        self._interactive_events: list[AgentEvent] = []
+        self._interactive_events_lock = threading.RLock()
+        self._stream_evidence = CodeBuddyStreamEvidenceAdapter()
 
     @property
     def environment(self) -> ControlledEnvironment:
@@ -70,6 +78,16 @@ class CodeBuddyAgentModel(AgentModel):
             multiple_mock_tools=True,
             controlled_environment=True,
             local_state_control=self.local_state.is_available(),
+            interactive_session=True,
+            streaming_events=True,
+            runtime_control=True,
+            permission_control=True,
+            background_task_events=True,
+            product_runtime_evidence=True,
+            session_correlation_evidence=True,
+            tool_event_evidence=True,
+            permission_event_evidence=True,
+            task_event_evidence=True,
         )
 
     def check_authentication(self) -> AuthResult:
@@ -105,18 +123,21 @@ class CodeBuddyAgentModel(AgentModel):
         context: RequestContext | None = None,
         timeout: float | None = None,
         allow_tools: bool = True,
+        permission_policy: PermissionPolicy = PermissionPolicy.DENY_UNAPPROVED,
     ) -> TurnResult:
         if context is not None:
             raise RuntimeError("CodeBuddy CLI 未公开用户或实例身份上下文选择参数")
         with self.environment.activity("send_prompt") as correlation:
             self._has_attempted_session = True
             self.environment.ledger.record("agent_model", "prompt",
-                                           {"prompt": prompt, "session_id": self._session_id,
-                                            "allow_tools": allow_tools}, correlation)
+                                            {"prompt": prompt, "session_id": self._session_id,
+                                            "allow_tools": allow_tools,
+                                            "permission_policy": permission_policy.value}, correlation)
             try:
                 turn = self.driver.send_prompt(
                     prompt, timeout=timeout, session_id=self._session_id,
                     resume=self._has_started_session, allow_tools=allow_tools,
+                    permission_policy=permission_policy,
                     extra_args=self.mock_tool.extra_args if allow_tools else (),
                 )
             except subprocess.TimeoutExpired as error:
@@ -130,10 +151,63 @@ class CodeBuddyAgentModel(AgentModel):
                 self._has_started_session = True
             return turn
 
+    def start_session(
+        self,
+        *,
+        timeout: float | None = None,
+        allow_tools: bool = True,
+        permission_policy: PermissionPolicy = PermissionPolicy.ASK,
+    ) -> InteractiveSession:
+        if self._has_attempted_session:
+            raise RuntimeError("一个 Agent Model 只能启动一种会话执行路径")
+        lease = self.environment.open_managed_activity("interactive_session")
+        self._has_attempted_session = True
+
+        def record_event(event: AgentEvent) -> None:
+            with self._interactive_events_lock:
+                self._interactive_events.append(event)
+            self.environment.ledger.record(
+                "codebuddy_cli",
+                "interactive_event",
+                asdict(event),
+                lease.correlation_id,
+            )
+
+        try:
+            session = self.driver.start_session(
+                session_id=self._session_id,
+                timeout=timeout,
+                allow_tools=allow_tools,
+                permission_policy=permission_policy,
+                extra_args=self.mock_tool.extra_args if allow_tools else (),
+                event_sink=record_event,
+                close_callback=lease.close,
+            )
+        except BaseException as error:
+            lease.close(error)
+            raise
+        return session
+
     def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:
         with self.environment.activity("capture_evidence"):
             external_records = self.evidence.capture(request) if self.evidence.is_available() else ()
-            records = external_records + self.mock_tool.capture(request) + self.environment.capture(request)
+            with self._interactive_events_lock:
+                interactive_events = tuple(self._interactive_events)
+            stream_records = (
+                self._stream_evidence.capture(
+                    request,
+                    events=interactive_events,
+                    run_id=self.environment.run_id,
+                )
+                if interactive_events
+                else ()
+            )
+            records = (
+                external_records
+                + stream_records
+                + self.mock_tool.capture(request)
+                + self.environment.capture(request)
+            )
             self.environment.ledger.save_artifact(f"capture_{uuid.uuid4().hex}",
                                                   [asdict(record) for record in records])
             return records
@@ -160,12 +234,20 @@ class CodeBuddyAgentModel(AgentModel):
     def close(self) -> None:
         if self._closed:
             return
-        if self._environment is not None:
-            self._environment.begin_shutdown()
         errors: list[BaseException] = []
-        for cleanup in (lambda: self.driver.close(session_id=self._session_id),
-                        self.mock_tool.close,
-                        self._environment.close if self._environment is not None else lambda: None):
+        if self._environment is not None:
+            try:
+                self._environment.begin_shutdown(allow_active=True)
+            except BaseException as error:
+                errors.append(error)
+        try:
+            self.driver.close(session_id=self._session_id)
+        except BaseException as error:
+            errors.append(error)
+        for cleanup in (
+            self.mock_tool.close,
+            self._environment.close if self._environment is not None else lambda: None,
+        ):
             try:
                 cleanup()
             except BaseException as error:

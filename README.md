@@ -2,7 +2,7 @@
 
 一个基于 pytest、面向多种 Agent CLI 产品的自动化测试项目。测试用例只与统一的
 Agent Model 接口交互，每种产品通过自己的测试驱动接入。测试驱动统一封装 CLI
-启动、STDIO/PTY 交互、认证状态识别、会话管理和输出解析。
+启动、STDIO/PTY 交互、认证状态识别、会话管理、运行控制和输出解析。
 
 首个计划接入的被测产品是腾讯 **CodeBuddy Code CLI**（命令为 `codebuddy`）。
 
@@ -113,6 +113,16 @@ capability 本身不自动决定结果。
 CodeBuddy 通过 STDIO MCP 桥接访问测试进程中的工具运行时；多次启动 MCP 进程不会丢失
 本次运行的模拟状态。旧的 `configure_mock_tool(MockToolProfile(...), run_id=...)` 保持可用。
 
+需要多轮输入、权限确认、运行中引导、中断或流式事件时，使用
+`agent_model.start_session()` 创建产品无关的长驻会话。CodeBuddy 适配使用其公开
+`stream-json` STDIO 协议，并把文本分片、工具调用、权限请求、后台任务和终态转换为统一
+事件。所有等待均按事件条件和超时执行；会话关闭前不能恢复工作区或结束受控环境。
+
+`allow_tools=True` 只表示工具可见，不代表绕过产品权限。无人值守的 `send_prompt()` 默认
+使用 `PermissionPolicy.DENY_UNAPPROVED`；仅工作区文件冒烟用例显式使用
+`ALLOW_WORKSPACE_EDITS`。需要允许、拒绝或取消单次真实权限请求时，应在长驻会话中响应
+对应请求事件。
+
 在测试类的方法中，可以这样设置模拟工具：
 
 ```python
@@ -177,6 +187,13 @@ teardown 结果以 pytest 报告为准。JUnit 的测试属性包含证据目录
 
 逻辑和 Judge 可共同消费 `EvidenceBundle`；调用 `env.archive_bundle(bundle)` 保存完整
 Bundle。Judge 输入可能裁剪的原始输出，在归档中保留完整版本。
+标准化证据记录包含采集状态、来源通道、权威边界、RUN/session/request/turn/task/tool
+关联标识、可证明事实和限制。只有 `available` 记录满足必需证据；缺失、超时、采集错误
+或来源未验证的记录不能用于判定通过。
+
+CodeBuddy 的公开运行时流可证明当前 CLI 进程发出的会话、工具、权限、任务和终态事件，
+但不能证明云端账号身份、服务端授权、安全审计事件或未观察通道不存在副作用。权威身份
+断言只接受独立的产品公开查询接口证据，不接受 Agent 自述、本地登录缓存或初始化响应。
 用 `EvidenceLedger.verify_archive(directory)` 检查归档内部一致性；哈希链不是数字签名，
 不能抵御拥有整个目录写权限的主体重写归档。
 

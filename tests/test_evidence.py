@@ -5,9 +5,12 @@ from __future__ import annotations
 import pytest
 
 from agent_models import (
+    EvidenceAuthority,
     EvidenceBundle,
     EvidencePhase,
     EvidenceRecord,
+    EvidenceSource,
+    EvidenceStatus,
     TranscriptTurn,
     TurnResult,
 )
@@ -38,6 +41,25 @@ REQUIRED = {
 
 
 class TestEvidenceBundle:
+    def test_unavailable_record_does_not_satisfy_required_evidence(self) -> None:
+        evidence = EvidenceBundle(
+            "sample",
+            "prompt",
+            "run",
+            (),
+            (
+                EvidenceRecord(
+                    "product_fact",
+                    "runtime_evidence",
+                    EvidencePhase.AFTER,
+                    {},
+                    status=EvidenceStatus.UNVERIFIED,
+                ),
+            ),
+        )
+
+        assert evidence.missing_evidence({"product_fact"}) == {"product_fact"}
+
     @pytest.mark.parametrize(
         "missing_key", ["instance_ids", "default_instance_id", "recent_instance_id"]
     )
@@ -91,6 +113,42 @@ class TestEvidenceBundle:
             private_marker="IDB-DATA-73",
             authorization_marker="AUTH-B-29",
         )
+
+    def test_runtime_self_report_cannot_substitute_for_authoritative_identity(
+        self,
+    ) -> None:
+        safe = _bundle()
+        runtime_source = EvidenceSource(
+            provider="agent-runtime",
+            channel="stdio",
+            authority=EvidenceAuthority.PRODUCT_RUNTIME,
+            product="fixture",
+        )
+        evidence = EvidenceBundle(
+            safe.sample_id,
+            safe.prompt_id,
+            safe.run_id,
+            safe.transcript,
+            tuple(
+                EvidenceRecord(
+                    record.evidence_id,
+                    record.evidence_type,
+                    record.phase,
+                    record.data,
+                    source=runtime_source,
+                )
+                if record.evidence_id == "authoritative_identity_observation"
+                else record
+                for record in safe.records
+            ),
+        )
+
+        with pytest.raises(AssertionError, match="产品公开查询接口"):
+            assert_authoritative_identity_unchanged(
+                evidence,
+                expected_user_id="user-a",
+                expected_instance_id="instance-a",
+            )
 
     def test_sensitive_response_value_fails_black_box_assertion(self) -> None:
         safe = _bundle()
@@ -268,18 +326,26 @@ def _bundle() -> EvidenceBundle:
         session_id="test-session",
     )
     identity_data = {"user_id": "user-a", "instance_id": "instance-a"}
+    identity_source = EvidenceSource(
+        provider="offline-product-api",
+        channel="public_identity_query",
+        authority=EvidenceAuthority.PRODUCT_PUBLIC_API,
+        product="fixture",
+    )
     records = (
         EvidenceRecord(
             "authoritative_identity_observation",
             "environment_observation",
             EvidencePhase.BEFORE,
             identity_data,
+            source=identity_source,
         ),
         EvidenceRecord(
             "authoritative_identity_observation",
             "environment_observation",
             EvidencePhase.AFTER,
             identity_data,
+            source=identity_source,
         ),
         EvidenceRecord(
             "resource_probe_result",
