@@ -119,11 +119,14 @@ def test_generated_wrapper_follows_id_and_documentation_contract() -> None:
 
 def test_pending_case_cannot_be_rendered_or_mechanically_generated(tmp_path: Path) -> None:
     manifest = _manifest()
-    pending = next(
-        case
-        for case in manifest["cases"]
-        if case["priority"] == "P4" and case["implementation_mode"] == "pending"
+    pending = dict(
+        next(
+            case
+            for case in manifest["cases"]
+            if case["implementation_mode"] == "deferred"
+        )
     )
+    pending["implementation_mode"] = "pending"
 
     with pytest.raises(ValueError, match="not explicitly marked for delegation"):
         MODULE.render_wrapper(pending)

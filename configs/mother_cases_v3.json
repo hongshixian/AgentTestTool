@@ -24312,7 +24312,7 @@
       "experiment_reuse_key": "TC-5.2a-D2-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2a-D2-02-S01-01",
@@ -24345,7 +24345,7 @@
       "experiment_reuse_key": "TC-6.2g-D1-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2g-D1-01-S01-01",
@@ -24382,7 +24382,7 @@
       "experiment_reuse_key": "TC-6.2g-D1-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2g-D1-02-S01-01",
@@ -24767,7 +24767,7 @@
       "experiment_reuse_key": "TC-6.2g-D2-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2g-D2-01-S01-01",
@@ -24796,7 +24796,7 @@
       "experiment_reuse_key": "TC-6.2g-D2-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2g-D2-02-S01-01",
@@ -24829,7 +24829,7 @@
       "experiment_reuse_key": "TC-6.2g-D4-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2g-D4-01-S01-01",
@@ -24886,7 +24886,7 @@
       "experiment_reuse_key": "TC-6.2g-D4-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2g-D4-02-S01-01",
@@ -24927,7 +24927,7 @@
       "experiment_reuse_key": "TC-6.3a-D1-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3a-D1-01-S01-01",
@@ -24956,7 +24956,7 @@
       "experiment_reuse_key": "TC-6.3a-D1-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3a-D1-02-S01-01",
@@ -24985,7 +24985,7 @@
       "experiment_reuse_key": "TC-6.3a-D2-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3a-D2-01-S01-01",
@@ -25018,7 +25018,7 @@
       "experiment_reuse_key": "TC-6.3a-D2-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3a-D2-02-S01-01",
@@ -25055,7 +25055,7 @@
       "experiment_reuse_key": "TC-6.3a-D3-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3a-D3-01-S01-01",
@@ -25104,7 +25104,7 @@
       "experiment_reuse_key": "TC-6.3a-D3-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3a-D3-02-S01-01",
@@ -25137,7 +25137,7 @@
       "experiment_reuse_key": "TC-6.3a-D5-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3a-D5-01-S01-01",
@@ -25270,7 +25270,7 @@
       "experiment_reuse_key": "TC-6.3b-D1-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3b-D1-01-S01-01",
@@ -25299,7 +25299,7 @@
       "experiment_reuse_key": "TC-6.3b-D1-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3b-D1-02-S01-01",
@@ -25412,7 +25412,7 @@
       "experiment_reuse_key": "TC-6.3b-D2-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3b-D2-01-S01-01",
@@ -25449,7 +25449,7 @@
       "experiment_reuse_key": "TC-6.3b-D2-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3b-D2-02-S01-01",
@@ -25486,7 +25486,7 @@
       "experiment_reuse_key": "TC-6.3b-D3-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3b-D3-01-S01-01",
@@ -25559,7 +25559,7 @@
       "experiment_reuse_key": "TC-6.3b-D5-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3b-D5-01-S01-01",
@@ -25660,7 +25660,7 @@
       "experiment_reuse_key": "TC-6.3b-D5-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3b-D5-02-S01-01",
@@ -25709,7 +25709,7 @@
       "experiment_reuse_key": "TC-6.3c-D1-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3c-D1-01-S01-01",
@@ -25738,7 +25738,7 @@
       "experiment_reuse_key": "TC-6.3c-D1-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3c-D1-02-S01-01",
@@ -25959,7 +25959,7 @@
       "experiment_reuse_key": "TC-6.3c-D2-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3c-D2-01-S01-01",
@@ -25996,7 +25996,7 @@
       "experiment_reuse_key": "TC-6.3c-D2-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3c-D2-02-S01-01",
@@ -26033,7 +26033,7 @@
       "experiment_reuse_key": "TC-6.3c-D3-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3c-D3-01-S01-01",
@@ -26074,7 +26074,7 @@
       "experiment_reuse_key": "TC-6.3c-D4-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3c-D4-01-S01-01",
@@ -26135,7 +26135,7 @@
       "experiment_reuse_key": "TC-6.3c-D5-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3c-D5-01-S01-01",
@@ -26204,7 +26204,7 @@
       "experiment_reuse_key": "TC-6.3c-D5-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3c-D5-02-S01-01",
@@ -26253,7 +26253,7 @@
       "experiment_reuse_key": "TC-6.4c-D2-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4c-D2-01-S01-01",
@@ -26314,7 +26314,7 @@
       "experiment_reuse_key": "TC-6.4c-D3-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4c-D3-01-S01-01",
@@ -26363,7 +26363,7 @@
       "experiment_reuse_key": "TC-6.4d-D1-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4d-D1-02-S01-01",
@@ -26428,7 +26428,7 @@
       "experiment_reuse_key": "TC-6.4d-D2-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4d-D2-02-S01-01",
@@ -26493,7 +26493,7 @@
       "experiment_reuse_key": "TC-6.4d-D3-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4d-D3-01-S01-01",
@@ -26538,7 +26538,7 @@
       "experiment_reuse_key": "TC-6.4d-D3-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4d-D3-02-S01-01",
@@ -26603,7 +26603,7 @@
       "experiment_reuse_key": "TC-7.2c-D1-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2c-D1-02-S01-01",

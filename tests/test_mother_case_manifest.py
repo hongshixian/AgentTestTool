@@ -180,7 +180,7 @@ def test_p2_representatives_are_selected_from_their_generated_wrappers() -> None
     assert all(case["representative_child_script"] for case in cases)
 
 
-def test_p3_representatives_are_deferred_and_p4_remains_pending() -> None:
+def test_p3_and_p4_deferred_metadata_matches_their_execution_policy() -> None:
     p3_cases = [
         case
         for case in _checked_in_manifest()["cases"]
@@ -216,9 +216,14 @@ def test_p3_representatives_are_deferred_and_p4_remains_pending() -> None:
     )
 
     assert len(p4_cases) == 36
-    assert all(case["implementation_mode"] == "pending" for case in p4_cases)
+    assert all(case["implementation_mode"] == "deferred" for case in p4_cases)
     assert all(case["representative_child_id"] is None for case in p4_cases)
     assert all(case["representative_child_script"] is None for case in p4_cases)
+
+    assert all(
+        case["implementation_mode"] != "pending"
+        for case in _checked_in_manifest()["cases"]
+    )
 
 
 @pytest.mark.parametrize("missing_field", ("representative_child_id", "representative_child_script"))
