@@ -42,6 +42,8 @@ markers = [
     "e2e: invokes a real Agent CLI and may invoke Judge or other external services",
     "smoke: belongs to the minimal E2E verification subset",
     "security: requires trusted security-test environment evidence",
+    "mother_case: one representative execution path for a source workbook case",
+    "child_case: one expanded test prompt derived from a source workbook case",
 ]
 
 [tool.uv]

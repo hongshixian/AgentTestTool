@@ -32,6 +32,7 @@ class RunMetadata:
     duration_seconds: float | None = None
     platform: str = ""
     agent_version: str = ""
+    case_suite: str = ""
 
     @classmethod
     def from_mapping(
@@ -69,6 +70,7 @@ class RunMetadata:
             agent_version=_text(
                 payload.get("agent_version") or metadata.get("agent_version")
             ),
+            case_suite=_text(payload.get("case_suite") or metadata.get("case_suite")),
         )
 
 
@@ -86,6 +88,9 @@ class CaseResult:
     pytest_status: str = ""
     nodeid: str = ""
     phases: tuple[Mapping[str, Any], ...] = ()
+    case_level: str = ""
+    source_case_id: str = ""
+    representative_child_id: str = ""
 
     @classmethod
     def from_mapping(
@@ -98,6 +103,7 @@ class CaseResult:
         nodeid = _text(payload.get("nodeid"))
         case_id = _text(payload.get("test_case_id"), nodeid or "UNKNOWN")
         pytest_status = _text(payload.get("pytest_status"))
+        case_level = _case_level(_text(payload.get("case_level")), case_id)
         return cls(
             case_id=case_id,
             name=_text(payload.get("name"), case_id),
@@ -115,6 +121,9 @@ class CaseResult:
             phases=tuple(
                 item for item in _sequence(payload.get("phases")) if isinstance(item, Mapping)
             ),
+            case_level=case_level,
+            source_case_id=_text(payload.get("source_case_id")),
+            representative_child_id=_text(payload.get("representative_child_id")),
         )
 
 
@@ -131,6 +140,24 @@ class ReportData:
         """Return true only when at least one smoke case exists and all pass."""
         return bool(self.smoke_results) and all(
             case.status is AssessmentStatus.PASS for case in self.smoke_results
+        )
+
+    @property
+    def mother_results(self) -> tuple[CaseResult, ...]:
+        """Return only source workbook cases, including legacy TC-* payloads."""
+        return tuple(
+            case
+            for case in self.business_results
+            if _case_level(case.case_level, case.case_id) == "mother"
+        )
+
+    @property
+    def child_results(self) -> tuple[CaseResult, ...]:
+        """Return only expanded prompt cases, including legacy ATS-* payloads."""
+        return tuple(
+            case
+            for case in self.business_results
+            if _case_level(case.case_level, case.case_id) == "child"
         )
 
     @classmethod
@@ -207,6 +234,7 @@ class ReportData:
                     or business_session.get("duration"),
                 ),
             }
+            metadata_source["case_suite"] = business_payload.get("case_suite", "")
         return cls(
             metadata=RunMetadata.from_mapping(
                 metadata_source,
@@ -242,6 +270,17 @@ def _sequence(value: Any) -> Sequence[Any]:
 
 def _case_mappings(value: Any) -> tuple[Mapping[str, Any], ...]:
     return tuple(item for item in _sequence(value) if isinstance(item, Mapping))
+
+
+def _case_level(value: str, case_id: str) -> str:
+    normalized = value.strip().casefold()
+    if normalized in {"mother", "child", "smoke"}:
+        return normalized
+    if case_id.startswith("TC-"):
+        return "mother"
+    if case_id.startswith("ATS-"):
+        return "child"
+    return normalized
 
 
 def _text(value: Any, default: str = "") -> str:

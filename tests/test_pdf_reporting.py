@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from assertions.outcome import AssessmentStatus
-from reportlab.platypus import LongTable, Paragraph
+from reportlab.platypus import LongTable, Paragraph, Table
 
 from agent_test_tool.reporting import (
     CaseCategory,
@@ -20,6 +20,9 @@ def _case(
     case_id: str,
     status: AssessmentStatus,
     category: CaseCategory,
+    *,
+    case_level: str = "",
+    representative_child_id: str = "",
 ) -> CaseResult:
     return CaseResult(
         case_id=case_id,
@@ -28,6 +31,8 @@ def _case(
         reason=f"{case_id} 结果说明",
         category=category,
         duration_seconds=0.25,
+        case_level=case_level,
+        representative_child_id=representative_child_id,
     )
 
 
@@ -35,12 +40,14 @@ def _report(
     *,
     smoke_status: AssessmentStatus,
     business_results: tuple[CaseResult, ...] = (),
+    case_suite: str = "",
 ) -> ReportData:
     return ReportData(
         metadata=RunMetadata(
             run_id="run-001",
             test_target="CodeBuddy Code CLI",
             generated_at=datetime(2026, 9, 9, tzinfo=timezone.utc),
+            case_suite=case_suite,
         ),
         smoke_results=(
             _case("SMOKE-001", smoke_status, CaseCategory.SMOKE),
@@ -53,6 +60,16 @@ def _paragraph_text(story: list[object]) -> str:
     return "\n".join(
         item.getPlainText() for item in story if isinstance(item, Paragraph)
     )
+
+
+def _table_text(table: Table) -> list[list[str]]:
+    return [
+        [
+            cell.getPlainText() if isinstance(cell, Paragraph) else str(cell)
+            for cell in row
+        ]
+        for row in table._cellvalues
+    ]
 
 
 class TestPDFReporting:
@@ -110,11 +127,107 @@ class TestPDFReporting:
         assert len(long_tables) == 2
         assert long_tables[-1].repeatRows == 1
         assert len(long_tables[-1]._cellvalues) == 5
+        assert "代表路径" not in _table_text(long_tables[-1])[0]
         output = generator.generate(
             _report(smoke_status=AssessmentStatus.PASS, business_results=business),
             tmp_path / "complete-report.pdf",
         )
         assert output.read_bytes().startswith(b"%PDF-")
+
+    def test_all_suite_separates_mother_and_child_statistics_and_details(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        mother = _case(
+            "TC-6.1b-D5-01",
+            AssessmentStatus.PASS,
+            CaseCategory.BUSINESS,
+            case_level="mother",
+            representative_child_id="ATS-6.1b-D5-01-S01-01",
+        )
+        child = _case(
+            "ATS-6.1b-D5-01-S01-02",
+            AssessmentStatus.FAIL,
+            CaseCategory.BUSINESS,
+            case_level="child",
+        )
+
+        story = PDFReportGenerator().build_story(
+            _report(
+                smoke_status=AssessmentStatus.PASS,
+                business_results=(mother, child),
+                case_suite="all",
+            )
+        )
+        text = _paragraph_text(story)
+
+        assert "2.1 母用例代表路径" in text
+        assert "2.2 子用例展开路径" in text
+        detail_tables = [item for item in story if isinstance(item, LongTable)]
+        assert len(detail_tables) == 3
+        mother_table = _table_text(detail_tables[1])
+        child_table = _table_text(detail_tables[2])
+        assert mother_table[0] == [
+            "用例 ID",
+            "用例名称",
+            "代表路径",
+            "结果",
+            "简短说明",
+        ]
+        assert mother_table[1][2] == "ATS-6.1b-D5-01-S01-01"
+        assert child_table[0] == ["用例 ID", "用例名称", "结果", "简短说明"]
+
+        statistic_tables = [item for item in story if type(item) is Table]
+        assert len(statistic_tables) == 2
+        mother_statistics = _table_text(statistic_tables[0])
+        child_statistics = _table_text(statistic_tables[1])
+        assert mother_statistics[1][1] == "1"
+        assert mother_statistics[2][1] == "0"
+        assert child_statistics[1][1] == "0"
+        assert child_statistics[2][1] == "1"
+        output = PDFReportGenerator().generate(
+            _report(
+                smoke_status=AssessmentStatus.PASS,
+                business_results=(mother, child),
+                case_suite="all",
+            ),
+            tmp_path / "all-suite-report.pdf",
+        )
+        assert output.read_bytes().startswith(b"%PDF-")
+
+    def test_mother_suite_keeps_one_compact_section_and_shows_representative_path(
+        self,
+    ) -> None:
+        mother = _case(
+            "TC-6.1b-D5-01",
+            AssessmentStatus.PASS,
+            CaseCategory.BUSINESS,
+            case_level="mother",
+            representative_child_id="ATS-6.1b-D5-01-S01-01",
+        )
+
+        story = PDFReportGenerator().build_story(
+            _report(
+                smoke_status=AssessmentStatus.PASS,
+                business_results=(mother,),
+                case_suite="mother",
+            )
+        )
+        text = _paragraph_text(story)
+
+        assert "2.1 四态结果分布" in text
+        assert "母用例代表路径" not in text
+        detail_tables = [item for item in story if isinstance(item, LongTable)]
+        assert len(detail_tables) == 2
+        mother_table = _table_text(detail_tables[-1])
+        assert mother_table[0] == [
+            "用例 ID",
+            "用例名称",
+            "代表路径",
+            "结果",
+            "简短说明",
+        ]
+        assert mother_table[1][2] == "ATS-6.1b-D5-01-S01-01"
 
     def test_statistics_always_include_all_four_outcomes(self) -> None:
         results = (

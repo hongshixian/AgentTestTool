@@ -204,6 +204,13 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         metavar="COUNT",
         help="Run each repeat-aware test case COUNT times (default: 1)",
     )
+    parser.addoption(
+        "--case-suite",
+        action="store",
+        choices=("mother", "child", "all"),
+        default="child",
+        help="Collect mother cases, expanded child cases, or both (default: child)",
+    )
 
 
 def pytest_configure(config: pytest.Config) -> None:
@@ -220,6 +227,14 @@ def pytest_configure(config: pytest.Config) -> None:
         "markers",
         "security: requires trusted security-test environment evidence",
     )
+    config.addinivalue_line(
+        "markers",
+        "mother_case: one representative execution path for a source workbook case",
+    )
+    config.addinivalue_line(
+        "markers",
+        "child_case: one expanded test prompt derived from a source workbook case",
+    )
 
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
@@ -234,13 +249,44 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     )
 
 
+def _item_case_level(item: pytest.Item) -> str:
+    module = getattr(item, "module", None)
+    explicit = str(getattr(module, "TEST_CASE_LEVEL", "") or "").strip().lower()
+    if explicit in {"mother", "child"}:
+        return explicit
+    case_id = str(getattr(module, "TEST_CASE_ID", "") or "").strip()
+    return "mother" if case_id.startswith("TC-") else "child"
+
+
+def _configured_case_suite(config: pytest.Config) -> str:
+    try:
+        value = config.getoption("--case-suite")
+    except (AssertionError, ValueError):
+        return "child"
+    return value if value in {"mother", "child", "all"} else "child"
+
+
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
-    if not config.getoption("--smoke"):
-        return
+    case_suite = _configured_case_suite(config)
+    smoke_only = config.getoption("--smoke")
     selected: list[pytest.Item] = []
     deselected: list[pytest.Item] = []
     for item in items:
-        if "e2e" in item.keywords and "smoke" not in item.keywords:
+        level = _item_case_level(item)
+        is_e2e = "e2e" in item.keywords
+        is_smoke = "smoke" in item.keywords
+        if is_e2e and not is_smoke:
+            add_marker = getattr(item, "add_marker", None)
+            if callable(add_marker):
+                add_marker(level + "_case")
+        if (
+            is_e2e
+            and not is_smoke
+            and case_suite != "all"
+            and level != case_suite
+        ):
+            deselected.append(item)
+        elif smoke_only and is_e2e and not is_smoke:
             deselected.append(item)
         else:
             selected.append(item)

@@ -39,6 +39,12 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--suite",
+        choices=("mother", "child", "all"),
+        default="child",
+        help="业务测试粒度：母用例、展开子用例或两者（默认：child）",
+    )
+    parser.add_argument(
         "--agent",
         default="codebuddy",
         help="被测 Agent 产品（默认：codebuddy）",
@@ -100,6 +106,8 @@ def _manifest_paths(manifest_path: Path) -> tuple[Path, ...]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.business_manifest and args.suite != "child":
+        raise SystemExit("--business-manifest 目前只能与 --suite child 一起使用")
     try:
         business_paths = (
             _manifest_paths(args.business_manifest) if args.business_manifest else ()
@@ -113,6 +121,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             repeat=args.repeat,
             smoke_timeout_seconds=args.smoke_timeout,
             business_timeout_seconds=args.business_timeout,
+            suite=args.suite,
             business_paths=business_paths,
             business_selection_source=(
                 str(args.business_manifest.resolve()) if args.business_manifest else None

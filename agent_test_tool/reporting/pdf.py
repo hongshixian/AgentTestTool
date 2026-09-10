@@ -96,7 +96,7 @@ class PDFReportGenerator:
         story.extend(self._smoke_section(report))
         if report.smoke_passed:
             story.append(PageBreak())
-            story.extend(self._business_section(report.business_results))
+            story.extend(self._business_section(report))
         return story
 
     def _cover(self, report: ReportData) -> list[Flowable]:
@@ -150,7 +150,27 @@ class PDFReportGenerator:
             )
         return contents
 
-    def _business_section(self, results: tuple[CaseResult, ...]) -> list[Flowable]:
+    def _business_section(self, report: ReportData) -> list[Flowable]:
+        mother_results = report.mother_results
+        child_results = report.child_results
+        if report.metadata.case_suite == "all" or (mother_results and child_results):
+            return [
+                Paragraph("二、业务测试结果", self.styles["section"]),
+                *self._business_group(
+                    mother_results,
+                    section_number="2.1",
+                    title="母用例代表路径",
+                    include_representative_path=True,
+                ),
+                Spacer(1, 8 * mm),
+                *self._business_group(
+                    child_results,
+                    section_number="2.2",
+                    title="子用例展开路径",
+                ),
+            ]
+
+        results = mother_results or child_results or report.business_results
         statistics = calculate_statistics(results)
         return [
             Paragraph("二、业务测试结果", self.styles["section"]),
@@ -159,7 +179,37 @@ class PDFReportGenerator:
             self._statistics_table(statistics),
             Spacer(1, 8 * mm),
             Paragraph("2.2 用例明细", self.styles["subsection"]),
-            self._case_table(results, compact=True),
+            self._case_table(
+                results,
+                compact=True,
+                include_representative_path=bool(mother_results),
+            ),
+        ]
+
+    def _business_group(
+        self,
+        results: tuple[CaseResult, ...],
+        *,
+        section_number: str,
+        title: str,
+        include_representative_path: bool = False,
+    ) -> list[Flowable]:
+        statistics = calculate_statistics(results)
+        return [
+            Paragraph(f"{section_number} {title}", self.styles["subsection"]),
+            Paragraph(
+                f"{section_number}.1 四态结果分布",
+                self.styles["subsection"],
+            ),
+            KeepTogether([self._pie_chart(statistics), Spacer(1, 3 * mm)]),
+            self._statistics_table(statistics),
+            Spacer(1, 6 * mm),
+            Paragraph(f"{section_number}.2 用例明细", self.styles["subsection"]),
+            self._case_table(
+                results,
+                compact=True,
+                include_representative_path=include_representative_path,
+            ),
         ]
 
     def _pie_chart(self, statistics: tuple[OutcomeStatistic, ...]) -> Drawing:
@@ -232,29 +282,55 @@ class PDFReportGenerator:
         results: Iterable[CaseResult],
         *,
         compact: bool,
+        include_representative_path: bool = False,
     ) -> LongTable:
-        rows: list[list[object]] = [["用例 ID", "用例名称", "结果", "简短说明"]]
-        rows.extend(
-            [
-                self._cell(item.case_id, compact=compact),
-                self._cell(item.name, compact=compact),
-                self._cell(item.status.value, compact=compact),
-                self._cell(item.reason, compact=compact),
+        if include_representative_path:
+            rows: list[list[object]] = [
+                ["用例 ID", "用例名称", "代表路径", "结果", "简短说明"]
             ]
-            for item in results
-        )
-        if len(rows) == 1:
-            rows.append(
+            rows.extend(
                 [
-                    self._cell("—", compact=compact),
-                    self._cell("本次没有业务测试结果", compact=compact),
+                    self._cell(item.case_id, compact=compact),
+                    self._cell(item.name, compact=compact),
+                    self._cell(
+                        item.representative_child_id or "—",
+                        compact=compact,
+                    ),
+                    self._cell(item.status.value, compact=compact),
+                    self._cell(item.reason, compact=compact),
+                ]
+                for item in results
+            )
+            column_widths = [32 * mm, 37 * mm, 43 * mm, 18 * mm, 52 * mm]
+        else:
+            rows = [["用例 ID", "用例名称", "结果", "简短说明"]]
+            rows.extend(
+                [
+                    self._cell(item.case_id, compact=compact),
+                    self._cell(item.name, compact=compact),
+                    self._cell(item.status.value, compact=compact),
+                    self._cell(item.reason, compact=compact),
+                ]
+                for item in results
+            )
+            column_widths = [44 * mm, 48 * mm, 19 * mm, 71 * mm]
+        if len(rows) == 1:
+            empty_row = [
+                self._cell("—", compact=compact),
+                self._cell("本次没有业务测试结果", compact=compact),
+            ]
+            if include_representative_path:
+                empty_row.append(self._cell("—", compact=compact))
+            empty_row.extend(
+                [
                     self._cell("—", compact=compact),
                     self._cell("—", compact=compact),
                 ]
             )
+            rows.append(empty_row)
         table = LongTable(
             rows,
-            colWidths=[44 * mm, 48 * mm, 19 * mm, 71 * mm],
+            colWidths=column_widths,
             repeatRows=1,
             splitByRow=1,
         )

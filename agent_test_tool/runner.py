@@ -20,6 +20,7 @@ FAIL_STATUS = "不通过"
 REPORT_SCHEMA_VERSION = 1
 PACKAGE_ROOT = Path(__file__).resolve().parent.parent
 TEST_CASES_ROOT = PACKAGE_ROOT / "test_cases"
+CASE_SUITES = frozenset({"mother", "child", "all"})
 TEST_OBJECT_NAMES = {
     "codebuddy": "CodeBuddy Code CLI",
 }
@@ -34,6 +35,7 @@ class WorkflowConfig:
     repeat: int = 1
     smoke_timeout_seconds: float = 900.0
     business_timeout_seconds: float = 86_400.0
+    suite: str = "child"
     business_paths: tuple[Path, ...] = ()
     business_selection_source: str | None = None
     run_id: str | None = None
@@ -134,6 +136,7 @@ def _run_pytest_phase(
     run_directory: Path,
     agent: str,
     repeat: int,
+    case_suite: str,
     timeout_seconds: float,
     process_runner: ProcessRunner,
 ) -> PhaseExecution:
@@ -158,6 +161,8 @@ def _run_pytest_phase(
         agent,
         "--evidence-dir",
         str(evidence_parent),
+        "--case-suite",
+        case_suite,
     ]
     if repeat > 1:
         command_parts.extend(("--repeat", str(repeat)))
@@ -166,6 +171,7 @@ def _run_pytest_phase(
     environment = os.environ.copy()
     environment["AGENT_TEST_RUN_ID"] = run_id
     environment["AGENT_TEST_PHASE"] = phase
+    environment["AGENT_TEST_CASE_SUITE"] = case_suite
 
     timed_out = False
     error: str | None = None
@@ -302,6 +308,10 @@ def run_workflow(
     """Run smoke, conditionally run business cases, and always build a report."""
     if config.repeat < 1:
         raise ValueError("repeat 必须是正整数")
+    if config.suite not in CASE_SUITES:
+        raise ValueError(f"未知业务测试套件：{config.suite}")
+    if config.business_paths and config.suite != "child":
+        raise ValueError("业务清单目前只能用于 child 套件")
     if config.smoke_timeout_seconds <= 0 or config.business_timeout_seconds <= 0:
         raise ValueError("阶段超时必须大于 0")
 
@@ -319,6 +329,7 @@ def run_workflow(
         run_directory=run_directory,
         agent=config.agent,
         repeat=1,
+        case_suite="all",
         timeout_seconds=config.smoke_timeout_seconds,
         process_runner=process_runner,
     )
@@ -333,6 +344,7 @@ def run_workflow(
             run_directory=run_directory,
             agent=config.agent,
             repeat=config.repeat,
+            case_suite=config.suite,
             timeout_seconds=config.business_timeout_seconds,
             process_runner=process_runner,
         )
@@ -354,6 +366,7 @@ def run_workflow(
             None if business is not None else "冒烟测试未全部通过，未执行业务测试"
         ),
         "business_selection": {
+            "suite": config.suite,
             "source": config.business_selection_source,
             "path_count": len(config.business_paths),
             "paths": [str(path) for path in config.business_paths],

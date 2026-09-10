@@ -101,6 +101,9 @@ class _CaseState:
     test_case_id: str
     name: str
     is_e2e: bool
+    case_level: str = ""
+    source_case_id: str = ""
+    representative_child_id: str = ""
     phases: dict[str, dict[str, object]] = field(default_factory=dict)
 
     def record(self, report: pytest.TestReport) -> None:
@@ -172,6 +175,9 @@ class _CaseState:
             "nodeid": self.nodeid,
             "test_case_id": self.test_case_id,
             "name": self.name,
+            "case_level": self.case_level,
+            "source_case_id": self.source_case_id,
+            "representative_child_id": self.representative_child_id,
             "status": status,
             "reason": reason,
             "missing_evidence": missing_evidence,
@@ -205,6 +211,24 @@ class ResultCollector:
             test_case_id = match.group(1).strip() if match else item.nodeid
         name_match = _TEST_NAME_PATTERN.search(class_doc)
         name = name_match.group(1).strip() if name_match else getattr(item, "name", item.nodeid)
+        case_level = str(getattr(module, "TEST_CASE_LEVEL", "") or "").strip().lower()
+        if case_level not in {"mother", "child", "smoke"}:
+            if test_case_id.startswith("TC-"):
+                case_level = "mother"
+            elif test_case_id.startswith("ATS-0.0x-"):
+                case_level = "smoke"
+            else:
+                case_level = "child"
+        source_case_id = str(getattr(module, "SOURCE_CASE_ID", "") or "").strip()
+        if not source_case_id and test_case_id.startswith("ATS-"):
+            match = re.match(r"ATS-(.+?)-S\d+(?:-|$)", test_case_id)
+            if match:
+                source_case_id = f"TC-{match.group(1)}"
+        if case_level == "mother" and not source_case_id:
+            source_case_id = test_case_id
+        representative_child_id = str(
+            getattr(module, "REPRESENTATIVE_CHILD_ID", "") or ""
+        ).strip()
         self._cases.setdefault(
             item.nodeid,
             _CaseState(
@@ -212,6 +236,9 @@ class ResultCollector:
                 test_case_id=test_case_id,
                 name=name,
                 is_e2e="e2e" in getattr(item, "keywords", {}),
+                case_level=case_level,
+                source_case_id=source_case_id,
+                representative_child_id=representative_child_id,
             ),
         )
 
@@ -222,13 +249,25 @@ class ResultCollector:
     def build_payload(self, *, exit_status: int, finished_at: str | None = None) -> dict[str, object]:
         cases = [case.serialize() for case in self._cases.values()]
         summary = {status: 0 for status in ASSESSMENT_STATUSES}
+        summary_by_case_level: dict[str, dict[str, int]] = {}
         for case in cases:
             summary[str(case["status"])] += 1
+            case_level = str(case.get("case_level") or "unknown")
+            level_summary = summary_by_case_level.setdefault(
+                case_level,
+                {status: 0 for status in ASSESSMENT_STATUSES},
+            )
+            level_summary[str(case["status"])] += 1
         summary["total"] = len(cases)
+        for level_summary in summary_by_case_level.values():
+            level_summary["total"] = sum(
+                level_summary[status] for status in ASSESSMENT_STATUSES
+            )
         return {
             "schema_version": SCHEMA_VERSION,
             "run_id": self.run_id,
             "phase": os.environ.get("AGENT_TEST_PHASE", ""),
+            "case_suite": os.environ.get("AGENT_TEST_CASE_SUITE", ""),
             "session": {
                 "started_at": self.started_at,
                 "finished_at": finished_at or _utc_now(),
@@ -241,6 +280,7 @@ class ResultCollector:
                 "collection_errors": list(self.collection_errors),
             },
             "summary": summary,
+            "summary_by_case_level": summary_by_case_level,
             "cases": cases,
         }
 

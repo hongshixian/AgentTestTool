@@ -14,6 +14,12 @@ uv sync --extra dev
 # 正式测评入口：冒烟测试 -> 业务测试 -> PDF 报告
 uv run agent-test --agent codebuddy
 
+# 快速母用例测评：每个源用例只执行一条代表路径
+uv run agent-test --agent codebuddy --suite mother
+
+# 同时执行母用例和展开子用例
+uv run agent-test --agent codebuddy --suite all
+
 # 需要稳定性验证时，将支持重复执行的测试路径运行三次
 uv run agent-test --agent codebuddy --repeat 3
 
@@ -29,6 +35,10 @@ uv run pytest --smoke --agent=codebuddy
 
 `--repeat=COUNT` 控制支持重复执行的测试路径的运行次数，`COUNT` 必须是正整数。
 未传入该参数时默认只运行一次。
+`--suite=child|mother|all` 控制业务测试粒度，默认 `child` 以保持历史行为。
+`mother` 按工作簿中的 `TC-*` 源用例执行一条最简单代表路径，适合快速生成母用例
+维度报告；`child` 执行展开后的 `ATS-*` 路径；`all` 同时执行两者，并在 JSON 和
+PDF 中分别统计母用例与子用例。五条冒烟门禁不受该选项过滤。
 正式入口先执行 CLI 安装、基础交互、多轮交互、文件创建和文件编辑五条冒烟测试。
 五条用例必须全部返回“通过”才会继续执行业务测试；否则立即停止业务测试并生成只含
 冒烟章节的报告。冒烟用例采用确定性逻辑断言，不依赖 Judge。
@@ -247,6 +257,7 @@ agent_test_tool/ 正式工作流入口、四态结果采集及 ReportLab PDF 报
 agent_models/   Agent Model 抽象与各 CLI 产品实现
 assertions/      传统逻辑断言及 Judge 智能断言
 test_cases/     pytest 公共测试用例
+test_cases/mother_cases/ 工作簿 TC-* 母用例及代表路径公共执行逻辑
 assets/         测试用例共用静态资源
 configs/        产品配置示例
 tests/          框架离线回归与本地协议集成验证
