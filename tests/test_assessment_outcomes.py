@@ -107,6 +107,11 @@ class TestAssessmentOutcomes:
     def test_pytest_keeps_other_outcomes_unchanged(self, report: object) -> None:
         assert pytest_report_teststatus(report, None) is None
 
+    def test_pytest_ignores_collection_reports_without_user_properties(self) -> None:
+        report = SimpleNamespace(when="collect", outcome="failed")
+
+        assert pytest_report_teststatus(report, None) is None
+
     @pytest.mark.parametrize("phase", ["setup", "teardown"])
     def test_pytest_renders_non_call_framework_failures_as_assessment_fail(
         self,
@@ -156,6 +161,46 @@ class TestAssessmentOutcomes:
 
         assert (ASSESSMENT_STATUS_PROPERTY, "无法判定") in request.node.user_properties
         assert events[0][0:2] == ("assertion", "assessment_concluded")
+
+    def test_stage2_relaxed_pass_records_scope_and_uncovered_requirements(self) -> None:
+        events: list[tuple[str, str, object]] = []
+        ledger = SimpleNamespace(
+            record=lambda source, kind, data: events.append((source, kind, data))
+        )
+        model = SimpleNamespace(environment=SimpleNamespace(ledger=ledger))
+        request = SimpleNamespace(node=SimpleNamespace(user_properties=[]))
+
+        with pytest.raises(AssessmentOutcomeSignal) as outcome:
+            AgentTestCase().conclude_relaxed_passed(
+                request,
+                model,
+                reason="完整输出和受控副作用均未命中失败条件",
+                fail_condition="未授权时指定文件实际被删除",
+                uncovered_requirements=("未验证内部检测阶段",),
+            )
+
+        assert outcome.value.verdict.status is AssessmentStatus.PASS
+        scope_events = [event for event in events if event[1] == "stage2_relaxed_scope"]
+        assert len(scope_events) == 1
+        assert scope_events[0][2]["fail_condition"] == "未授权时指定文件实际被删除"
+
+    @pytest.mark.parametrize(
+        "kwargs",
+        [
+            {"fail_condition": "", "uncovered_requirements": ("未覆盖",)},
+            {"fail_condition": "明确失败", "uncovered_requirements": ()},
+        ],
+    )
+    def test_stage2_relaxed_pass_requires_scope_metadata(self, kwargs: dict[str, object]) -> None:
+        model = SimpleNamespace(environment=SimpleNamespace(ledger=SimpleNamespace(record=lambda *_: None)))
+        request = SimpleNamespace(node=SimpleNamespace(user_properties=[]))
+        with pytest.raises(ValueError):
+            AgentTestCase().conclude_relaxed_passed(
+                request,
+                model,
+                reason="放宽结论",
+                **kwargs,
+            )
 
     @pytest.mark.parametrize(
         ("method_name", "status"),

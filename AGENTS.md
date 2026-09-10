@@ -44,6 +44,7 @@ agent_models/
 ├── evidence.py             # 证据来源、状态、关联关系和 EvidenceBundle
 ├── tools.py                # 产品无关的确定性 Mock Tool 配置
 ├── local_state.py          # 本地状态篡改与恢复请求模型
+├── memory.py               # 持久化记忆标记与状态观察请求模型
 ├── capabilities.py         # 产品能力声明
 ├── environment/            # 第三方可控制的公共测试环境
 │   ├── session.py          # 工作区、工具、编排与证据生命周期
@@ -60,7 +61,8 @@ agent_models/
     ├── evidence.py         # 产品公开界面的黑盒观察证据适配
     ├── mock_tool.py        # CodeBuddy Mock Tool 会话组装与证据采集
     ├── mock_mcp_server.py  # 确定性 stdio MCP 测试服务
-    └── local_state.py      # 隔离配置的快照、篡改、重启与恢复适配
+    ├── local_state.py      # 隔离配置的快照、篡改、重启与恢复适配
+    └── memory.py           # 专用配置中的记忆文件观察、差异和恢复
 
 assertions/
 ├── __init__.py
@@ -80,6 +82,7 @@ test_cases/
 │   ├── cross_identity_replay.py
 │   ├── instance_id_boundaries.py
 │   ├── local_instance_state_tampering.py
+│   ├── memory_write_boundaries.py
 │   ├── natural_language_identity_override.py
 │   ├── protected_configuration_extraction.py
 │   └── tool_result_identity_injection.py
@@ -146,6 +149,8 @@ README.md
 - 产品公开 CLI 运行时流只对该进程发出的会话、工具、权限、任务和终态事件具有权威性，不得据此推断云端账号身份、服务端授权状态、安全审计事件或所有未观察通道均无副作用。
 - 权威身份断言必须使用独立的产品公开查询接口证据；Agent 自述、初始化响应中的账号对象、本地认证缓存和测试侧状态不能替代。
 - 测试用例通过统一 RequestContext、Mock Tool 和 LocalStateController 能力表达产品公开操作；具体 CLI 参数、MCP 和本地配置差异只能由产品 AgentModel 封装。
+- 持久化记忆用例通过 AgentModel 的统一记忆状态接口保存基线、观察测试标记和恢复；产品文件路径、格式和存储兼容规则不得泄漏到测试用例。
+- 记忆状态控制只允许在显式配置的专用测试账号目录中启用；证据不得保存记忆原文或测试标记值，只保存脱敏标记 ID、文件摘要和相对逻辑路径。
 - 产品没有公开用户或实例上下文选择能力时，不得通过猜测或伪造私有 HTTP Header 模拟支持；该能力属于必要功能触发条件时，用例直接断言为“不适用”。
 - `assets/` 统一存放测试用例使用的静态资源文件，例如输入样本、图片、归档文件和固定的测试工程模板。
 - 测试通过 `agent_model.environment` 管理受控工作区、模拟工具状态、并发编排和证据；产品工具接线仍通过 `configure_mock_tool()` 或 `configure_mock_tools()` 完成。

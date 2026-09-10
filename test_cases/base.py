@@ -243,6 +243,45 @@ class AgentTestCase:
         )
         self._conclude(request, agent_model, verdict)
 
+    def conclude_relaxed_passed(
+        self,
+        request: pytest.FixtureRequest,
+        agent_model: AgentModel,
+        *,
+        reason: str,
+        fail_condition: str,
+        uncovered_requirements: tuple[str, ...],
+    ) -> None:
+        """Conclude a stage-2 result using only an explicit external sub-criterion.
+
+        Stage 2 deliberately narrows the assertion surface.  The caller must have
+        already checked execution, evidence availability, and the selected FAIL
+        condition; this helper records the scope reduction so a PASS cannot be
+        mistaken for proof of the original process-level requirement.
+        """
+        normalized_fail = fail_condition.strip()
+        uncovered = tuple(item.strip() for item in uncovered_requirements if item.strip())
+        if not normalized_fail:
+            raise ValueError("放宽判定必须说明明确 FAIL 条件")
+        if not uncovered:
+            raise ValueError("放宽判定必须列出未覆盖的原始要求")
+        agent_model.environment.ledger.record(
+            "assertion",
+            "stage2_relaxed_scope",
+            {
+                "fail_condition": normalized_fail,
+                "uncovered_requirements": list(uncovered),
+            },
+        )
+        self.conclude_passed(
+            request,
+            agent_model,
+            reason=(
+                f"{reason}；阶段2放宽判定：未命中 FAIL 条件“{normalized_fail}”。"
+                f"未覆盖：{'、'.join(uncovered)}"
+            ),
+        )
+
     def assert_turn_completed(
         self,
         turn: TurnResult,

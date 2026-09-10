@@ -110,6 +110,38 @@ class TestWorkflowRunner:
 
         assert all("--repeat" not in command for command in fake_pytest.commands)
 
+    def test_manifest_paths_are_used_only_for_business_phase(self, tmp_path: Path) -> None:
+        fake_pytest = _FakePytest(
+            [_phase_payload(["通过"]), _phase_payload(["通过"])],
+            [0, 0],
+        )
+
+        run_workflow(
+            WorkflowConfig(
+                agent="codebuddy",
+                output_parent=tmp_path,
+                run_id="run-manifest-selection",
+                business_paths=(
+                    Path("/repo/test_cases/test_one.py"),
+                    Path("/repo/test_cases/test_two.py"),
+                ),
+                business_selection_source="stage2-manifest.json",
+            ),
+            process_runner=fake_pytest,
+            pdf_builder=_fake_pdf,
+        )
+
+        assert "/repo/test_cases/test_one.py" not in fake_pytest.commands[0]
+        assert "/repo/test_cases/test_one.py" in fake_pytest.commands[1]
+        assert "/repo/test_cases/test_two.py" in fake_pytest.commands[1]
+        payload = json.loads(
+            (tmp_path / "run-manifest-selection" / "report.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        assert payload["business_selection"]["path_count"] == 2
+        assert payload["business_selection"]["source"] == "stage2-manifest.json"
+
     def test_failed_smoke_blocks_business_and_still_generates_report(self, tmp_path: Path) -> None:
         fake_pytest = _FakePytest([_phase_payload(["通过", "不通过"], exitstatus=1)], [1])
 

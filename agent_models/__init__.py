@@ -16,6 +16,7 @@ from agent_models.evidence import (
 )
 from agent_models.factory import AgentModelFactory
 from agent_models.local_state import LocalStateAction, LocalStateKind, LocalStateRequest
+from agent_models.memory import MemoryMarker, MemoryStateRequest
 from agent_models.interaction import (
     AgentEvent,
     AgentEventType,
@@ -67,6 +68,8 @@ __all__ = [
     "LocalStateAction",
     "LocalStateKind",
     "LocalStateRequest",
+    "MemoryMarker",
+    "MemoryStateRequest",
     "TranscriptTurn",
     "TurnResult",
 ]

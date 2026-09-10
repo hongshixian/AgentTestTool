@@ -10,6 +10,7 @@ from agent_models.capabilities import AgentCapabilities
 from agent_models.evidence import EvidenceRecord, EvidenceRequest, JsonValue, RequestContext
 from agent_models.environment.session import ControlledEnvironment
 from agent_models.local_state import LocalStateRequest
+from agent_models.memory import MemoryStateRequest
 from agent_models.interaction import (
     BackgroundTaskControlResult,
     BackgroundTaskHandle,
@@ -131,6 +132,30 @@ class AgentModel(ABC):
     @abstractmethod
     def restore_local_state(self, request: LocalStateRequest) -> tuple[EvidenceRecord, ...]:
         """Restore an isolated product configuration after a tamper test."""
+
+    def prepare_memory_state(
+        self,
+        request: MemoryStateRequest,
+    ) -> tuple[EvidenceRecord, ...]:
+        """Save an in-memory baseline of documented product memory artifacts."""
+
+        raise NotImplementedError("This product has no persistent-memory adapter")
+
+    def capture_memory_state(
+        self,
+        request: MemoryStateRequest,
+    ) -> tuple[EvidenceRecord, ...]:
+        """Observe memory-file changes and marker hits without returning raw content."""
+
+        raise NotImplementedError("This product has no persistent-memory adapter")
+
+    def restore_memory_state(
+        self,
+        request: MemoryStateRequest,
+    ) -> tuple[EvidenceRecord, ...]:
+        """Restore documented memory artifacts to the saved execution baseline."""
+
+        raise NotImplementedError("This product has no persistent-memory adapter")
 
     @abstractmethod
     def close(self) -> None:

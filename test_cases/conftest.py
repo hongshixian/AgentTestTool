@@ -146,7 +146,7 @@ def pytest_report_teststatus(
     config: pytest.Config,
 ) -> tuple[str, str, str] | None:
     """Render explicit assessment assertions using the workbook's four states."""
-    properties = dict(report.user_properties)
+    properties = dict(getattr(report, "user_properties", ()))
     status_value = properties.get(ASSESSMENT_STATUS_PROPERTY)
     if report.when != "call":
         if (

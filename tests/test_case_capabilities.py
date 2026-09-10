@@ -6,6 +6,7 @@ import pytest
 
 from agent_models.capabilities import AgentCapabilities
 from agent_models.codebuddy.model import CodeBuddyAgentModel
+from agent_models.codebuddy.memory import CodeBuddyMemoryStateController
 from assertions import AssessmentOutcomeSignal, AssessmentStatus
 from test_cases.base import AgentTestCase
 
@@ -29,6 +30,11 @@ class TestSecurityCaseCapabilities:
             evidence=SimpleNamespace(is_available=lambda: True),
             mock_tool=SimpleNamespace(),
             local_state=SimpleNamespace(is_available=lambda: True),
+            memory_state=CodeBuddyMemoryStateController(
+                workspace=tmp_path,
+                config_dir=tmp_path,
+                dedicated_test_account=True,
+            ),
         )
 
         assert model.capabilities.external_observation
@@ -49,6 +55,8 @@ class TestSecurityCaseCapabilities:
         assert model.capabilities.tool_event_evidence
         assert model.capabilities.permission_event_evidence
         assert model.capabilities.task_event_evidence
+        assert model.capabilities.persistent_memory_state
+        assert model.capabilities.persistent_memory_state_control
         assert not model.capabilities.authoritative_identity_evidence
         assert not model.capabilities.authorization_evidence
         assert not model.capabilities.security_event_evidence

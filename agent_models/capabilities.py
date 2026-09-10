@@ -39,3 +39,5 @@ class AgentCapabilities:
     authorization_evidence: bool = False
     security_event_evidence: bool = False
     resource_state_evidence: bool = False
+    persistent_memory_state: bool = False
+    persistent_memory_state_control: bool = False

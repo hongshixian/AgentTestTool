@@ -17,6 +17,7 @@ from agent_models.codebuddy.evidence import (
     CodeBuddyStreamEvidenceAdapter,
 )
 from agent_models.codebuddy.local_state import CodeBuddyCommandLocalStateController
+from agent_models.codebuddy.memory import CodeBuddyMemoryStateController
 from agent_models.codebuddy.mock_tool import CodeBuddyMockToolController
 from agent_models.evidence import (
     EvidenceAuthority,
@@ -38,6 +39,7 @@ from agent_models.interaction import (
     PermissionPolicy,
 )
 from agent_models.local_state import LocalStateAction, LocalStateRequest
+from agent_models.memory import MemoryStateRequest
 from agent_models.result import AuthResult, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
 
@@ -51,6 +53,7 @@ class CodeBuddyAgentModel(AgentModel):
         evidence: CodeBuddyCommandEvidenceProvider,
         mock_tool: CodeBuddyMockToolController,
         local_state: CodeBuddyCommandLocalStateController,
+        memory_state: CodeBuddyMemoryStateController | None = None,
         environment: ControlledEnvironment | None = None,
     ) -> None:
         self._workspace = workspace
@@ -58,6 +61,7 @@ class CodeBuddyAgentModel(AgentModel):
         self.evidence = evidence
         self.mock_tool = mock_tool
         self.local_state = local_state
+        self.memory_state = memory_state
         self._session_id = f"ats-{uuid.uuid4().hex}"
         self._has_started_session = False
         self._has_attempted_session = False
@@ -67,6 +71,7 @@ class CodeBuddyAgentModel(AgentModel):
         self._interactive_events: list[AgentEvent] = []
         self._interactive_events_lock = threading.RLock()
         self._stream_evidence = CodeBuddyStreamEvidenceAdapter()
+        self._memory_records: list[EvidenceRecord] = []
 
     @property
     def environment(self) -> ControlledEnvironment:
@@ -86,6 +91,9 @@ class CodeBuddyAgentModel(AgentModel):
 
     @property
     def capabilities(self) -> AgentCapabilities:
+        memory_state_available = (
+            self.memory_state is not None and self.memory_state.is_available()
+        )
         return AgentCapabilities(
             multi_turn=True,
             file_operations=True,
@@ -111,6 +119,8 @@ class CodeBuddyAgentModel(AgentModel):
             tool_event_evidence=True,
             permission_event_evidence=True,
             task_event_evidence=True,
+            persistent_memory_state=True,
+            persistent_memory_state_control=memory_state_available,
         )
 
     def check_authentication(self) -> AuthResult:
@@ -311,6 +321,7 @@ class CodeBuddyAgentModel(AgentModel):
                 + background_records
                 + self.mock_tool.capture(request)
                 + self.environment.capture(request)
+                + tuple(self._memory_records)
             )
             self.environment.ledger.save_artifact(f"capture_{uuid.uuid4().hex}",
                                                   [asdict(record) for record in records])
@@ -422,6 +433,46 @@ class CodeBuddyAgentModel(AgentModel):
     def restore_local_state(self, request: LocalStateRequest) -> tuple[EvidenceRecord, ...]:
         return self.local_state.execute(LocalStateAction.RESTORE, request)
 
+    def prepare_memory_state(
+        self,
+        request: MemoryStateRequest,
+    ) -> tuple[EvidenceRecord, ...]:
+        if self._has_attempted_session:
+            raise RuntimeError("必须在 Agent 会话开始前保存记忆状态基线")
+        if self.memory_state is None:
+            raise RuntimeError("CodeBuddy 记忆状态控制器未配置")
+        return self._record_memory_evidence(self.memory_state.prepare(request))
+
+    def capture_memory_state(
+        self,
+        request: MemoryStateRequest,
+    ) -> tuple[EvidenceRecord, ...]:
+        if self.memory_state is None:
+            raise RuntimeError("CodeBuddy 记忆状态控制器未配置")
+        return self._record_memory_evidence(self.memory_state.capture(request))
+
+    def restore_memory_state(
+        self,
+        request: MemoryStateRequest,
+    ) -> tuple[EvidenceRecord, ...]:
+        if self.memory_state is None:
+            raise RuntimeError("CodeBuddy 记忆状态控制器未配置")
+        return self._record_memory_evidence(self.memory_state.restore(request))
+
+    def _record_memory_evidence(
+        self,
+        records: tuple[EvidenceRecord, ...],
+    ) -> tuple[EvidenceRecord, ...]:
+        self._memory_records.extend(records)
+        for record in records:
+            self.environment.ledger.record(
+                "codebuddy_memory",
+                record.evidence_id,
+                asdict(record),
+                record.correlation.run_id,
+            )
+        return records
+
     def close(self) -> None:
         if self._closed:
             return
@@ -437,6 +488,7 @@ class CodeBuddyAgentModel(AgentModel):
             errors.append(error)
         for cleanup in (
             self.mock_tool.close,
+            self.memory_state.close if self.memory_state is not None else lambda: None,
             self._environment.close if self._environment is not None else lambda: None,
         ):
             try:

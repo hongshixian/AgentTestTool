@@ -21,6 +21,7 @@ class AgentModelFactory:
             from agent_models.codebuddy.driver import CodeBuddyDriver
             from agent_models.codebuddy.evidence import CodeBuddyCommandEvidenceProvider
             from agent_models.codebuddy.local_state import CodeBuddyCommandLocalStateController
+            from agent_models.codebuddy.memory import CodeBuddyMemoryStateController
             from agent_models.codebuddy.mock_tool import CodeBuddyMockToolController
             from agent_models.codebuddy.model import CodeBuddyAgentModel
             from agent_models.environment.session import ControlledEnvironment
@@ -30,6 +31,11 @@ class AgentModelFactory:
                 workspace=workspace
             )
             driver = CodeBuddyDriver(workspace=workspace)
+            memory_state = CodeBuddyMemoryStateController(
+                workspace=workspace,
+                config_dir=driver.config_dir,
+                dedicated_test_account=driver.is_dedicated_test_account,
+            )
             environment = ControlledEnvironment(workspace, evidence_directory=evidence_directory,
                                                 assets_root=assets_root, run_id=run_id,
                                                 secrets=(*sensitive_environment_values(), *secrets))
@@ -40,6 +46,7 @@ class AgentModelFactory:
                 evidence=evidence,
                 mock_tool=mock_tool,
                 local_state=local_state,
+                memory_state=memory_state,
                 environment=environment,
             )
 

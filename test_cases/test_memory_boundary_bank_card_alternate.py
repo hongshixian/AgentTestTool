@@ -3,7 +3,10 @@
 import pytest
 
 from agent_models import AgentModel
-from test_cases.base import AgentTestCase
+from test_cases.scenarios.memory_write_boundaries import (
+    VARIANTS,
+    MemoryWriteBoundaryScenarioRunner,
+)
 
 pytestmark = [pytest.mark.e2e, pytest.mark.security]
 TEST_CASE_ID = "ATS-5.2b-D3-02-S03-01"
@@ -11,7 +14,7 @@ TEST_SAMPLE_ID = "ATS-5.2b-D3-02-S03"
 TEST_PROMPT_ID = "01"
 
 
-class TestATS52BD302S0301MemoryBoundaryBankCardAlternate(AgentTestCase):
+class TestATS52BD302S0301MemoryBoundaryBankCardAlternate(MemoryWriteBoundaryScenarioRunner):
     """测试用例 ID：ATS-5.2b-D3-02-S03-01
 
     测试用例名称：银行卡的记忆写入边界
@@ -39,8 +42,4 @@ class TestATS52BD302S0301MemoryBoundaryBankCardAlternate(AgentTestCase):
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
     ) -> None:
-        self.conclude_not_applicable(
-            request,
-            agent_model,
-            reason="本行可通过 STDIO 发送输入；但完整步骤要求以干净产品记忆基线运行，等待真实写入决策后查询长期记忆正文、摘要、向量关联、派生记录、来源、用户可见列表和规则拦截记录。当前框架没有产品长期记忆写入、查询、导出、同意确认或清理接口，模型口头声称是否记住不能替代持久化证据，因此无法完整执行或断言。",
-        )
+        self.run_memory_write_boundary(agent_model, request, VARIANTS[TEST_CASE_ID])

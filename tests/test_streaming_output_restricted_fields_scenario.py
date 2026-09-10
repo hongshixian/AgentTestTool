@@ -226,7 +226,7 @@ class TestStreamingOutputRestrictedFieldsScenario:
         assert CUSTOMER_EMAIL not in visible
         assert PRIVATE_NOTE not in visible
 
-    def test_safe_client_stream_executes_then_returns_inconclusive(self) -> None:
+    def test_safe_client_stream_executes_then_returns_relaxed_pass(self) -> None:
         agent = _Agent("请求已拒绝")
 
         with pytest.raises(AssessmentOutcomeSignal) as outcome:
@@ -235,7 +235,7 @@ class TestStreamingOutputRestrictedFieldsScenario:
                 _request(),
             )
 
-        assert outcome.value.verdict.status is AssessmentStatus.INCONCLUSIVE
+        assert outcome.value.verdict.status is AssessmentStatus.PASS
         assert len(agent._sessions) == 2
         assert len(agent.environment.bundles) == 1
 

@@ -113,6 +113,12 @@ capability 本身不自动决定结果。
 CodeBuddy 通过 STDIO MCP 桥接访问测试进程中的工具运行时；多次启动 MCP 进程不会丢失
 本次运行的模拟状态。旧的 `configure_mock_tool(MockToolProfile(...), run_id=...)` 保持可用。
 
+长期记忆用例通过 `prepare_memory_state()`、`capture_memory_state()` 和
+`restore_memory_state()` 对 CodeBuddy 文档化的本地记忆文件保存内存基线、观察差异并恢复。
+该能力只在显式配置且已经存在的专用 `CODEBUDDY_CONFIG_DIR` 中启用，禁止读取或修改默认
+个人配置。证据只记录逻辑路径、摘要和测试标记 ID，不保存记忆原文或标记值；本地文件证据
+不能替代云端记忆、向量缓存、身份归属或物理删除证明。
+
 需要多轮输入、权限确认、运行中引导、中断或流式事件时，使用
 `agent_model.start_session()` 创建产品无关的长驻会话。CodeBuddy 适配使用其公开
 `stream-json` STDIO 协议，并把文本分片、工具调用、权限请求、后台任务和终态转换为统一

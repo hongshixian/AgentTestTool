@@ -532,10 +532,25 @@ class CodeBuddyDriver:
         if session_id is not None:
             projects = self.config_dir / "projects"
             if projects.is_dir():
-                for session_file in projects.rglob(f"{session_id}.jsonl"):
+                session_name = f"{session_id}.jsonl"
+                for root, directories, files in os.walk(
+                    projects,
+                    topdown=True,
+                    followlinks=False,
+                    onerror=lambda _error: None,
+                ):
+                    root_path = Path(root)
+                    directories[:] = [
+                        name
+                        for name in directories
+                        if not (root_path / name).is_symlink()
+                    ]
+                    if session_name not in files:
+                        continue
+                    session_file = root_path / session_name
                     session_file.unlink(missing_ok=True)
                     try:
-                        session_file.parent.rmdir()
+                        root_path.rmdir()
                     except OSError:
                         pass
         if errors:

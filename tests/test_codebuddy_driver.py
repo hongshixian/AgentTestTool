@@ -220,3 +220,19 @@ class TestCodeBuddyDriver:
 
         assert not session_directory.joinpath("ats-session.jsonl").exists()
         assert retained.exists()
+
+    def test_close_ignores_project_directory_disappearing_during_scan(
+        self,
+        monkeypatch,
+        tmp_path,
+    ) -> None:
+        tmp_path.joinpath("projects").mkdir()
+
+        def disappearing_walk(_root, *, onerror, **_kwargs):
+            onerror(FileNotFoundError("project directory disappeared"))
+            return iter(())
+
+        monkeypatch.setattr("agent_models.codebuddy.driver.os.walk", disappearing_walk)
+        driver = CodeBuddyDriver(workspace=tmp_path, config_dir=tmp_path)
+
+        driver.close(session_id="ats-session")

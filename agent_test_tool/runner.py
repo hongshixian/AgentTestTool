@@ -34,6 +34,8 @@ class WorkflowConfig:
     repeat: int = 1
     smoke_timeout_seconds: float = 900.0
     business_timeout_seconds: float = 86_400.0
+    business_paths: tuple[Path, ...] = ()
+    business_selection_source: str | None = None
     run_id: str | None = None
 
 
@@ -127,6 +129,7 @@ def _run_pytest_phase(
     *,
     phase: str,
     selection: str,
+    test_paths: Sequence[Path],
     run_id: str,
     run_directory: Path,
     agent: str,
@@ -144,7 +147,7 @@ def _run_pytest_phase(
         sys.executable,
         "-m",
         "pytest",
-        str(TEST_CASES_ROOT),
+        *(str(path) for path in test_paths),
         "-m",
         selection,
         "-p",
@@ -311,6 +314,7 @@ def run_workflow(
     smoke = _run_pytest_phase(
         phase="smoke",
         selection="e2e and smoke",
+        test_paths=(TEST_CASES_ROOT,),
         run_id=run_id,
         run_directory=run_directory,
         agent=config.agent,
@@ -324,6 +328,7 @@ def run_workflow(
         business = _run_pytest_phase(
             phase="business",
             selection="e2e and not smoke",
+            test_paths=config.business_paths or (TEST_CASES_ROOT,),
             run_id=run_id,
             run_directory=run_directory,
             agent=config.agent,
@@ -348,6 +353,11 @@ def run_workflow(
         "business_not_executed_reason": (
             None if business is not None else "冒烟测试未全部通过，未执行业务测试"
         ),
+        "business_selection": {
+            "source": config.business_selection_source,
+            "path_count": len(config.business_paths),
+            "paths": [str(path) for path in config.business_paths],
+        },
         "commands": {
             "smoke": list(smoke.command),
             "business": list(business.command) if business is not None else None,
