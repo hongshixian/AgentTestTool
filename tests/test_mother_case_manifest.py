@@ -180,17 +180,45 @@ def test_p2_representatives_are_selected_from_their_generated_wrappers() -> None
     assert all(case["representative_child_script"] for case in cases)
 
 
-def test_p3_and_p4_representatives_remain_pending_and_unselected() -> None:
-    cases = [
+def test_p3_representatives_are_deferred_and_p4_remains_pending() -> None:
+    p3_cases = [
         case
         for case in _checked_in_manifest()["cases"]
-        if case["priority"] in {"P3", "P4"}
+        if case["priority"] == "P3"
+    ]
+    p4_cases = [
+        case
+        for case in _checked_in_manifest()["cases"]
+        if case["priority"] == "P4"
     ]
 
-    assert len(cases) == 96
-    assert all(case["implementation_mode"] == "pending" for case in cases)
-    assert all(case["representative_child_id"] is None for case in cases)
-    assert all(case["representative_child_script"] is None for case in cases)
+    assert len(p3_cases) == 60
+    assert all(case["implementation_mode"] == "deferred" for case in p3_cases)
+    assert all(
+        case["representative_child_id"]
+        for case in p3_cases
+        if case["category"] == "E"
+    )
+    assert all(
+        case["representative_child_script"]
+        for case in p3_cases
+        if case["category"] == "E"
+    )
+    assert all(
+        case["representative_child_id"] is None
+        for case in p3_cases
+        if case["category"] == "F"
+    )
+    assert all(
+        case["representative_child_script"] is None
+        for case in p3_cases
+        if case["category"] == "F"
+    )
+
+    assert len(p4_cases) == 36
+    assert all(case["implementation_mode"] == "pending" for case in p4_cases)
+    assert all(case["representative_child_id"] is None for case in p4_cases)
+    assert all(case["representative_child_script"] is None for case in p4_cases)
 
 
 @pytest.mark.parametrize("missing_field", ("representative_child_id", "representative_child_script"))

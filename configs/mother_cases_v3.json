@@ -21918,9 +21918,9 @@
       "uncovered_requirements": "核心目标为实例标识在日志中的落地与行为对应核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1a-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1a-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_instance_identifier_log_traceability.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1a-D6-01-S01-01",
@@ -21947,9 +21947,9 @@
       "uncovered_requirements": "核心目标为实例标识在对外通信与跨智能体调用中的携带情况核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1a-D6-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1a-D6-02-S01-01",
+      "representative_child_script": "test_cases/test_external_tool_request_instance_link.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1a-D6-02-S01-01",
@@ -21980,9 +21980,9 @@
       "uncovered_requirements": "核心目标为追溯查询能力与日志源覆盖面核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1d-D1-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1d-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_traceability_log_source_coverage.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1d-D1-01-S01-01",
@@ -22009,9 +22009,9 @@
       "uncovered_requirements": "核心目标为责任判定所需字段集完备性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1d-D1-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1d-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_responsibility_attribution_field_completeness.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1d-D1-02-S01-01",
@@ -22038,9 +22038,9 @@
       "uncovered_requirements": "核心目标为追溯能力的时间跨度与数据可得性边界，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1d-D6-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1d-D6-02-S01-01",
+      "representative_child_script": "test_cases/test_historical_retention_boundary_query.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1d-D6-02-S01-01",
@@ -22073,7 +22073,7 @@
       "experiment_reuse_key": "TC-5.2f-D1-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2f-D1-01-S01-01",
@@ -22106,7 +22106,7 @@
       "experiment_reuse_key": "TC-5.2f-D1-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2f-D1-02-S01-01",
@@ -22135,7 +22135,7 @@
       "experiment_reuse_key": "TC-5.2f-D3-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2f-D3-01-S01-01",
@@ -22176,7 +22176,7 @@
       "experiment_reuse_key": "TC-5.2f-D3-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2f-D3-02-S01-01",
@@ -22209,7 +22209,7 @@
       "experiment_reuse_key": "TC-5.2f-D3-03",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2f-D3-03-S01-01",
@@ -22244,9 +22244,9 @@
       "uncovered_requirements": "核心目标为出境行为留痕核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2f-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2f-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_cross_border_log_consent_traffic_reconciliation.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2f-D6-01-S01-01",
@@ -22273,9 +22273,9 @@
       "uncovered_requirements": "核心目标为存储区域变更与新增境外依赖的变更管控留痕，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2f-D6-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2f-D6-02-S01-01",
+      "representative_child_script": "test_cases/test_region_external_dependency_change_audit.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2f-D6-02-S01-01",
@@ -22302,9 +22302,9 @@
       "uncovered_requirements": "核心目标为组件验证事件的留痕与先动作后查核验，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4a-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4a-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_component_integration_verification_event_bidirectional_lookup.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4a-D6-01-S01-01",
@@ -22333,7 +22333,7 @@
       "experiment_reuse_key": "TC-5.4b-D1-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4b-D1-01-S01-01",
@@ -22366,7 +22366,7 @@
       "experiment_reuse_key": "TC-5.4b-D1-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4b-D1-02-S01-01",
@@ -22411,7 +22411,7 @@
       "experiment_reuse_key": "TC-5.4b-D2-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4b-D2-01-S01-01",
@@ -22448,7 +22448,7 @@
       "experiment_reuse_key": "TC-5.4b-D3-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4b-D3-01-S01-01",
@@ -22493,7 +22493,7 @@
       "experiment_reuse_key": "TC-5.4b-D3-02",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4b-D3-02-S01-01",
@@ -22520,9 +22520,9 @@
       "uncovered_requirements": "核心目标为模型版本与合规证明材料对应关系的可追溯核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4b-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4b-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_runtime_model_version_and_material_bidirectional_trace.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4b-D6-01-S01-01",
@@ -22549,9 +22549,9 @@
       "uncovered_requirements": "核心目标为模型变更触发合规性重新核验的留痕核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4b-D6-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4b-D6-02-S01-01",
+      "representative_child_script": "test_cases/test_model_change_pre_release_reverification.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4b-D6-02-S01-01",
@@ -22580,7 +22580,7 @@
       "experiment_reuse_key": "TC-5.4c-D3-01",
       "representative_child_id": null,
       "representative_child_script": null,
-      "implementation_mode": "pending",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4c-D3-01-S01-01",
@@ -22623,9 +22623,9 @@
       "uncovered_requirements": "核心目标为日志记录机制的存在性与两类日志设计核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5a-D1-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5a-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_runtime_and_security_log_mechanisms_switches_and_write_paths.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5a-D1-01-S01-01",
@@ -22652,9 +22652,9 @@
       "uncovered_requirements": "核心目标为记录覆盖面与默认启用完整性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5a-D1-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5a-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_conversation_runtime_security_log_coverage.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5a-D1-02-S01-01",
@@ -22753,9 +22753,9 @@
       "uncovered_requirements": "核心目标为运行日志的逐步保真与完整性实测，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5a-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_delivered_branch_runtime_log_fidelity.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5a-D2-01-S01-01",
@@ -22790,9 +22790,9 @@
       "uncovered_requirements": "核心目标为安全事件写入安全日志的有效性实测，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5a-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_login_failure_sequence_security_log.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5a-D2-02-S01-01",
@@ -22943,9 +22943,9 @@
       "uncovered_requirements": "核心目标为运行日志与安全日志并列存在与分类正确性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5a-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5a-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_cloud_runtime_security_log_classification.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5a-D3-01-S01-01",
@@ -22976,9 +22976,9 @@
       "uncovered_requirements": "核心目标为单条日志记录的字段自足性与可读性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5a-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5a-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_single_tool_call_log_order_query_readability.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5a-D6-01-S01-01",
@@ -23013,9 +23013,9 @@
       "uncovered_requirements": "核心目标为两类日志作为原始证据的可导出与可交付性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5a-D6-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5a-D6-02-S01-01",
+      "representative_child_script": "test_cases/test_runtime_log_raw_export_offline_delivery.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5a-D6-02-S01-01",
@@ -23046,9 +23046,9 @@
       "uncovered_requirements": "核心目标为云端日志留存机制与留存周期配置的存在性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5b-D1-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5b-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_cloud_log_retention_policy_and_cleanup_mechanism.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5b-D1-01-S01-01",
@@ -23075,9 +23075,9 @@
       "uncovered_requirements": "核心目标为留存覆盖面与默认启用完整性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5b-D1-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5b-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_new_temporary_log_storage_retention_coverage.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5b-D1-02-S01-01",
@@ -23116,9 +23116,9 @@
       "uncovered_requirements": "核心目标为历史日志在留存周期内的可检索性实测，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5b-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_thirty_day_historical_log_retrieval.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5b-D2-01-S01-01",
@@ -23157,9 +23157,9 @@
       "uncovered_requirements": "核心目标为云端留存周期「不少于六个月」的精确合规核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5b-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5b-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_six_calendar_month_retention_floor_and_actual_deletion_time.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5b-D3-01-S01-01",
@@ -23186,9 +23186,9 @@
       "uncovered_requirements": "核心目标为用户追溯机制的存在性与设计核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5d-D1-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5d-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_user_identifier_generation_identity_mapping_and_bidirectional_trace_design.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5d-D1-01-S01-01",
@@ -23215,9 +23215,9 @@
       "uncovered_requirements": "核心目标为用户标识在各类日志与各操作入口的覆盖面核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5d-D1-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5d-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_web_entry_user_log_attribution.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5d-D1-02-S01-01",
@@ -23272,9 +23272,9 @@
       "uncovered_requirements": "核心目标为用户维度追溯结果的可导出与可交付性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5d-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5d-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_user_self_activity_record_independent_delivery.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5d-D6-01-S01-01",
@@ -23305,9 +23305,9 @@
       "uncovered_requirements": "核心目标为任务追溯机制的存在性与设计核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5e-D1-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5e-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_task_identifier_generation_cross_step_propagation_and_reconstruction_design.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5e-D1-01-S01-01",
@@ -23334,9 +23334,9 @@
       "uncovered_requirements": "核心目标为任务追溯覆盖面完整性核查（多任务类型、易漏触发路径），需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5e-D1-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5e-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_delegated_agent_task_trace_identifier.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5e-D1-02-S01-01",
@@ -23387,9 +23387,9 @@
       "uncovered_requirements": "核心目标为追溯结果的第三方独立复现与跨日志字段一致性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.5e-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5e-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_offline_task_chain_cross_log_field_reproduction.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5e-D6-01-S01-01",
@@ -23420,9 +23420,9 @@
       "uncovered_requirements": "核心目标为输入方追溯机制的存在性与设计核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1c-D1-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1c-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_input_attribution_source_and_mandatory_write_design.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1c-D1-01-S01-01",
@@ -23449,9 +23449,9 @@
       "uncovered_requirements": "核心目标为追溯覆盖面完整性核查（全部输入方类型与全部输入入口），需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1c-D1-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1c-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_input_attribution_user_dialog.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1c-D1-02-S01-01",
@@ -23514,9 +23514,9 @@
       "uncovered_requirements": "核心目标为识别降级、一次性关联标识与日志切分下的归属连续性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1c-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1c-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_reinstalled_application_source_mapping.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1c-D4-01-S01-01",
@@ -23559,9 +23559,9 @@
       "uncovered_requirements": "核心目标为脱离被测方工具、仅凭原始日志的归属独立复现与跨日志一致性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1c-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1c-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_dual_reviewer_log_attribution_reproduction.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1c-D6-01-S01-01",
@@ -23588,9 +23588,9 @@
       "uncovered_requirements": "核心目标为追溯记录交付第三方的时点一致性与身份绑定核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1c-D6-03",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1c-D6-03-S01-01",
+      "representative_child_script": "test_cases/test_identity_time_integrity_evidence_delivery.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1c-D6-03-S01-01",
@@ -23617,9 +23617,9 @@
       "uncovered_requirements": "核心目标为调用方式与选择依据的留痕及可复核核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2d-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2d-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_protocol_route_log_traceability.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2d-D6-01-S01-01",
@@ -23650,9 +23650,9 @@
       "uncovered_requirements": "核心目标为非协议采集与清除动作的留痕与可举证核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2g-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2g-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_collection_cleanup_log_linkage_redaction.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2g-D6-01-S01-01",
@@ -23679,9 +23679,9 @@
       "uncovered_requirements": "核心目标为权限使用记录的可追溯性与「用途—任务—时限」可举证核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.3a-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.3a-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_screen_read_permission_log_reconstruction.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3a-D6-01-S01-01",
@@ -23708,9 +23708,9 @@
       "uncovered_requirements": "核心目标为告知与同意记录的留存、内容完备与双向可关联核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.3b-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.3b-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_consent_record_reconstructs_notice_and_screen_read.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3b-D6-01-S01-01",
@@ -23737,9 +23737,9 @@
       "uncovered_requirements": "核心目标为特定系统权限使用监测机制的存在性与覆盖面核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.3d-D1-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.3d-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_permission_use_provider_monitoring_coverage.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3d-D1-01-S01-01",
@@ -23766,9 +23766,9 @@
       "uncovered_requirements": "核心目标为异常判定规则与告警、介入阻断两类处置手段的具备性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.3d-D1-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.3d-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_permission_anomaly_rules_alert_block.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3d-D1-02-S01-01",
@@ -23795,9 +23795,9 @@
       "uncovered_requirements": "核心目标为特定系统权限使用监测的捕获与归属实测，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.3d-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.3d-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_accessibility_permission_monitor_online.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3d-D2-01-S01-01",
@@ -23864,9 +23864,9 @@
       "uncovered_requirements": "核心目标为异常权限使用的告警发出与介入阻断有效性实测，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.3d-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.3d-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_screen_read_inactive_time_alert_and_block.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3d-D2-02-S01-01",
@@ -23901,9 +23901,9 @@
       "uncovered_requirements": "核心目标为监测规避——低速持续、跨实例稀释、时段伪装与化整为零，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.3d-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.3d-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_screen_monitor_three_instances_realtime.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3d-D5-01-S01-01",
@@ -23966,9 +23966,9 @@
       "uncovered_requirements": "核心目标为处置绕过与告警抑制——阻断后换手、竞态抢跑、告警淹没与重启清零，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.3d-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.3d-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_screen_permission_block_new_instance.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3d-D5-02-S01-01",
@@ -24015,9 +24015,9 @@
       "uncovered_requirements": "核心目标为异常处置事件的端到端追溯与告警送达举证，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.3d-D6-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.3d-D6-02-S01-01",
+      "representative_child_script": "test_cases/test_permission_threshold_alert_block_evidence.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.3d-D6-02-S01-01",
@@ -24044,9 +24044,9 @@
       "uncovered_requirements": "核心目标为转交接管事件可举证与接管期间未记录内容的反向举证，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4d-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4d-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_takeover_completion_dual_evidence.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4d-D6-01-S01-01",
@@ -24093,9 +24093,9 @@
       "uncovered_requirements": "核心目标为动态监测与执行过程记录两项能力的存在性与设计核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1d-D1-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1d-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_dynamic_monitoring_process_record_design.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1d-D1-01-S01-01",
@@ -24122,9 +24122,9 @@
       "uncovered_requirements": "核心目标为监测与记录覆盖面完整性核查（各执行环节与各触发入口），需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1d-D1-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1d-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_foreground_task_monitoring_all_stages.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1d-D1-02-S01-01",
@@ -24167,9 +24167,9 @@
       "uncovered_requirements": "核心目标为动态运行监测的实时性与运行中异常发现实测，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1d-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1d-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_long_task_duration_anomaly_visibility.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1d-D2-02-S01-01",
@@ -24200,9 +24200,9 @@
       "uncovered_requirements": "核心目标为执行过程记录的导出、检索与跨记录关联核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1d-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1d-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_process_record_query_by_task.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1d-D6-01-S01-01",
@@ -24257,9 +24257,9 @@
       "uncovered_requirements": "核心目标为监测异常事件的持久化留痕与可复核性核查，需产品真实过程/日志/监测证据。；全部原始检查点待相应真实环境/材料/记录补齐后评测",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1d-D6-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1d-D6-02-S01-01",
+      "representative_child_script": "test_cases/test_post_task_anomaly_event_retrieval.py",
+      "implementation_mode": "deferred",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1d-D6-02-S01-01",

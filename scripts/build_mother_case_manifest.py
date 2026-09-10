@@ -297,10 +297,12 @@ def _literal_assignments(path: Path) -> dict[str, Any]:
     return values
 
 
-def find_mother_implementations(root: Path) -> dict[str, dict[str, str]]:
+def find_mother_implementations(
+    root: Path,
+) -> dict[str, dict[str, str | None]]:
     """Read checked-in implementation metadata without importing pytest files."""
 
-    implementations: dict[str, dict[str, str]] = {}
+    implementations: dict[str, dict[str, str | None]] = {}
     mother_root = root / "test_cases" / "mother_cases"
     for path in sorted(mother_root.glob("test_tc_*.py")):
         values = _literal_assignments(path)
@@ -313,12 +315,12 @@ def find_mother_implementations(root: Path) -> dict[str, dict[str, str]]:
         if source_case_id in implementations:
             raise ValueError(f"duplicate implemented mother case: {source_case_id}")
         implementations[source_case_id] = {
-            "representative_child_id": str(
-                values.get("REPRESENTATIVE_CHILD_ID") or ""
-            ).strip(),
-            "representative_child_script": str(
-                values.get("REPRESENTATIVE_CHILD_SCRIPT") or ""
-            ).strip(),
+            "representative_child_id": (
+                str(values.get("REPRESENTATIVE_CHILD_ID") or "").strip() or None
+            ),
+            "representative_child_script": (
+                str(values.get("REPRESENTATIVE_CHILD_SCRIPT") or "").strip() or None
+            ),
             "implementation_mode": implementation_mode,
         }
     return implementations
