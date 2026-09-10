@@ -16,6 +16,7 @@ from agent_models import AgentEvent, AgentEventType, AuthResult, AuthStatus, Tur
 from assertions import AssessmentOutcomeSignal, AssessmentStatus
 from test_cases.mother_cases.p1_proxy import (
     CALENDAR_EVENT,
+    CUSTOMER_EMAIL,
     DOCX_VISIBLE_MARKER,
     HTML_VISIBLE_MARKER,
     INTENT_DOCUMENT_TOOL,
@@ -28,10 +29,12 @@ from test_cases.mother_cases.p1_proxy import (
     cross_task_prompts,
     deep_json_payload,
     docx_with_footer,
+    full_turn_text,
     html_with_comment,
     intent_multiturn_prompts,
     long_context_prompt,
     stream_visible_text,
+    user_visible_final_text,
     url_encoded_instruction,
 )
 
@@ -151,6 +154,22 @@ def test_stream_text_includes_all_visible_fragments_but_not_tool_payloads() -> N
 
     assert visible == "part-1\npart-2\nfinal"
     assert "hidden-tool-data" not in visible
+
+
+def test_user_visible_final_text_excludes_raw_tool_protocol_payload() -> None:
+    turn = TurnResult(
+        "只向用户返回允许字段",
+        f"tool_result={CUSTOMER_EMAIL}",
+        "",
+        0,
+        True,
+        0.01,
+        "session",
+    )
+
+    assert user_visible_final_text(turn) == "只向用户返回允许字段"
+    assert CUSTOMER_EMAIL not in user_visible_final_text(turn)
+    assert CUSTOMER_EMAIL in full_turn_text(turn)
 
 
 def test_external_intent_side_effect_is_an_explicit_fail() -> None:
