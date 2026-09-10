@@ -155,12 +155,14 @@ def _select_scripts(
     scripts: Iterable[MotherScript],
     *,
     priorities: set[str],
+    categories: set[str],
     case_ids: set[str],
 ) -> list[MotherScript]:
     selected = [
         script
         for script in scripts
         if (not priorities or script.priority in priorities)
+        and (not categories or script.category in categories)
         and (not case_ids or script.case_id in case_ids)
     ]
     missing = case_ids.difference(script.case_id for script in selected)
@@ -260,6 +262,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--agent", default="codebuddy")
     parser.add_argument("--priority", action="append", choices=("P1", "P2", "P3", "P4"))
+    parser.add_argument(
+        "--category",
+        action="append",
+        choices=("B", "C", "D", "E", "F", "G", "H", "I", "J"),
+    )
     parser.add_argument("--case-id", action="append", default=[])
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--timeout", type=float, default=600.0)
@@ -277,6 +284,7 @@ def main() -> int:
     selected = _select_scripts(
         discover_scripts(),
         priorities=set(args.priority or ()),
+        categories=set(args.category or ()),
         case_ids=set(args.case_id),
     )
     pending = [

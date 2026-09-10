@@ -4652,9 +4652,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.1a-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1a-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_instance_identity_mechanism_design.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1a-D1-01-S01-01",
@@ -4685,9 +4685,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.1a-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1a-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_first_launch_instance_queryable_identifier.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1a-D1-02-S01-01",
@@ -4734,9 +4734,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1a-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_cross_account_instance_identifier_reuse.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1a-D2-01-S01-01",
@@ -4771,9 +4771,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1a-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_responsibility_subject_query.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1a-D2-02-S01-01",
@@ -4804,9 +4804,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1a-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1a-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_identifier_non_reuse_generation_space.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1a-D3-01-S01-01",
@@ -4833,9 +4833,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.1b-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1b-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_identifier_integrity_protection_coverage.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1b-D1-01-S01-01",
@@ -4862,9 +4862,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1b-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_server_rejects_foreign_instance_tampering.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1b-D2-01-S01-01",
@@ -4899,9 +4899,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1b-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_local_identity_replaced_with_foreign_id.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1b-D2-02-S01-01",
@@ -4936,9 +4936,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1b-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1b-D4-01-S02-01",
+      "representative_child_script": "test_cases/test_truncated_identity_storage_detection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1b-D4-01-S01-01",
@@ -4985,9 +4985,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1b-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1b-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_instance_integrity_none_algorithm.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1b-D5-01-S01-01",
@@ -5046,9 +5046,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1b-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1b-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_user_a_credentials_with_user_b_instance.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1b-D5-02-S01-01",
@@ -5159,9 +5159,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.1c-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1c-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_identity_authentication_subject_coverage.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1c-D1-01-S01-01",
@@ -5188,9 +5188,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1c-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_authenticated_account_identity_binding.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1c-D2-01-S01-01",
@@ -5249,9 +5249,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1c-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_inbound_agent_valid_credential_identity.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1c-D2-02-S01-01",
@@ -5310,9 +5310,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1c-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1c-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_token_expiry_boundary.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1c-D4-01-S01-01",
@@ -5355,9 +5355,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1c-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1c-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_protected_endpoints_reject_unauthenticated_access.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1c-D5-01-S01-01",
@@ -5456,9 +5456,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.1c-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1c-D5-02-S04-01",
+      "representative_child_script": "test_cases/test_direct_admin_claim_cannot_elevate_account.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1c-D5-02-S01-01",
@@ -5501,9 +5501,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.1d-D2-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1d-D2-01-S02-01",
+      "representative_child_script": "test_cases/test_tool_error_cause_traceability.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1d-D2-01-S01-01",
@@ -5538,9 +5538,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.1d-D2-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.1d-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_cross_instance_traceability_discrimination.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.1d-D2-02-S01-01",
@@ -5571,9 +5571,9 @@
       "uncovered_requirements": "本轮只验证敏感值落盘检查；不评价原条款的全部内部机制、真实读取轨迹、时间可信性或全量日志覆盖。",
       "criteria_version": "CLI宽松-v2-I",
       "experiment_reuse_key": "TC-5.2a-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2a-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_sensitive_data_scope_in_logs_trace_cache.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2a-D3-02-S01-01",
@@ -5600,9 +5600,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2b-D1-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2b-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_long_term_memory_protection_mechanisms.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2b-D1-01-S01-01",
@@ -5629,9 +5629,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2b-D2-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2b-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_cross_user_memory_baseline.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2b-D2-01-S01-01",
@@ -5674,9 +5674,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2b-D2-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2b-D2-02-S01-03",
+      "representative_child_script": "test_cases/test_forged_long_term_memory_authorization.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2b-D2-02-S01-01",
@@ -5719,9 +5719,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2b-D3-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2b-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_calculation_memory_relevance.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2b-D3-01-S01-01",
@@ -5756,9 +5756,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2b-D3-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2b-D3-02-S01-06",
+      "representative_child_script": "test_cases/test_memory_boundary_one_time_transaction_primary.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2b-D3-02-S01-01",
@@ -5845,9 +5845,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2b-D4-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2b-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_memory_capacity_retains_payment_refusal.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2b-D4-01-S01-01",
@@ -5894,9 +5894,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2b-D5-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2b-D5-01-S02-01",
+      "representative_child_script": "test_cases/test_default_authorization_memory_cannot_bypass_confirmation.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2b-D5-01-S01-01",
@@ -5951,9 +5951,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2b-D5-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2b-D5-02-S02-01",
+      "representative_child_script": "test_cases/test_document_body_memory_write.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2b-D5-02-S01-01",
@@ -6004,9 +6004,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2b-D6-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2b-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_memory_lifecycle_traceability.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2b-D6-01-S01-01",
@@ -6033,9 +6033,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2c-D1-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2c-D1-01-S01-02",
+      "representative_child_script": "test_cases/test_memory_deletion_propagation_coverage.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2c-D1-01-S01-01",
@@ -6066,9 +6066,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2c-D2-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2c-D2-01-S02-01",
+      "representative_child_script": "test_cases/test_deleted_memory_blank_session_recall.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2c-D2-01-S01-01",
@@ -6127,9 +6127,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2c-D2-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2c-D2-02-S02-01",
+      "representative_child_script": "test_cases/test_memory_clear_semantic_recall.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2c-D2-02-S01-01",
@@ -6168,9 +6168,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2c-D3-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2c-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_context_clear_server_cache.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2c-D3-02-S01-01",
@@ -6209,9 +6209,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.2c-D4-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2c-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_memory_bulk_delete_network_interruption.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2c-D4-01-S01-01",
@@ -6258,9 +6258,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；未取得的向量索引、缓存、后台存储、其他设备路径单独列缺口",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2c-D4-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2c-D4-02-S01-01",
+      "representative_child_script": "test_cases/test_deleted_memory_recall_cache_timeline.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2c-D4-02-S01-01",
@@ -6291,9 +6291,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.2d-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2d-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2d-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_local_processing_notice_cloud_isolation_mechanisms.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2d-D1-01-S01-01",
@@ -6320,9 +6320,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2d-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2d-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_contact_local_processing_online_offline.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2d-D2-01-S01-01",
@@ -6369,9 +6369,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；未取得的向量索引、缓存、后台存储、其他设备路径单独列缺口",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2d-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2d-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_cross_user_private_cache_dense_queries.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2d-D2-02-S01-01",
@@ -6414,9 +6414,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2d-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2d-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_cloud_transfer_notice_before_image_upload.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2d-D3-01-S01-01",
@@ -6451,9 +6451,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2d-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2d-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_image_ocr_notice_transfer_consistency.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2d-D3-02-S01-01",
@@ -6484,9 +6484,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2d-D3-03",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2d-D3-03-S01-01",
+      "representative_child_script": "test_cases/test_remote_cloud_switch_renotification.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2d-D3-03-S01-01",
@@ -6517,9 +6517,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.2e-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2e-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2e-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_parcel_tracking_third_party_consent.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2e-D1-01-S01-01",
@@ -6558,9 +6558,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2e-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2e-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_third_party_record_rejection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2e-D2-01-S01-01",
@@ -6591,9 +6591,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2e-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2e-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_consent_withdrawal_stops_new_transfer.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2e-D2-02-S01-01",
@@ -6632,9 +6632,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2e-D2-03",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2e-D2-03-S01-01",
+      "representative_child_script": "test_cases/test_failed_tool_fallback_new_provider_consent.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2e-D2-03-S01-01",
@@ -6677,9 +6677,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2e-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2e-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_selectable_revocable_third_party_consent.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2e-D3-01-S01-01",
@@ -6710,9 +6710,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2e-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2e-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_provider_consent_withdrawal_and_reconsent.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2e-D3-02-S01-01",
@@ -6751,9 +6751,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.2e-D3-03",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.2e-D3-03-S01-01",
+      "representative_child_script": "test_cases/test_subprocessor_restrictions_disclosure_audit.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.2e-D3-03-S01-01",
@@ -6788,9 +6788,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.3a-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3a-D1-01-S01-02",
+      "representative_child_script": "test_cases/test_personal_information_encryption_black_box.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3a-D1-01-S01-01",
@@ -6821,9 +6821,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.3a-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3a-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_primary_backend_encryption_channel_coverage.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3a-D1-02-S01-01",
@@ -6854,9 +6854,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3a-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_registration_login_plaintext_traffic.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3a-D2-01-S01-01",
@@ -6895,9 +6895,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3a-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_cross_agent_and_server_downstream_plaintext_capture.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3a-D2-02-S01-01",
@@ -6940,9 +6940,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3a-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3a-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_personal_information_exclusion_outbound_fields.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3a-D3-01-S01-01",
@@ -6993,9 +6993,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3a-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3a-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_reversible_encoding_as_encryption.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3a-D3-02-S01-01",
@@ -7030,9 +7030,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3a-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3a-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_https_unreachable_plaintext_leak.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3a-D4-01-S01-01",
@@ -7099,9 +7099,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.3b-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3b-D1-01-S01-02",
+      "representative_child_script": "test_cases/test_counterparty_authentication_black_box.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3b-D1-01-S01-01",
@@ -7132,9 +7132,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.3b-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3b-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_synchronous_inbound_peer_authentication.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3b-D1-02-S01-01",
@@ -7177,9 +7177,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3b-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_external_agent_valid_credential_identity.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3b-D2-01-S01-01",
@@ -7206,9 +7206,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3b-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_inbound_peer_without_credentials_is_rejected.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3b-D2-02-S01-01",
@@ -7251,9 +7251,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3b-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3b-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_peer_auth_expired_credential.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3b-D4-01-S01-01",
@@ -7320,9 +7320,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3b-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3b-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_delegation_neighbor_auth_impersonated_upstream.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3b-D5-01-S01-01",
@@ -7381,9 +7381,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3b-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3b-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_peer_identity_proof_replay.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3b-D5-02-S01-01",
@@ -7438,9 +7438,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.3c-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3c-D1-01-S01-02",
+      "representative_child_script": "test_cases/test_secure_communication_black_box_properties.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3c-D1-01-S01-01",
@@ -7471,9 +7471,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.3c-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3c-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_direct_and_east_west_channels_default_security.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3c-D1-02-S01-01",
@@ -7516,9 +7516,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3c-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_inter_agent_raw_packet_confidentiality.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3c-D2-01-S01-01",
@@ -7561,9 +7561,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3c-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_agent_protocol_consumed_message_replay.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3c-D2-02-S01-01",
@@ -7610,9 +7610,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3c-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3c-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_channel_cryptographic_parameters_and_three_properties.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3c-D3-01-S01-01",
@@ -7639,9 +7639,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3c-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3c-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_agent_comm_plaintext_downgrade.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3c-D4-01-S01-01",
@@ -7704,9 +7704,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3c-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3c-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_agent_comm_none_algorithm_rejection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3c-D5-01-S01-01",
@@ -7769,9 +7769,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.3c-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.3c-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_delegation_impersonation_authorization_subject.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.3c-D5-02-S01-01",
@@ -7838,9 +7838,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.4a-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4a-D1-01-S01-02",
+      "representative_child_script": "test_cases/test_component_integrity_black_box.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4a-D1-01-S01-01",
@@ -7871,9 +7871,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.4a-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4a-D1-02-S01-04",
+      "representative_child_script": "test_cases/test_terminal_update_component_verification_coverage.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4a-D1-02-S01-01",
@@ -7912,9 +7912,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4a-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_component_wrong_baseline_recovery.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4a-D2-01-S01-01",
@@ -7945,9 +7945,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4a-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_component_header_tamper_blocking.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4a-D2-02-S01-01",
@@ -7978,9 +7978,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4a-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4a-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_component_post_verification_artifact_substitution.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4a-D3-01-S01-01",
@@ -8023,9 +8023,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4a-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4a-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_marketplace_fake_publisher_personal_info_component_integration_rejection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4a-D5-01-S01-01",
@@ -8336,9 +8336,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4a-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4a-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_component_none_algorithm_rejected.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4a-D5-02-S01-01",
@@ -8409,9 +8409,9 @@
       "uncovered_requirements": "本轮只验证制品与清单一致性；不评价原条款的全部内部机制、真实读取轨迹、时间可信性或全量日志覆盖。",
       "criteria_version": "CLI宽松-v2-I",
       "experiment_reuse_key": "TC-5.4a-D6-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4a-D6-02-S01-01",
+      "representative_child_script": "test_cases/test_rejected_component_log_and_runtime_inventory_evidence.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4a-D6-02-S01-01",
@@ -8438,9 +8438,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.4c-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4c-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_extension_preassessment_process_scope.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4c-D1-01-S01-01",
@@ -8471,9 +8471,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-5.4c-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4c-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_first_party_market_extension_evaluation_coverage.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4c-D1-02-S01-01",
@@ -8524,9 +8524,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4c-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_compliant_extension_evaluation_and_user_availability.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4c-D2-01-S01-01",
@@ -8561,9 +8561,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4c-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_excessive_permission_extension_prepublication_detection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4c-D2-02-S01-01",
@@ -8598,9 +8598,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4c-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4c-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_pre_release_extension_artifact_replacement_block.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4c-D3-02-S01-01",
@@ -8651,9 +8651,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4c-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4c-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_extension_missing_required_metadata_fail_closed.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4c-D4-01-S01-01",
@@ -8720,9 +8720,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-5.4c-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.4c-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_extension_preassessment_marketplace_tool_name_plain_text_full_personal_information.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.4c-D5-01-S01-01",
@@ -9993,9 +9993,9 @@
       "uncovered_requirements": "本轮只验证已落盘留存记录保护；不评价原条款的全部内部机制、真实读取轨迹、时间可信性或全量日志覆盖。",
       "criteria_version": "CLI宽松-v2-I",
       "experiment_reuse_key": "TC-5.5b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5b-D2-02-S01-02",
+      "representative_child_script": "test_cases/test_tiered_archive_preserves_raw_log_detail.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5b-D2-02-S01-01",
@@ -10026,9 +10026,9 @@
       "uncovered_requirements": "本轮只验证生命周期事件下的文件留存；不评价原条款的全部内部机制、真实读取轨迹、时间可信性或全量日志覆盖。",
       "criteria_version": "CLI宽松-v2-I",
       "experiment_reuse_key": "TC-5.5b-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5b-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_log_retention_near_quota.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5b-D4-01-S01-01",
@@ -10087,9 +10087,9 @@
       "uncovered_requirements": "本轮只验证真实完整性校验；不评价原条款的全部内部机制、真实读取轨迹、时间可信性或全量日志覆盖。",
       "criteria_version": "CLI宽松-v2-I",
       "experiment_reuse_key": "TC-5.5c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5c-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_security_log_result_integrity_check.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5c-D2-01-S01-01",
@@ -10136,9 +10136,9 @@
       "uncovered_requirements": "本轮只验证配额压力下留存文件保护；不评价原条款的全部内部机制、真实读取轨迹、时间可信性或全量日志覆盖。",
       "criteria_version": "CLI宽松-v2-I",
       "experiment_reuse_key": "TC-5.5c-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5c-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_log_quota_pressure_large_entry.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5c-D5-02-S01-01",
@@ -10193,9 +10193,9 @@
       "uncovered_requirements": "本轮只验证导出文件独立校验；不评价原条款的全部内部机制、真实读取轨迹、时间可信性或全量日志覆盖。",
       "criteria_version": "CLI宽松-v2-I",
       "experiment_reuse_key": "TC-5.5c-D6-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5c-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_third_party_offline_original_tampered_log_verification.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5c-D6-01-S01-01",
@@ -10226,9 +10226,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.5d-D2-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5d-D2-01-S02-01",
+      "representative_child_script": "test_cases/test_user_traceability_first_session_set.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5d-D2-01-S01-01",
@@ -10271,9 +10271,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.5d-D2-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5d-D2-02-S02-01",
+      "representative_child_script": "test_cases/test_shared_document_read_log_attributed_to_reader.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5d-D2-02-S01-01",
@@ -10312,9 +10312,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.5d-D4-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5d-D4-01-S03-03",
+      "representative_child_script": "test_cases/test_same_device_account_switch_attribution_boundary.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5d-D4-01-S01-01",
@@ -10357,9 +10357,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.5d-D6-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5d-D6-02-S01-01",
+      "representative_child_script": "test_cases/test_security_event_user_trace_independent_dual_review.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5d-D6-02-S01-01",
@@ -10386,9 +10386,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.5e-D2-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5e-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_interleaved_task_trace_isolation.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5e-D2-02-S01-01",
@@ -10423,9 +10423,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-5.5e-D4-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-5.5e-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_traceability_second_tool_timeout.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-5.5e-D4-01-S01-01",
@@ -10472,9 +10472,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.1a-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1a-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_input_party_recognition_and_mutual_method_design.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1a-D1-01-S01-01",
@@ -10501,9 +10501,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.1a-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1a-D1-02-S01-08",
+      "representative_child_script": "test_cases/test_input_identity_terminal_local_entry.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1a-D1-02-S01-01",
@@ -10558,9 +10558,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1a-D2-01-S01-02",
+      "representative_child_script": "test_cases/test_terminal_cloud_downstream_identity_consistency.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1a-D2-01-S01-01",
@@ -10591,9 +10591,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1a-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_tool_output_input_party_binding.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1a-D2-02-S01-01",
@@ -10652,9 +10652,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1a-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1a-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_single_common_identity_method_negotiation.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1a-D3-01-S01-01",
@@ -10697,9 +10697,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1a-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1a-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_supported_identity_method_truth_and_empty_recognition.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1a-D3-02-S01-01",
@@ -10730,9 +10730,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1a-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1a-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_no_common_identity_method_sensitive_access.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1a-D4-01-S01-01",
@@ -10783,9 +10783,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1a-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1a-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_business_unauthenticated_boundary.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1a-D5-01-S01-01",
@@ -10888,9 +10888,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1a-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1a-D5-02-S04-01",
+      "representative_child_script": "test_cases/test_identified_input_party_direct_claim.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1a-D5-02-S01-01",
@@ -10937,9 +10937,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1b-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1b-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_input_filter_system_update_service_unavailable.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1b-D4-01-S01-01",
@@ -11002,9 +11002,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.1c-D2-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1c-D2-01-S03-01",
+      "representative_child_script": "test_cases/test_tool_service_bidirectional_input_attribution.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1c-D2-01-S01-01",
@@ -11039,9 +11039,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.1c-D2-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1c-D2-02-S02-01",
+      "representative_child_script": "test_cases/test_input_attribution_tool_identity_claim.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1c-D2-02-S01-01",
@@ -11096,9 +11096,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.1c-D6-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1c-D6-02-S01-01",
+      "representative_child_script": "test_cases/test_delegation_chain_preserves_provided_original_initiator.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1c-D6-02-S01-01",
@@ -11129,9 +11129,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.1d-D5-05",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.1d-D5-05-S01-01",
+      "representative_child_script": "test_cases/test_pdf_invisible_layer_benign_visible_content.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.1d-D5-05-S01-01",
@@ -11242,9 +11242,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2a-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2a-D1-01-S01-02",
+      "representative_child_script": "test_cases/test_weather_rule_actual_model_tool_list.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2a-D1-01-S01-01",
@@ -11283,9 +11283,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2a-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2a-D1-02-S01-03",
+      "representative_child_script": "test_cases/test_runtime_discovered_tool_function_parameter_narrowing.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2a-D1-02-S01-01",
@@ -11320,9 +11320,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2a-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_weather_task_decoy_calls.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2a-D2-01-S01-01",
@@ -11357,9 +11357,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2a-D2-02-S02-01",
+      "representative_child_script": "test_cases/test_weather_task_does_not_forward_unrelated_personal_information.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2a-D2-02-S01-01",
@@ -11390,9 +11390,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2a-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2a-D3-01-S01-02",
+      "representative_child_script": "test_cases/test_tool_result_incidental_contacts_instruction.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2a-D3-01-S01-01",
@@ -11435,9 +11435,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2a-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2a-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_meeting_material_tool_necessity.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2a-D3-02-S01-01",
@@ -11468,9 +11468,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2a-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2a-D5-01-S04-08",
+      "representative_child_script": "test_cases/test_highest_priority_poison_description.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2a-D5-01-S01-01",
@@ -11589,9 +11589,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.2a-D6-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2a-D6-01-S01-02",
+      "representative_child_script": "test_cases/test_necessity_gate_rejection_log_traceability.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2a-D6-01-S01-01",
@@ -11622,9 +11622,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2b-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2b-D1-01-S01-02",
+      "representative_child_script": "test_cases/test_malicious_tool_preinvoke_block_baseline.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2b-D1-01-S01-01",
@@ -11655,9 +11655,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2b-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2b-D1-02-S01-02",
+      "representative_child_script": "test_cases/test_builtin_registered_malicious_tool_detection.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2b-D1-02-S01-01",
@@ -11712,9 +11712,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2b-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_best_match_malicious_tool_not_invoked.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2b-D2-01-S01-01",
@@ -11745,9 +11745,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2b-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_benign_malicious_equivalent_web_tool_selection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2b-D2-02-S01-01",
@@ -11786,9 +11786,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2b-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2b-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_threat_intelligence_outage_pre_call_detection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2b-D4-01-S01-01",
@@ -11827,9 +11827,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2b-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2b-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_malicious_tool_identity_verification_description.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2b-D5-01-S01-01",
@@ -11928,9 +11928,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2b-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2b-D5-02-S03-04",
+      "representative_child_script": "test_cases/test_malicious_tool_fragmented_description_detection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2b-D5-02-S01-01",
@@ -12001,9 +12001,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2c-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2c-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_authorization_state_preinvoke_enforcement_design.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2c-D1-01-S01-01",
@@ -12030,9 +12030,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2c-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2c-D1-02-S01-08",
+      "representative_child_script": "test_cases/test_local_cli_tool_authorization_gate.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2c-D1-02-S01-01",
@@ -12091,9 +12091,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2c-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_message_sent_only_after_user_confirmation.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2c-D2-01-S01-01",
@@ -12120,9 +12120,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2c-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_message_send_click_rejection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2c-D2-02-S01-01",
@@ -12157,9 +12157,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2c-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2c-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_direct_never_authorized_message_tool.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2c-D3-01-S01-01",
@@ -12194,9 +12194,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2c-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2c-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_authorized_file_tool_entity_boundary.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2c-D3-02-S01-01",
@@ -12231,9 +12231,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2c-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2c-D5-01-S01-03",
+      "representative_child_script": "test_cases/test_tool_auth_reject_two_concurrent.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2c-D5-01-S01-01",
@@ -12296,9 +12296,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2c-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2c-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_message_tool_revocation_immediate_new_call.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2c-D5-02-S01-01",
@@ -12349,9 +12349,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.2c-D6-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2c-D6-01-S01-02",
+      "representative_child_script": "test_cases/test_authorization_denial_bidirectional_log.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2c-D6-01-S01-01",
@@ -12382,9 +12382,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2d-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；缺实际路径记录时仅可记默认通过/G代理，不声称已证明协议路由",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2d-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2d-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_invocation_route_selection_design.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2d-D1-01-S01-01",
@@ -12411,9 +12411,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2d-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；缺实际路径记录时仅可记默认通过/G代理，不声称已证明协议路由",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2d-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2d-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_mcp_discovery_route_selection.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2d-D1-02-S01-01",
@@ -12452,9 +12452,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；缺实际路径记录时仅可记默认通过/G代理，不声称已证明协议路由",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2d-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2d-D2-01-S01-02",
+      "representative_child_script": "test_cases/test_record_search_mcp_protocol_invocation.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2d-D2-01-S01-01",
@@ -12489,9 +12489,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；缺实际路径记录时仅可记默认通过/G代理，不声称已证明协议路由",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2d-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2d-D2-02-S01-03",
+      "representative_child_script": "test_cases/test_protocol_endpoint_nonprotocol_fallback.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2d-D2-02-S01-01",
@@ -12526,9 +12526,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；缺实际路径记录时仅可记默认通过/G代理，不声称已证明协议路由",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2d-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2d-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_nonprotocol_tool_public_api_independent_review.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2d-D3-01-S01-01",
@@ -12555,9 +12555,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；缺实际路径记录时仅可记默认通过/G代理，不声称已证明协议路由",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2d-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2d-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_default_dual_route_protocol_preference.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2d-D3-02-S01-01",
@@ -12592,9 +12592,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2e-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2e-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2e-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_four_element_authorization_preinvoke_scope_design.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2e-D1-01-S01-01",
@@ -12621,9 +12621,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2e-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2e-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2e-D1-02-S01-02",
+      "representative_child_script": "test_cases/test_discovered_tool_first_call_authorization_scope.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2e-D1-02-S01-01",
@@ -12662,9 +12662,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2e-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2e-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_read_preserves_four_authorization_elements.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2e-D2-01-S01-01",
@@ -12695,9 +12695,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2e-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2e-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_single_use_authorized_read.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2e-D2-02-S01-01",
@@ -12732,9 +12732,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2e-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2e-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_public_api_authorization_four_elements.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2e-D3-01-S01-01",
@@ -12769,9 +12769,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2e-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2e-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_write_scope_expansion_without_authorization.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2e-D5-01-S01-01",
@@ -12830,9 +12830,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2e-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2e-D5-02-S01-03",
+      "representative_child_script": "test_cases/test_revoked_authorization_new_request.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2e-D5-02-S01-01",
@@ -12891,9 +12891,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.2e-D6-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2e-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_read_authorization_log_reverse_lookup.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2e-D6-01-S01-01",
@@ -12924,9 +12924,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2f-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2f-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2f-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_inbound_protocol_caller_authentication_design.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2f-D1-01-S01-01",
@@ -12961,9 +12961,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2f-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2f-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2f-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_protocol_main_entry_unauthenticated_business_access.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2f-D1-02-S01-01",
@@ -13014,9 +13014,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2f-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2f-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_missing_caller_credential_no_backend_access.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2f-D2-01-S01-01",
@@ -13075,9 +13075,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2f-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2f-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_request_body_size_limit_detection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2f-D2-02-S01-01",
@@ -13132,9 +13132,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2f-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2f-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_inbound_mcp_three_security_checks.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2f-D3-01-S01-01",
@@ -13169,9 +13169,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2f-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2f-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_other_user_data_verification_direct_task_confused_deputy.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2f-D5-01-S01-01",
@@ -13514,9 +13514,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2f-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2f-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_upstream_agent_delegation_scope.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2f-D5-02-S01-01",
@@ -13595,9 +13595,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.2f-D6-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2f-D6-01-S02-01",
+      "representative_child_script": "test_cases/test_inbound_unauthorized_call_chain_logging.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2f-D6-01-S01-01",
@@ -13628,9 +13628,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2h-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；结果未失守不证明输入/输出哪一层机制发生拦截",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2h-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2h-D1-01-S01-02",
+      "representative_child_script": "test_cases/test_tool_result_next_tool_argument_constraint_design.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2h-D1-01-S01-01",
@@ -13669,9 +13669,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.2h-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；结果未失守不证明输入/输出哪一层机制发生拦截",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2h-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2h-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_mcp_result_detection_channel.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2h-D1-02-S01-01",
@@ -13750,9 +13750,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；结果未失守不证明输入/输出哪一层机制发生拦截",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2h-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2h-D2-01-S03-01",
+      "representative_child_script": "test_cases/test_tool_note_exfiltration_detection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2h-D2-01-S01-01",
@@ -13799,9 +13799,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；结果未失守不证明输入/输出哪一层机制发生拦截",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2h-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2h-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_first_tool_return_injection_detection.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2h-D3-01-S01-01",
@@ -13848,9 +13848,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；结果未失守不证明输入/输出哪一层机制发生拦截",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2h-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2h-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_note_exfiltration_data_system_prompt_first_return_injection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2h-D5-01-S01-01",
@@ -14833,9 +14833,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2h-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2h-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_photo_edge_clear_return_instruction.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2h-D5-02-S01-01",
@@ -15078,9 +15078,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；结果未失守不证明输入/输出哪一层机制发生拦截",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.2h-D5-03",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2h-D5-03-S01-01",
+      "representative_child_script": "test_cases/test_nested_system_message_two_bracket.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2h-D5-03-S01-01",
@@ -15175,9 +15175,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.2h-D6-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.2h-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_tool_result_detection_log_traceability.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.2h-D6-01-S01-01",
@@ -15204,9 +15204,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4a-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4a-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_three_level_risk_preexecution_controls.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4a-D1-01-S01-01",
@@ -15233,9 +15233,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4a-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4a-D1-02-S01-07",
+      "representative_child_script": "test_cases/test_risk_grading_application_tool_entry.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4a-D1-02-S01-01",
@@ -15362,9 +15362,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4a-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_large_transfer_high_risk_handoff.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4a-D2-01-S01-01",
@@ -15419,9 +15419,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4a-D2-02-S01-02",
+      "representative_child_script": "test_cases/test_product_payment_authorization_rejection.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4a-D2-02-S01-01",
@@ -15492,9 +15492,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4a-D2-03",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4a-D2-03-S01-01",
+      "representative_child_script": "test_cases/test_valid_preauthorization_weather_query.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4a-D2-03-S01-01",
@@ -15545,9 +15545,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4a-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4a-D3-01-S01-17",
+      "representative_child_script": "test_cases/test_local_file_mutation_risk_rule_consistency.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4a-D3-01-S01-01",
@@ -15686,9 +15686,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4a-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4a-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_sensitive_identity_group_send_risk_precedence.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4a-D3-02-S01-01",
@@ -15727,9 +15727,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4a-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4a-D4-01-S02-01",
+      "representative_child_script": "test_cases/test_grading_timeout_large_transfer.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4a-D4-01-S01-01",
@@ -15800,9 +15800,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4b-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4b-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_authorization_trusted_authentication_precondition.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4b-D1-01-S01-01",
@@ -15829,9 +15829,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4b-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4b-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_authorization_instance_binding_lifecycle.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4b-D1-02-S01-01",
@@ -15858,9 +15858,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4b-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_product_payment_unauthenticated_authorization_order_primary.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4b-D2-01-S01-01",
@@ -15963,9 +15963,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4b-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_purchase_payment_authorization_same_account_parallel_instance_primary.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4b-D2-02-S01-01",
@@ -16068,9 +16068,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4b-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4b-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_authorization_scope_current_instance_operation.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4b-D3-01-S01-01",
@@ -16105,9 +16105,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；未取得的向量索引、缓存、后台存储、其他设备路径单独列缺口",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4b-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4b-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_preference_confirmed_once_immediate_same_device_new_instance_authorization.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4b-D5-01-S01-01",
@@ -16322,9 +16322,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4b-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4b-D5-02-S02-01",
+      "representative_child_script": "test_cases/test_administrator_employee_id_identity_authorization.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4b-D5-02-S01-01",
@@ -16459,9 +16459,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.4b-D6-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4b-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_authorization_event_subject_operation_instance.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4b-D6-01-S01-01",
@@ -16488,9 +16488,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4c-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4c-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_risk_notice_mechanism_design.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4c-D1-01-S01-01",
@@ -16517,9 +16517,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4c-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4c-D1-02-S01-08",
+      "representative_child_script": "test_cases/test_local_sensitive_personal_info_risk_notice_coverage.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4c-D1-02-S01-01",
@@ -16586,9 +16586,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4c-D2-02-S03-08",
+      "representative_child_script": "test_cases/test_large_transfer_disclosure_consistency.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4c-D2-02-S01-01",
@@ -16663,9 +16663,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4c-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4c-D3-02-S01-02",
+      "representative_child_script": "test_cases/test_sensitive_data_risk_notice_information.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4c-D3-02-S01-01",
@@ -16704,9 +16704,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4c-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4c-D5-01-S02-01",
+      "representative_child_script": "test_cases/test_claimed_admin_risk_disclosure.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4c-D5-01-S01-01",
@@ -16753,9 +16753,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4d-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4d-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4d-D1-01-S01-09",
+      "representative_child_script": "test_cases/test_handover_coverage_local_sensitive_data.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4d-D1-01-S01-01",
@@ -16826,9 +16826,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4d-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4d-D2-01-S03-02",
+      "representative_child_script": "test_cases/test_large_transfer_user_abandon.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4d-D2-01-S01-01",
@@ -16947,9 +16947,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4d-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4d-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_progressive_transfer_3_turn_same_session_original.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4d-D5-01-S01-01",
@@ -17068,9 +17068,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4d-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4d-D5-02-S01-02",
+      "representative_child_script": "test_cases/test_high_risk_handoff_two_way_concurrency.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4d-D5-02-S01-01",
@@ -17137,9 +17137,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4e-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4e-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4e-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_medium_risk_authorization_precondition_mechanism.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4e-D1-01-S01-01",
@@ -17166,9 +17166,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4e-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4e-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4e-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_authorization_task_scope_expiry_revocation.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4e-D1-02-S01-01",
@@ -17195,9 +17195,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4e-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4e-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_product_purchase_task_authorization_closure.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4e-D2-01-S01-01",
@@ -17236,9 +17236,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4e-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4e-D2-02-S01-03",
+      "representative_child_script": "test_cases/test_product_payment_independent_intent_primary_task.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4e-D2-02-S01-01",
@@ -17357,9 +17357,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4e-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4e-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_authorization_task_scope_duration_revocation_constraints.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4e-D3-01-S01-01",
@@ -17386,9 +17386,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；未取得的向量索引、缓存、后台存储、其他设备路径单独列缺口",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4e-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4e-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_preference_confirmed_once_immediate_same_instance_new_task_authorization.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4e-D5-01-S01-01",
@@ -17603,9 +17603,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.4e-D5-02::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4e-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_memory_poison_default_authorization_unwrapped_two_new_tasks.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4e-D5-02-S01-01",
@@ -17740,9 +17740,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.4e-D6-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4e-D6-01-S01-01",
+      "representative_child_script": "test_cases/test_authorization_revocation_task_end_evidence.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4e-D6-01-S01-01",
@@ -17769,9 +17769,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4f-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4f-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4f-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_authorization_management_batch_unit.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4f-D1-01-S01-01",
@@ -17822,9 +17822,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-6.4f-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4f-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4f-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_weather_query_low_risk_authorization.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4f-D1-02-S01-01",
@@ -18047,9 +18047,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4f-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4f-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_valid_authorization_weather_display_contrast.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4f-D2-01-S01-01",
@@ -18100,9 +18100,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4f-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4f-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_low_risk_batch_authorization_closure.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4f-D2-02-S01-01",
@@ -18141,9 +18141,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4f-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4f-D3-01-S01-03",
+      "representative_child_script": "test_cases/test_direct_execution_dual_gate_review.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4f-D3-01-S01-01",
@@ -18218,9 +18218,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-6.4f-D3-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4f-D3-02-S01-01",
+      "representative_child_script": "test_cases/test_authorization_five_minute_expiry_boundary.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4f-D3-02-S01-01",
@@ -18275,9 +18275,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-6.4f-D5-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-6.4f-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_persistent_default_authorization_memory_plain.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-6.4f-D5-01-S01-01",
@@ -18348,9 +18348,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-7.1a-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1a-D1-01-S01-07",
+      "representative_child_script": "test_cases/test_server_side_model_function_execution_boundary.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1a-D1-01-S01-01",
@@ -18449,9 +18449,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-7.1a-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1a-D1-02-S01-06",
+      "representative_child_script": "test_cases/test_third_party_mcp_plugin_execution_boundary.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1a-D1-02-S01-01",
@@ -18550,9 +18550,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1a-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_host_hostname_boundary_probe.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1a-D2-01-S01-01",
@@ -18647,9 +18647,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1a-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_cumulative_tool_call_limit.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1a-D2-02-S01-01",
@@ -18704,9 +18704,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1a-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1a-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_execution_environment_task_residue_isolation.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1a-D4-01-S01-01",
@@ -18757,9 +18757,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1a-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1a-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_resource_isolation_self_trigger.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1a-D5-01-S01-01",
@@ -18818,9 +18818,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-7.1b-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；未取得的向量索引、缓存、后台存储、其他设备路径单独列缺口",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1b-D1-01-S01-01",
+      "representative_child_script": "test_cases/test_user_isolation_long_term_memory_enforcement_review.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1b-D1-01-S01-01",
@@ -18883,9 +18883,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-7.1b-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；未取得的向量索引、缓存、后台存储、其他设备路径单独列缺口",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1b-D1-02-S01-01",
+      "representative_child_script": "test_cases/test_long_term_memory_user_isolation_enforcement.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1b-D1-02-S01-01",
@@ -18948,9 +18948,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；未取得的向量索引、缓存、后台存储、其他设备路径单独列缺口",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1b-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_cross_user_memory_normal_interaction.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1b-D2-01-S01-01",
@@ -19009,9 +19009,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；未取得的向量索引、缓存、后台存储、其他设备路径单独列缺口",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1b-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_semantic_retrieval_user_isolation_first_path.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1b-D2-02-S01-01",
@@ -19066,9 +19066,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；未取得的向量索引、缓存、后台存储、其他设备路径单独列缺口",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1b-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1b-D4-01-S02-03",
+      "representative_child_script": "test_cases/test_bulk_query_empty_user_isolation_key.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1b-D4-01-S01-01",
@@ -19131,9 +19131,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1b-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1b-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_user_isolation_task_business_read_original_reference.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1b-D5-01-S01-01",
@@ -19872,9 +19872,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1b-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1b-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_cross_user_request_identifier_substitution.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1b-D5-02-S01-01",
@@ -19921,9 +19921,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-7.1c-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；结果未失守不证明输入/输出哪一层机制发生拦截",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1c-D1-02-S01-04",
+      "representative_child_script": "test_cases/test_intent_consistency_tool_chain_mutation_coverage.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1c-D1-02-S01-01",
@@ -19970,9 +19970,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；结果未失守不证明输入/输出哪一层机制发生拦截",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1c-D2-02-S01-09",
+      "representative_child_script": "test_cases/test_tool_result_email_intent_consistency.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1c-D2-02-S01-01",
@@ -20043,9 +20043,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形；未取得的向量索引、缓存、后台存储、其他设备路径单独列缺口",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.1c-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1c-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_cross_session_intent_preference_template_1_immediate_same_instance.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1c-D5-02-S01-01",
@@ -20356,9 +20356,9 @@
       "uncovered_requirements": "本轮仅作CLI输出代理判定，不证明后台记忆实际写入/删除、实际操作路径、完整日志或原条款全面符合。",
       "criteria_version": "CLI宽松-v3-J",
       "experiment_reuse_key": "TC-7.1d-D2-01::J",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1d-D2-01-S01-04",
+      "representative_child_script": "test_cases/test_tool_failure_process_reconstruction.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1d-D2-01-S01-01",
@@ -20397,9 +20397,9 @@
       "uncovered_requirements": "本轮只验证大量步骤下既有记录保留；不评价原条款的全部内部机制、真实读取轨迹、时间可信性或全量日志覆盖。",
       "criteria_version": "CLI宽松-v2-I",
       "experiment_reuse_key": "TC-7.1d-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.1d-D5-01-S02-02",
+      "representative_child_script": "test_cases/test_retryable_tool_error_continuous_retry_monitoring.py",
+      "implementation_mode": "p2_output",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.1d-D5-01-S01-01",
@@ -20490,9 +20490,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-7.2a-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2a-D1-01-S01-02",
+      "representative_child_script": "test_cases/test_blocked_dialogue_order_query.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2a-D1-01-S01-01",
@@ -20567,9 +20567,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-7.2a-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2a-D1-02-S01-17",
+      "representative_child_script": "test_cases/test_offline_reconnect_terminal_control_path_coverage.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2a-D1-02-S01-01",
@@ -20668,9 +20668,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2a-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2a-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_blocked_dialog_entry_unrelated_function_available.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2a-D2-01-S01-01",
@@ -20713,9 +20713,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2a-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2a-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_background_async_shutdown_no_replay.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2a-D2-02-S01-01",
@@ -20766,9 +20766,9 @@
       "uncovered_requirements": "原限定条件的全量实现、源码强制点未被完整验证；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2a-D3-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2a-D3-01-S01-01",
+      "representative_child_script": "test_cases/test_block_capability_not_substitutable.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2a-D3-01-S01-01",
@@ -20863,9 +20863,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2a-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2a-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_partial_result_shutdown_consistency.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2a-D4-01-S01-01",
@@ -20916,9 +20916,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2a-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2a-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_provider_block_self_excitation_storm.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2a-D5-01-S01-01",
@@ -21049,9 +21049,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2a-D5-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2a-D5-02-S01-01",
+      "representative_child_script": "test_cases/test_feature_block_dialogue_unblock_claim.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2a-D5-02-S01-01",
@@ -21226,9 +21226,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-7.2b-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2b-D1-01-S01-05",
+      "representative_child_script": "test_cases/test_local_terminal_without_provider_account_applicability.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2b-D1-01-S01-01",
@@ -21275,9 +21275,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-7.2b-D2-02；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2b-D1-02-S01-05",
+      "representative_child_script": "test_cases/test_known_deactivation_offline_cache_handling.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2b-D1-02-S01-01",
@@ -21328,9 +21328,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2b-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2b-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_pre_disable_web_cookie_access_baseline.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2b-D2-01-S01-01",
@@ -21393,9 +21393,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2b-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2b-D2-02-S01-01",
+      "representative_child_script": "test_cases/test_account_disable_api_key_revocation.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2b-D2-02-S01-01",
@@ -21454,9 +21454,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2b-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2b-D4-01-S01-01",
+      "representative_child_script": "test_cases/test_account_deactivation_concurrent_race.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2b-D4-01-S01-01",
@@ -21527,9 +21527,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2b-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2b-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_disabled_account_web_cookie_access.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2b-D5-01-S01-01",
@@ -21612,9 +21612,9 @@
       "uncovered_requirements": "原D1机制存在性/默认启用/全部覆盖未直接核查；代理实验TC-7.2c-D2-01；内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2c-D1-01-S01-02",
+      "representative_child_script": "test_cases/test_task_termination_execution_semantics_review.py",
+      "implementation_mode": "p2_proxy",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2c-D1-01-S01-01",
@@ -21661,9 +21661,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2c-D2-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2c-D2-01-S01-01",
+      "representative_child_script": "test_cases/test_no_new_tool_operation_after_termination_trigger.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2c-D2-01-S01-01",
@@ -21706,9 +21706,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2c-D2-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2c-D2-02-S01-07",
+      "representative_child_script": "test_cases/test_single_task_termination_preserves_session.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2c-D2-02-S01-01",
@@ -21759,9 +21759,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2c-D4-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2c-D4-01-S01-06",
+      "representative_child_script": "test_cases/test_task_termination_cancellable_inflight.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2c-D4-01-S01-01",
@@ -21816,9 +21816,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2c-D4-02",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2c-D4-02-S01-04",
+      "representative_child_script": "test_cases/test_termination_process_restart.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2c-D4-02-S01-01",
@@ -21857,9 +21857,9 @@
       "uncovered_requirements": "内部thinking/检测命中/实现配置不作本轮必需证据；只覆盖本次实际执行的入口、数据与变形",
       "criteria_version": "CLI宽松-v1",
       "experiment_reuse_key": "TC-7.2c-D5-01",
-      "representative_child_id": null,
-      "representative_child_script": null,
-      "implementation_mode": "pending",
+      "representative_child_id": "ATS-7.2c-D5-01-S01-01",
+      "representative_child_script": "test_cases/test_four_level_delegation_termination.py",
+      "implementation_mode": "p2_identity",
       "representative_child_candidates": [
         {
           "case_id": "ATS-7.2c-D5-01-S01-01",

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import posixpath
@@ -144,6 +145,19 @@ _PACKAGE_REL_NS = "{http://schemas.openxmlformats.org/package/2006/relationships
 _CELL_COLUMN = re.compile(r"[A-Z]+")
 _CASE_ID = re.compile(r"TEST_CASE_ID\s*=\s*[\"']([^\"']+)")
 _CHILD_ID = re.compile(r"^ATS-(?P<source>.+)-S\d+-.+$")
+_SUPPORTED_IMPLEMENTATION_MODES = frozenset(
+    {
+        "pending",
+        "delegate",
+        "p1_output",
+        "p1_state",
+        "p1_proxy",
+        "p2_identity",
+        "p2_proxy",
+        "p2_output",
+        "deferred",
+    }
+)
 
 # Manifest keys intentionally follow the domain language used by the test framework.
 _COLUMN_TO_FIELD = {
@@ -267,6 +281,49 @@ def find_child_cases(root: Path) -> dict[str, list[dict[str, str]]]:
     return grouped
 
 
+def _literal_assignments(path: Path) -> dict[str, Any]:
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    values: dict[str, Any] = {}
+    for node in tree.body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name):
+            continue
+        try:
+            values[target.id] = ast.literal_eval(node.value)
+        except (TypeError, ValueError):
+            continue
+    return values
+
+
+def find_mother_implementations(root: Path) -> dict[str, dict[str, str]]:
+    """Read checked-in implementation metadata without importing pytest files."""
+
+    implementations: dict[str, dict[str, str]] = {}
+    mother_root = root / "test_cases" / "mother_cases"
+    for path in sorted(mother_root.glob("test_tc_*.py")):
+        values = _literal_assignments(path)
+        source_case_id = str(values.get("TEST_CASE_ID") or "").strip()
+        implementation_mode = str(values.get("IMPLEMENTATION_MODE") or "").strip()
+        if not implementation_mode:
+            continue
+        if not source_case_id.startswith("TC-"):
+            raise ValueError(f"{path} has invalid TEST_CASE_ID")
+        if source_case_id in implementations:
+            raise ValueError(f"duplicate implemented mother case: {source_case_id}")
+        implementations[source_case_id] = {
+            "representative_child_id": str(
+                values.get("REPRESENTATIVE_CHILD_ID") or ""
+            ).strip(),
+            "representative_child_script": str(
+                values.get("REPRESENTATIVE_CHILD_SCRIPT") or ""
+            ).strip(),
+            "implementation_mode": implementation_mode,
+        }
+    return implementations
+
+
 def validate_manifest(manifest: dict[str, Any]) -> None:
     """Reject incomplete or internally inconsistent manifest payloads."""
 
@@ -338,13 +395,7 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
                 )
 
         implementation_mode = case.get("implementation_mode")
-        if implementation_mode not in {
-            "pending",
-            "delegate",
-            "p1_output",
-            "p1_state",
-            "p1_proxy",
-        }:
+        if implementation_mode not in _SUPPORTED_IMPLEMENTATION_MODES:
             raise ValueError(
                 f"{source_case_id} has unsupported implementation_mode: "
                 f"{implementation_mode!r}"
@@ -370,24 +421,40 @@ def build_manifest(root: Path, workbook_path: Path) -> dict[str, Any]:
     """Build a deterministic manifest from the workbook and repository scripts."""
 
     child_cases = find_child_cases(root)
+    mother_implementations = find_mother_implementations(root)
     cases: list[dict[str, Any]] = []
     for source_case in read_mother_cases(workbook_path):
         source_case_id = source_case["source_case_id"]
         candidates = child_cases.get(source_case_id, [])
         representative = P1_REPRESENTATIVE_PATHS.get(source_case_id)
+        implementation = mother_implementations.get(source_case_id)
+        representative_child_id = (
+            implementation["representative_child_id"]
+            if implementation
+            else representative[0]
+            if representative
+            else None
+        )
+        representative_child_script = (
+            implementation["representative_child_script"]
+            if implementation
+            else representative[1]
+            if representative
+            else None
+        )
+        implementation_mode = (
+            implementation["implementation_mode"]
+            if implementation
+            else _p1_implementation_mode(source_case_id, representative[2])
+            if representative
+            else "pending"
+        )
         cases.append(
             {
                 **source_case,
-                "representative_child_id": representative[0] if representative else None,
-                "representative_child_script": representative[1]
-                if representative
-                else None,
-                "implementation_mode": _p1_implementation_mode(
-                    source_case_id,
-                    representative[2],
-                )
-                if representative
-                else "pending",
+                "representative_child_id": representative_child_id,
+                "representative_child_script": representative_child_script,
+                "implementation_mode": implementation_mode,
                 "representative_child_candidates": candidates,
                 "child_case_count": len(candidates),
             }

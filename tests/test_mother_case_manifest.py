@@ -93,6 +93,30 @@ def test_child_candidates_exist_and_encode_the_same_mother_case() -> None:
             assert (ROOT / child["script"]).is_file()
 
 
+def test_mother_implementation_metadata_is_read_without_importing_wrappers(
+    tmp_path: Path,
+) -> None:
+    mother_root = tmp_path / "test_cases" / "mother_cases"
+    mother_root.mkdir(parents=True)
+    wrapper = mother_root / "test_tc_example.py"
+    wrapper.write_text(
+        "TEST_CASE_ID = 'TC-EXAMPLE'\n"
+        "REPRESENTATIVE_CHILD_ID = 'ATS-EXAMPLE-S01-01'\n"
+        "REPRESENTATIVE_CHILD_SCRIPT = 'test_cases/test_example.py'\n"
+        "IMPLEMENTATION_MODE = 'p2_output'\n"
+        "raise RuntimeError('must not import')\n",
+        encoding="utf-8",
+    )
+
+    assert MODULE.find_mother_implementations(tmp_path) == {
+        "TC-EXAMPLE": {
+            "representative_child_id": "ATS-EXAMPLE-S01-01",
+            "representative_child_script": "test_cases/test_example.py",
+            "implementation_mode": "p2_output",
+        }
+    }
+
+
 def test_all_p1_representatives_match_the_curated_inventory() -> None:
     cases = {
         case["source_case_id"]: case
@@ -136,13 +160,34 @@ def test_curated_p1_mapping_matches_the_documented_inventory() -> None:
     assert documented == MODULE.P1_REPRESENTATIVE_PATHS
 
 
-def test_non_p1_representatives_remain_pending_and_unselected() -> None:
+def test_p2_representatives_are_selected_from_their_generated_wrappers() -> None:
     cases = [
         case
         for case in _checked_in_manifest()["cases"]
-        if case["priority"] != "P1"
+        if case["priority"] == "P2"
     ]
 
+    assert len(cases) == 242
+    assert {
+        mode: sum(case["implementation_mode"] == mode for case in cases)
+        for mode in ("p2_identity", "p2_proxy", "p2_output")
+    } == {
+        "p2_identity": 98,
+        "p2_proxy": 100,
+        "p2_output": 44,
+    }
+    assert all(case["representative_child_id"] for case in cases)
+    assert all(case["representative_child_script"] for case in cases)
+
+
+def test_p3_and_p4_representatives_remain_pending_and_unselected() -> None:
+    cases = [
+        case
+        for case in _checked_in_manifest()["cases"]
+        if case["priority"] in {"P3", "P4"}
+    ]
+
+    assert len(cases) == 96
     assert all(case["implementation_mode"] == "pending" for case in cases)
     assert all(case["representative_child_id"] is None for case in cases)
     assert all(case["representative_child_script"] is None for case in cases)

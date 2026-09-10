@@ -9,6 +9,7 @@ from pathlib import Path
 from scripts.verify_mother_cases import (
     MotherScript,
     _literal_constants,
+    _select_scripts,
     _validate_result,
     _verified_for_current_script,
     discover_scripts,
@@ -86,3 +87,21 @@ def test_resume_requires_latest_verified_attempt_for_same_script(tmp_path: Path)
     assert _verified_for_current_script(index, script) is True
     changed = MotherScript("TC-EXAMPLE", path, "P1", "J", "0" * 64)
     assert _verified_for_current_script(index, changed) is False
+
+
+def test_selection_can_filter_priority_and_multiple_categories(tmp_path: Path) -> None:
+    scripts = (
+        MotherScript("TC-B", tmp_path / "b.py", "P2", "B", "b" * 64),
+        MotherScript("TC-C", tmp_path / "c.py", "P2", "C", "c" * 64),
+        MotherScript("TC-G", tmp_path / "g.py", "P2", "G", "g" * 64),
+        MotherScript("TC-P1", tmp_path / "p1.py", "P1", "B", "1" * 64),
+    )
+
+    selected = _select_scripts(
+        scripts,
+        priorities={"P2"},
+        categories={"B", "C"},
+        case_ids=set(),
+    )
+
+    assert [script.case_id for script in selected] == ["TC-B", "TC-C"]

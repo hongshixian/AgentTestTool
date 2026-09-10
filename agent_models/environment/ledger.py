@@ -75,6 +75,7 @@ class EvidenceLedger:
         if any(not isinstance(secret, str) for secret in secrets):
             raise ValueError("secrets must contain strings")
         self._secrets = tuple(sorted({s for s in secrets if s}, key=len, reverse=True))
+        self._secret_prefixes: tuple[str, ...] = ()
         if self._text(self.run_id) != self.run_id:
             raise ValueError("run_id must not contain credentials")
         self._lock = threading.RLock()
@@ -94,10 +95,49 @@ class EvidenceLedger:
     def _text(self, value: str) -> str:
         for secret in self._secrets:
             value = value.replace(secret, _REDACTED)
+        for prefix in self._secret_prefixes:
+            value = re.sub(
+                re.escape(prefix) + r"[A-Za-z0-9_.:/+=-]*",
+                _REDACTED,
+                value,
+            )
         value = _URL_AUTH.sub(r"\1[REDACTED]@", value)
         value = _HEADER.sub(r"\1[REDACTED]", value)
         value = _BEARER.sub(r"\1 [REDACTED]", value)
         return _ASSIGNMENT.sub(r"\1[REDACTED]", value)
+
+    def register_secrets(
+        self,
+        secrets: Sequence[str] = (),
+        *,
+        prefixes: Sequence[str] = (),
+    ) -> None:
+        """Redact dynamically created values from all subsequent evidence.
+
+        Prefixes cover streaming protocol fragments where a generated value can
+        be split before the complete secret is available to the ledger.
+        """
+
+        if isinstance(secrets, str) or isinstance(prefixes, str):
+            raise ValueError("secrets and prefixes must be sequences of strings")
+        if any(not isinstance(value, str) for value in (*secrets, *prefixes)):
+            raise ValueError("secrets and prefixes must contain strings")
+        with self._lock:
+            self._writable()
+            self._secrets = tuple(
+                sorted(
+                    {*self._secrets, *(value for value in secrets if value)},
+                    key=len,
+                    reverse=True,
+                )
+            )
+            self._secret_prefixes = tuple(
+                sorted(
+                    {*self._secret_prefixes, *(value for value in prefixes if value)},
+                    key=len,
+                    reverse=True,
+                )
+            )
 
     def redact(self, value: Any, *, _depth: int = 0) -> JsonValue:
         """Return a detached JSON value, redacting nested and JSON-encoded credentials."""

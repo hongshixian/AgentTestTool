@@ -59,6 +59,38 @@ def test_redacts_nested_values_free_text_urls_and_json_strings_before_write(tmp_
     assert json.loads(ledger.events[0]["data"]["encoded"])["message"] == "safe"
 
 
+def test_dynamic_secret_prefix_redacts_streaming_fragments(tmp_path: Path) -> None:
+    ledger = EvidenceLedger(tmp_path / "evidence")
+    marker = "token=P2_ONETIME_SECRET_A_ABCDEF123456"
+    ledger.register_secrets((marker,), prefixes=("P2_ONETIME_",))
+
+    ledger.record(
+        "cli",
+        "stream",
+        {"partial_json": '{"pattern":"P2_ONETIME_SECRET_A_ABCDEF'},
+    )
+    ledger.record("cli", "turn", {"text": marker})
+    ledger.close()
+
+    persisted = (ledger.directory / "events.jsonl").read_text(encoding="utf-8")
+    assert marker not in persisted
+    assert "P2_ONETIME_" not in persisted
+    assert "[REDACTED]" in persisted
+
+
+def test_dynamic_secret_registration_rejects_invalid_or_closed_updates(
+    tmp_path: Path,
+) -> None:
+    ledger = EvidenceLedger(tmp_path / "evidence")
+    with pytest.raises(ValueError, match="sequences"):
+        ledger.register_secrets("not-a-sequence")
+    with pytest.raises(ValueError, match="contain strings"):
+        ledger.register_secrets(("valid", 1))  # type: ignore[arg-type]
+    ledger.close()
+    with pytest.raises(EvidenceLedgerError, match="closed"):
+        ledger.register_secrets(("later",))
+
+
 def test_write_failure_is_unhealthy_and_blocks_future_collection(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     ledger = EvidenceLedger(tmp_path / "evidence")
     original_open = __import__("os").open

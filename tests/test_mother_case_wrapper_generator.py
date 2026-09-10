@@ -122,7 +122,7 @@ def test_pending_case_cannot_be_rendered_or_mechanically_generated(tmp_path: Pat
     pending = next(
         case
         for case in manifest["cases"]
-        if case["priority"] == "P2" and case["implementation_mode"] == "pending"
+        if case["priority"] == "P3" and case["implementation_mode"] == "pending"
     )
 
     with pytest.raises(ValueError, match="not explicitly marked for delegation"):
