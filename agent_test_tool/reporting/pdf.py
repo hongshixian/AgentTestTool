@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from html import escape
@@ -31,6 +32,12 @@ from reportlab.platypus import (
     TableStyle,
 )
 
+from .clauses import (
+    ClauseDefinition,
+    ClauseResultGroup,
+    group_results_by_clause,
+    load_clause_definitions,
+)
 from .models import CaseResult, ReportData
 from .statistics import OutcomeStatistic, calculate_statistics
 
@@ -49,6 +56,8 @@ class ReportFonts:
 
     regular: str
     bold: str
+    latin: str
+    latin_bold: str
 
 
 class PDFReportGenerator:
@@ -59,9 +68,13 @@ class PDFReportGenerator:
         *,
         regular_font_path: Path | None = None,
         bold_font_path: Path | None = None,
+        clauses: Iterable[ClauseDefinition] | None = None,
     ) -> None:
         self.fonts = _register_fonts(regular_font_path, bold_font_path)
         self.styles = _styles(self.fonts)
+        self.clauses = (
+            tuple(clauses) if clauses is not None else load_clause_definitions()
+        )
 
     def generate(self, report: ReportData, output_path: Path) -> Path:
         """Generate a complete PDF and return its resolved path."""
@@ -89,14 +102,18 @@ class PDFReportGenerator:
         return output_path
 
     def build_story(self, report: ReportData) -> list[Flowable]:
-        """Build the Platypus story, including smoke-gated business content."""
+        """Build the smoke-gated four-chapter Platypus story."""
         story: list[Flowable] = []
         story.extend(self._cover(report))
         story.append(PageBreak())
         story.extend(self._smoke_section(report))
         if report.smoke_passed:
             story.append(PageBreak())
-            story.extend(self._business_section(report))
+            story.extend(self._overall_section(report))
+            story.append(PageBreak())
+            story.extend(self._clause_results_section(report))
+            story.append(PageBreak())
+            story.extend(self._clause_details_section(report))
         return story
 
     def _cover(self, report: ReportData) -> list[Flowable]:
@@ -106,14 +123,18 @@ class PDFReportGenerator:
             Paragraph("测试报告", self.styles["cover_title"]),
             Spacer(1, 24 * mm),
             Paragraph(
-                f"测试对象：{_safe(report.metadata.test_target)}",
+                "测试对象："
+                + _mixed_safe(report.metadata.test_target, self.fonts.latin),
                 self.styles["cover_detail"],
             ),
             Spacer(1, 8 * mm),
-            Paragraph(f"报告生成日期：{generated_date}", self.styles["cover_detail"]),
+            Paragraph(
+                "报告生成日期：" + _mixed_safe(generated_date, self.fonts.latin),
+                self.styles["cover_detail"],
+            ),
             Spacer(1, 8 * mm),
             Paragraph(
-                f"运行标识：{_safe(report.metadata.run_id)}",
+                "运行标识：" + _mixed_safe(report.metadata.run_id, self.fonts.latin),
                 self.styles["cover_detail"],
             ),
         ]
@@ -150,69 +171,107 @@ class PDFReportGenerator:
             )
         return contents
 
-    def _business_section(self, report: ReportData) -> list[Flowable]:
-        mother_results = report.mother_results
-        child_results = report.child_results
-        if report.metadata.case_suite == "all" or (mother_results and child_results):
-            return [
-                Paragraph("二、业务测试结果", self.styles["section"]),
-                *self._business_group(
-                    mother_results,
-                    section_number="2.1",
-                    title="母用例代表路径",
-                    include_representative_path=True,
+    def _overall_section(self, report: ReportData) -> list[Flowable]:
+        statistics = calculate_statistics(report.business_results)
+        return [
+            Paragraph("二、整体测试结果", self.styles["section"]),
+            KeepTogether([self._pie_chart(statistics), Spacer(1, 3 * mm)]),
+            self._statistics_table(statistics),
+        ]
+
+    def _clause_results_section(self, report: ReportData) -> list[Flowable]:
+        contents: list[Flowable] = [
+            Paragraph("三、条款级测试结果", self.styles["section"]),
+        ]
+        for index, group in enumerate(self._clause_groups(report), start=1):
+            statistics = calculate_statistics(group.results)
+            clause_contents: list[Flowable] = [
+                Paragraph(
+                    _mixed_safe(
+                        f"3.{index} {group.section_title}",
+                        self.fonts.latin_bold,
+                    ),
+                    self.styles["subsection"],
                 ),
-                Spacer(1, 8 * mm),
-                *self._business_group(
-                    child_results,
-                    section_number="2.2",
-                    title="子用例展开路径",
+                self._clause_information_table(group),
+                Spacer(1, 3 * mm),
+                self._pie_chart(
+                    statistics,
+                    empty_message="该条款没有测试结果",
                 ),
+                Spacer(1, 3 * mm),
+                self._statistics_table(statistics),
             ]
+            contents.extend(
+                [
+                    KeepTogether(clause_contents),
+                    Spacer(1, 7 * mm),
+                ]
+            )
+        return contents
 
-        results = mother_results or child_results or report.business_results
-        statistics = calculate_statistics(results)
-        return [
-            Paragraph("二、业务测试结果", self.styles["section"]),
-            Paragraph("2.1 四态结果分布", self.styles["subsection"]),
-            KeepTogether([self._pie_chart(statistics), Spacer(1, 3 * mm)]),
-            self._statistics_table(statistics),
-            Spacer(1, 8 * mm),
-            Paragraph("2.2 用例明细", self.styles["subsection"]),
-            self._case_table(
-                results,
-                compact=True,
-                include_representative_path=bool(mother_results),
-            ),
+    def _clause_details_section(self, report: ReportData) -> list[Flowable]:
+        contents: list[Flowable] = [
+            Paragraph("四、各部分用例明细", self.styles["section"]),
         ]
+        include_representative_path = bool(report.mother_results)
+        for index, group in enumerate(self._clause_groups(report), start=1):
+            contents.extend(
+                [
+                    Paragraph(
+                        _mixed_safe(
+                            f"4.{index} {group.section_title}",
+                            self.fonts.latin_bold,
+                        ),
+                        self.styles["subsection"],
+                    ),
+                    self._case_table(
+                        group.results,
+                        compact=True,
+                        include_representative_path=include_representative_path,
+                        empty_message="该条款没有测试结果",
+                    ),
+                    Spacer(1, 7 * mm),
+                ]
+            )
+        return contents
 
-    def _business_group(
+    def _clause_groups(self, report: ReportData) -> tuple[ClauseResultGroup, ...]:
+        return group_results_by_clause(report.business_results, self.clauses)
+
+    def _clause_information_table(self, group: ClauseResultGroup) -> Table:
+        clause = group.clause
+        values = (
+            (
+                clause.security_domain,
+                clause.standard_clause,
+                clause.title,
+                clause.original_text,
+            )
+            if clause is not None
+            else ("未匹配条款", "—", "无法从用例 ID 识别来源条款", "—")
+        )
+        rows: list[list[object]] = [
+            [
+                self._header_cell(value, compact=True)
+                for value in ("安全域", "国标章条", "条款标题", "条款原文")
+            ],
+            [self._cell(value, compact=True) for value in values],
+        ]
+        table = Table(
+            rows,
+            colWidths=[25 * mm, 25 * mm, 50 * mm, 82 * mm],
+            repeatRows=1,
+        )
+        table.setStyle(self._table_style(font_size=7))
+        return table
+
+    def _pie_chart(
         self,
-        results: tuple[CaseResult, ...],
+        statistics: tuple[OutcomeStatistic, ...],
         *,
-        section_number: str,
-        title: str,
-        include_representative_path: bool = False,
-    ) -> list[Flowable]:
-        statistics = calculate_statistics(results)
-        return [
-            Paragraph(f"{section_number} {title}", self.styles["subsection"]),
-            Paragraph(
-                f"{section_number}.1 四态结果分布",
-                self.styles["subsection"],
-            ),
-            KeepTogether([self._pie_chart(statistics), Spacer(1, 3 * mm)]),
-            self._statistics_table(statistics),
-            Spacer(1, 6 * mm),
-            Paragraph(f"{section_number}.2 用例明细", self.styles["subsection"]),
-            self._case_table(
-                results,
-                compact=True,
-                include_representative_path=include_representative_path,
-            ),
-        ]
-
-    def _pie_chart(self, statistics: tuple[OutcomeStatistic, ...]) -> Drawing:
+        empty_message: str = "本次没有业务测试结果",
+    ) -> Drawing:
         drawing = Drawing(470, 185)
         values = [item.count for item in statistics]
         if not sum(values):
@@ -229,7 +288,7 @@ class PDFReportGenerator:
                 String(
                     245,
                     89,
-                    "本次没有业务测试结果",
+                    empty_message,
                     fontName=self.fonts.regular,
                     fontSize=10,
                 )
@@ -242,7 +301,9 @@ class PDFReportGenerator:
         pie.height = 125
         pie.data = values
         pie.labels = [
-            f"{item.status.value} {item.percentage:.1f}%" if item.count else ""
+            _fullwidth_ascii(f"{item.status.value} {item.percentage:.1f}%")
+            if item.count
+            else ""
             for item in statistics
         ]
         pie.slices.fontName = self.fonts.regular
@@ -258,7 +319,9 @@ class PDFReportGenerator:
                 String(
                     264,
                     y + 1,
-                    f"{item.status.value}：{item.count} 条（{item.percentage:.2f}%）",
+                    _fullwidth_ascii(
+                        f"{item.status.value}：{item.count} 条（{item.percentage:.2f}%）"
+                    ),
                     fontName=self.fonts.regular,
                     fontSize=9,
                 )
@@ -268,13 +331,23 @@ class PDFReportGenerator:
     def _statistics_table(
         self, statistics: tuple[OutcomeStatistic, ...]
     ) -> Table:
-        rows: list[list[object]] = [["测评结果", "用例数量", "占比"]]
+        rows: list[list[object]] = [
+            [
+                self._header_cell(value, compact=False)
+                for value in ("测评结果", "用例数量", "占比")
+            ]
+        ]
         rows.extend(
             [item.status.value, str(item.count), f"{item.percentage:.2f}%"]
             for item in statistics
         )
         table = Table(rows, colWidths=[75 * mm, 45 * mm, 45 * mm], repeatRows=1)
         table.setStyle(self._table_style(font_size=9))
+        table.setStyle(
+            TableStyle(
+                [("FONTNAME", (1, 1), (-1, -1), self.fonts.latin)]
+            )
+        )
         return table
 
     def _case_table(
@@ -283,10 +356,20 @@ class PDFReportGenerator:
         *,
         compact: bool,
         include_representative_path: bool = False,
+        empty_message: str = "本次没有业务测试结果",
     ) -> LongTable:
         if include_representative_path:
             rows: list[list[object]] = [
-                ["用例 ID", "用例名称", "代表路径", "结果", "简短说明"]
+                [
+                    self._header_cell(value, compact=compact)
+                    for value in (
+                        "用例 ID",
+                        "用例名称",
+                        "代表路径",
+                        "结果",
+                        "简短说明",
+                    )
+                ]
             ]
             rows.extend(
                 [
@@ -303,7 +386,12 @@ class PDFReportGenerator:
             )
             column_widths = [32 * mm, 37 * mm, 43 * mm, 18 * mm, 52 * mm]
         else:
-            rows = [["用例 ID", "用例名称", "结果", "简短说明"]]
+            rows = [
+                [
+                    self._header_cell(value, compact=compact)
+                    for value in ("用例 ID", "用例名称", "结果", "简短说明")
+                ]
+            ]
             rows.extend(
                 [
                     self._cell(item.case_id, compact=compact),
@@ -317,7 +405,7 @@ class PDFReportGenerator:
         if len(rows) == 1:
             empty_row = [
                 self._cell("—", compact=compact),
-                self._cell("本次没有业务测试结果", compact=compact),
+                self._cell(empty_message, compact=compact),
             ]
             if include_representative_path:
                 empty_row.append(self._cell("—", compact=compact))
@@ -339,7 +427,13 @@ class PDFReportGenerator:
 
     def _cell(self, value: str, *, compact: bool) -> Paragraph:
         style = self.styles["table_compact" if compact else "table"]
-        return Paragraph(_safe(value), style)
+        return Paragraph(_mixed_safe(value, self.fonts.latin), style)
+
+    def _header_cell(self, value: str, *, compact: bool) -> Paragraph:
+        style = self.styles[
+            "table_header_compact" if compact else "table_header"
+        ]
+        return Paragraph(_mixed_safe(value, self.fonts.latin_bold), style)
 
     def _table_style(self, *, font_size: float) -> TableStyle:
         return TableStyle(
@@ -362,19 +456,27 @@ class PDFReportGenerator:
         canvas.saveState()
         canvas.setFont(self.fonts.regular, 7)
         canvas.setFillColor(colors.HexColor("#666666"))
-        canvas.drawString(14 * mm, A4[1] - 10 * mm, "AgentTestTool 测试报告")
+        canvas.drawString(
+            14 * mm,
+            A4[1] - 10 * mm,
+            _fullwidth_ascii("AgentTestTool 测试报告"),
+        )
         canvas.drawRightString(
             A4[0] - 14 * mm,
             A4[1] - 10 * mm,
-            report.metadata.test_target,
+            _fullwidth_ascii(report.metadata.test_target),
         )
         canvas.line(14 * mm, A4[1] - 12 * mm, A4[0] - 14 * mm, A4[1] - 12 * mm)
         canvas.line(14 * mm, 12 * mm, A4[0] - 14 * mm, 12 * mm)
-        canvas.drawString(14 * mm, 8 * mm, f"RUN_ID：{report.metadata.run_id}")
+        canvas.drawString(
+            14 * mm,
+            8 * mm,
+            _fullwidth_ascii(f"RUN_ID：{report.metadata.run_id}"),
+        )
         canvas.drawRightString(
             A4[0] - 14 * mm,
             8 * mm,
-            f"第 {canvas.getPageNumber()} 页",
+            _fullwidth_ascii(f"第 {canvas.getPageNumber()} 页"),
         )
         canvas.restoreState()
 
@@ -430,6 +532,7 @@ def _styles(fonts: ReportFonts) -> dict[str, ParagraphStyle]:
             leading=18,
             spaceBefore=3 * mm,
             spaceAfter=3 * mm,
+            keepWithNext=1,
         ),
         "body": ParagraphStyle(
             "ReportBody",
@@ -461,6 +564,20 @@ def _styles(fonts: ReportFonts) -> dict[str, ParagraphStyle]:
             fontSize=6.5,
             leading=8.5,
         ),
+        "table_header": ParagraphStyle(
+            "ReportTableHeaderCell",
+            parent=sample["BodyText"],
+            fontName=fonts.bold,
+            fontSize=8,
+            leading=11,
+        ),
+        "table_header_compact": ParagraphStyle(
+            "ReportCompactTableHeaderCell",
+            parent=sample["BodyText"],
+            fontName=fonts.bold,
+            fontSize=6.5,
+            leading=8.5,
+        ),
     }
 
 
@@ -473,6 +590,7 @@ def _register_fonts(
             Path("assets/fonts/report_regular.ttf"),
             Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"),
             Path("/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc"),
+            Path("/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf"),
             Path("C:/Windows/Fonts/msyh.ttc"),
             Path("/System/Library/Fonts/PingFang.ttc"),
         )
@@ -482,6 +600,7 @@ def _register_fonts(
             Path("assets/fonts/report_bold.ttf"),
             Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"),
             Path("/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc"),
+            Path("/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf"),
             Path("C:/Windows/Fonts/msyhbd.ttc"),
             Path("/System/Library/Fonts/PingFang.ttc"),
         )
@@ -494,20 +613,48 @@ def _register_fonts(
             pdfmetrics.registerFont(TTFont(bold_name, str(bold_candidate)))
         else:
             bold_name = regular_name
-        return ReportFonts(regular_name, bold_name)
+        return ReportFonts(regular_name, bold_name, "Helvetica", "Helvetica-Bold")
 
     fallback = "STSong-Light"
     if fallback not in pdfmetrics.getRegisteredFontNames():
         pdfmetrics.registerFont(UnicodeCIDFont(fallback))
-    return ReportFonts(fallback, fallback)
+    return ReportFonts(fallback, fallback, "Helvetica", "Helvetica-Bold")
 
 
 def _first_existing_font(candidates: Iterable[Path]) -> Path | None:
     return next((path.resolve() for path in candidates if path.is_file()), None)
 
 
-def _safe(value: object) -> str:
-    return escape(str(value), quote=True).replace("\n", "<br/>")
+_ASCII_RUN_PATTERN = re.compile(r"[\x20-\x7e]+")
+
+
+def _mixed_safe(value: object, latin_font: str) -> str:
+    """Escape text and render ASCII runs with a font that contains Latin glyphs."""
+    lines: list[str] = []
+    for line in str(value).split("\n"):
+        position = 0
+        parts: list[str] = []
+        for match in _ASCII_RUN_PATTERN.finditer(line):
+            parts.append(escape(line[position : match.start()], quote=True))
+            parts.append(
+                f'<font name="{latin_font}">'
+                f"{escape(match.group(), quote=True)}"
+                "</font>"
+            )
+            position = match.end()
+        parts.append(escape(line[position:], quote=True))
+        lines.append("".join(parts))
+    return "<br/>".join(lines)
+
+
+def _fullwidth_ascii(value: object) -> str:
+    """Map printable ASCII to CJK fullwidth glyphs for canvas and chart labels."""
+    return "".join(
+        chr(ord(character) + 0xFEE0)
+        if "!" <= character <= "~"
+        else character
+        for character in str(value)
+    )
 
 
 def _date_text(value: datetime) -> str:
