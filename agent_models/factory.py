@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 from collections.abc import Sequence
+from contextlib import AbstractContextManager
+import os
 
 from agent_models.base import AgentModel
 from configs.environment import sensitive_environment_values
@@ -11,6 +13,26 @@ from configs.environment import sensitive_environment_values
 
 class AgentModelFactory:
     """Create the product model selected by a shared test run."""
+
+    @staticmethod
+    def worker_environment(product: str) -> AbstractContextManager[dict[str, str]]:
+        """Provide product-owned local configuration isolation for one worker."""
+        if product.strip().lower() == "codebuddy":
+            from agent_models.codebuddy.worker_profile import isolated_worker_profile
+
+            return isolated_worker_profile()
+        raise ValueError(f"Worker isolation is not implemented for product: {product}")
+
+    @staticmethod
+    def parallel_block_reason(product: str) -> str | None:
+        """Conservatively reject adapters with unisolated external helper state."""
+        if product.strip().lower() != "codebuddy":
+            return "Product worker isolation has not been implemented"
+        if any(os.environ.get(name, "").strip() for name in (
+            "CODEBUDDY_OBSERVATION_COMMAND", "CODEBUDDY_LOCAL_STATE_COMMAND",
+        )):
+            return "External product helpers do not declare worker isolation"
+        return None
 
     @staticmethod
     def create(product: str, *, workspace: Path, evidence_directory: Path | None = None,

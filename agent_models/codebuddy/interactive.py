@@ -628,18 +628,19 @@ class CodeBuddyInteractiveSession(InteractiveSession):
                 "errors_info",
                 "usage",
             )
-            self._emit(
-                AgentEventType.TURN_COMPLETED,
-                text=_optional_text(payload.get("result")) or "",
-                session_id=session_id,
-                request_id=request_id,
-                turn_id=turn_id,
-                data=result_data,
-                raw_line=raw_line,
-            )
             with self._condition:
                 if self._active_turn is not None and self._active_turn.turn_id == turn_id:
                     self._active_turn = None
+                # Completion observers must already be allowed to start the next turn.
+                self._emit(
+                    AgentEventType.TURN_COMPLETED,
+                    text=_optional_text(payload.get("result")) or "",
+                    session_id=session_id,
+                    request_id=request_id,
+                    turn_id=turn_id,
+                    data=result_data,
+                    raw_line=raw_line,
+                )
             return
 
         if message_type == "control_request":

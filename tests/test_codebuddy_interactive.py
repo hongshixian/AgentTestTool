@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import threading
 
 from agent_models import (
     AgentEventType,
@@ -39,6 +40,26 @@ def session(tmp_path: Path) -> CodeBuddyInteractiveSession:
 
 
 class TestCodeBuddyInteractiveSession:
+    def test_terminal_publication_already_releases_active_turn(self, session, monkeypatch):
+        published = threading.Event()
+        active_at_publication = []
+        original_emit = session._emit
+
+        def observe_emit(event_type, **kwargs):
+            event = original_emit(event_type, **kwargs)
+            if event_type is AgentEventType.TURN_COMPLETED:
+                active_at_publication.append(session._active_turn)
+                published.set()
+            return event
+
+        monkeypatch.setattr(session, "_emit", observe_emit)
+        first = session.send_input("one")
+        assert published.wait(2), "Local protocol probe did not publish completion"
+        assert active_at_publication == [None]
+        assert session.wait_for_completion(first).completed
+        second = session.send_input("two")
+        assert session.wait_for_completion(second).completed
+
     def test_multiple_turns_reuse_one_process_and_preserve_event_order(
         self, session: CodeBuddyInteractiveSession
     ) -> None:

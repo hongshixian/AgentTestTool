@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from agent_test_tool.cli import _manifest_paths
+from agent_test_tool.cli import _manifest_paths, build_parser
 
 
 def test_manifest_paths_load_repository_test_case(tmp_path: Path) -> None:
@@ -44,3 +44,15 @@ def test_manifest_paths_reject_out_of_scope_scripts(
 
     with pytest.raises(ValueError):
         _manifest_paths(manifest)
+
+
+def test_business_workers_accepts_four_and_preserves_serial_default():
+    parser = build_parser()
+    assert parser.parse_args([]).business_workers == 1
+    assert parser.parse_args(["--business-workers", "4", "--suite", "mother"]).business_workers == 4
+
+
+@pytest.mark.parametrize("count", ["0", "-1", "5", "invalid"])
+def test_business_workers_rejects_invalid_count(count):
+    with pytest.raises(SystemExit):
+        build_parser().parse_args(["--business-workers", count])

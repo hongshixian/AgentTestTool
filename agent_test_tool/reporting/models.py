@@ -134,6 +134,7 @@ class ReportData:
     metadata: RunMetadata
     smoke_results: tuple[CaseResult, ...]
     business_results: tuple[CaseResult, ...] = field(default_factory=tuple)
+    business_errors: tuple[str, ...] = field(default_factory=tuple)
 
     @property
     def smoke_passed(self) -> bool:
@@ -219,9 +220,20 @@ class ReportData:
             else ()
         )
         metadata_source = dict(smoke_payload)
+        business_errors: list[str] = []
         if business_payload is not None:
             smoke_session = _mapping(smoke_payload.get("session"))
             business_session = _mapping(business_payload.get("session"))
+            for field_name in ("internal_errors", "collection_errors"):
+                messages = business_session.get(field_name)
+                if isinstance(messages, list) and messages:
+                    business_errors.extend(str(message) for message in messages if message)
+            if business_payload.get("phase_error"):
+                business_errors.append(str(business_payload["phase_error"]))
+            if business_session.get("exitstatus") not in (None, 0) and not any(
+                case.status is AssessmentStatus.FAIL for case in business
+            ):
+                business_errors.append("业务进程异常退出，已记录用例结果不能代表本次测评完整完成")
             metadata_source["session"] = {
                 "started_at": smoke_session.get("started_at")
                 or smoke_session.get("started", ""),
@@ -242,6 +254,7 @@ class ReportData:
             ),
             smoke_results=smoke,
             business_results=business,
+            business_errors=tuple(dict.fromkeys(business_errors)),
         )
 
     @classmethod

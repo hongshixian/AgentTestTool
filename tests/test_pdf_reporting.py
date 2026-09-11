@@ -112,6 +112,21 @@ def _generator() -> PDFReportGenerator:
 
 
 class TestPDFReporting:
+    def test_business_framework_failure_is_visible_without_changing_case_counts(self, tmp_path: Path) -> None:
+        report = ReportData.from_pytest_payloads(
+            {"cases": [{"test_case_id": "SMOKE", "status": "通过"}]},
+            {
+                "session": {"exitstatus": 1, "internal_errors": ["Worker assignment/result mismatch"]},
+                "cases": [{"test_case_id": "TC-5.1a-D1-01", "status": "通过"}],
+            },
+        )
+        text = _paragraph_text(_generator().build_story(report))
+        assert "业务阶段执行异常" in text
+        assert "Worker assignment/result mismatch" in text
+        assert len(report.business_results) == 1
+        output = _generator().generate(report, tmp_path / "worker-failure.pdf")
+        assert output.read_bytes().startswith(b"%PDF-")
+
     def test_generate_creates_a_nonempty_pdf(self, tmp_path: Path) -> None:
         report = _report(smoke_status=AssessmentStatus.FAIL)
 

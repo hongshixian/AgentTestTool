@@ -201,6 +201,7 @@ class ResultCollector:
         self.internal_errors: list[str] = []
         self.collection_errors: list[str] = []
         self._cases: dict[str, _CaseState] = {}
+        self.execution_policies: dict[str, tuple[str, str]] = {}
 
     def register_item(self, item: pytest.Item) -> None:
         module = getattr(item, "module", None)
@@ -248,6 +249,10 @@ class ResultCollector:
 
     def build_payload(self, *, exit_status: int, finished_at: str | None = None) -> dict[str, object]:
         cases = [case.serialize() for case in self._cases.values()]
+        for case in cases:
+            policy = self.execution_policies.get(str(case["nodeid"]))
+            if policy is not None:
+                case["execution_policy"], case["execution_policy_reason"] = policy
         summary = {status: 0 for status in ASSESSMENT_STATUSES}
         summary_by_case_level: dict[str, dict[str, int]] = {}
         for case in cases:
@@ -291,6 +296,16 @@ class ResultCollector:
 def pytest_addoption(parser: pytest.Parser) -> None:
     group = parser.getgroup("agent-test-tool")
     group.addoption(
+        "--agent-require-isolated", action="store_true", default=False,
+        help="Reject worker items whose reviewed parallel policy is no longer valid",
+    )
+    group.addoption(
+        "--agent-nodeids-file",
+        default=None,
+        metavar="PATH",
+        help="Execute exactly the collected node IDs in a worker JSON selection file",
+    )
+    group.addoption(
         "--agent-result-json",
         action="store",
         default=None,
@@ -301,23 +316,66 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 def pytest_configure(config: pytest.Config) -> None:
     output_path = config.getoption("--agent-result-json", default=None)
+    selection_path = config.getoption("--agent-nodeids-file", default=None)
+    selected_nodeids = None
+    if selection_path:
+        if not output_path:
+            raise pytest.UsageError("--agent-nodeids-file requires --agent-result-json")
+        try:
+            selection = json.loads(Path(selection_path).read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, ValueError) as exc:
+            raise pytest.UsageError("Cannot read worker node ID selection") from exc
+        if (
+            not isinstance(selection, list)
+            or not selection
+            or any(not isinstance(value, str) or not value.strip() for value in selection)
+            or len(set(selection)) != len(selection)
+        ):
+            raise pytest.UsageError("Worker selection must be a nonempty list of unique node IDs")
+        selected_nodeids = frozenset(selection)
     if output_path:
-        plugin = _ResultPlugin(ResultCollector(Path(output_path).resolve()))
+        plugin = _ResultPlugin(
+            ResultCollector(Path(output_path).resolve()), selected_nodeids=selected_nodeids
+        )
         config.pluginmanager.register(plugin, "agent-test-tool-result-writer")
 
 
 class _ResultPlugin:
     """Hold per-session state so subprocesses and nested pytest runs stay isolated."""
 
-    def __init__(self, collector: ResultCollector) -> None:
+    def __init__(
+        self, collector: ResultCollector, *, selected_nodeids: frozenset[str] | None = None
+    ) -> None:
         self.collector = collector
+        self.selected_nodeids = selected_nodeids
 
-    @pytest.hookimpl(trylast=True)
-    def pytest_collection_modifyitems(self, items: list[pytest.Item]) -> None:
+    @pytest.hookimpl(wrapper=True, tryfirst=True)
+    def pytest_collection_modifyitems(self, config: pytest.Config, items: list[pytest.Item]):
         """Register only items left after pytest marker and keyword deselection."""
+        yield
+        # Filter after suite/marker plugins, then register only this worker's items.
+        if self.selected_nodeids is not None:
+            available = {item.nodeid for item in items}
+            missing = self.selected_nodeids - available
+            if missing:
+                self.collector.collection_errors.append(
+                    f"Worker selection missing {len(missing)} collected node IDs"
+                )
+                raise pytest.UsageError("Worker selection no longer matches pytest collection")
+            deselected = [item for item in items if item.nodeid not in self.selected_nodeids]
+            items[:] = [item for item in items if item.nodeid in self.selected_nodeids]
+            if deselected:
+                config.hook.pytest_deselected(items=deselected)
         self.collector.collected_count = len(items)
         for item in items:
+            from agent_test_tool.parallel_policy import case_execution_policy
+
+            policy = case_execution_policy(Path(item.path))
+            if config.getoption("--agent-require-isolated") and policy[0] != "isolated":
+                self.collector.collection_errors.append("Worker parallel review is stale or missing")
+                raise pytest.UsageError("Worker contains a case without a valid parallel review")
             self.collector.register_item(item)
+            self.collector.execution_policies[item.nodeid] = policy
 
     def pytest_collectreport(self, report: pytest.CollectReport) -> None:
         if report.failed:

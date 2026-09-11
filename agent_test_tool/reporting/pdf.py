@@ -173,11 +173,26 @@ class PDFReportGenerator:
 
     def _overall_section(self, report: ReportData) -> list[Flowable]:
         statistics = calculate_statistics(report.business_results)
-        return [
+        contents: list[Flowable] = [
             Paragraph("二、整体测试结果", self.styles["section"]),
+        ]
+        if report.business_errors:
+            details = "；".join(report.business_errors[:5])
+            if len(report.business_errors) > 5:
+                details += f"；另有 {len(report.business_errors) - 5} 项，详见结构化结果"
+            contents.append(Paragraph(
+                _mixed_safe(
+                    "业务阶段执行异常：" + details
+                    + "。以下统计仅反映已记录的用例结果，不代表测评完整完成。",
+                    self.fonts.latin,
+                ),
+                self.styles["notice"],
+            ))
+        contents.extend([
             KeepTogether([self._pie_chart(statistics), Spacer(1, 3 * mm)]),
             self._statistics_table(statistics),
-        ]
+        ])
+        return contents
 
     def _clause_results_section(self, report: ReportData) -> list[Flowable]:
         contents: list[Flowable] = [

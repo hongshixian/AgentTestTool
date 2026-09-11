@@ -65,6 +65,17 @@ def _fake_pdf(payload: object, output: Path) -> None:
 
 
 class TestWorkflowRunner:
+    def test_failed_smoke_does_not_start_parallel_business(self, tmp_path: Path) -> None:
+        fake_pytest = _FakePytest([_phase_payload(["不通过"], exitstatus=1)], [1])
+        result = run_workflow(
+            WorkflowConfig(agent="codebuddy", output_parent=tmp_path, business_workers=4),
+            process_runner=fake_pytest, pdf_builder=_fake_pdf,
+        )
+        assert not result.smoke_passed
+        assert result.business is None
+        assert len(fake_pytest.commands) == 1
+        assert result.report_pdf is not None
+
     def test_smoke_pass_runs_business_and_generates_report(self, tmp_path: Path) -> None:
         fake_pytest = _FakePytest(
             [_phase_payload(["通过", "通过"]), _phase_payload(["通过", "无法判定"])],

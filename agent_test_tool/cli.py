@@ -31,6 +31,13 @@ def build_parser() -> argparse.ArgumentParser:
         description="依次执行冒烟测试、业务测试并生成 PDF 测试报告。",
     )
     parser.add_argument(
+        "--business-workers",
+        type=int,
+        choices=range(1, 5),
+        default=1,
+        help="业务测试 worker 数量，最多 4；1 保持串行（默认：1）",
+    )
+    parser.add_argument(
         "--business-manifest",
         type=Path,
         help=(
@@ -119,6 +126,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             agent=args.agent,
             output_parent=args.output_dir,
             repeat=args.repeat,
+            business_workers=args.business_workers,
             smoke_timeout_seconds=args.smoke_timeout,
             business_timeout_seconds=args.business_timeout,
             suite=args.suite,

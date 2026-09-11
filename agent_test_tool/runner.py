@@ -39,6 +39,7 @@ class WorkflowConfig:
     business_paths: tuple[Path, ...] = ()
     business_selection_source: str | None = None
     run_id: str | None = None
+    business_workers: int = 1
 
 
 @dataclass(frozen=True, slots=True)
@@ -139,6 +140,10 @@ def _run_pytest_phase(
     case_suite: str,
     timeout_seconds: float,
     process_runner: ProcessRunner,
+    nodeids_file: Path | None = None,
+    collect_only: bool = False,
+    environment_overrides: Mapping[str, str] | None = None,
+    require_isolated: bool = False,
 ) -> PhaseExecution:
     result_path = run_directory / f"{phase}-results.json"
     stdout_path = run_directory / f"{phase}.stdout.log"
@@ -166,12 +171,19 @@ def _run_pytest_phase(
     ]
     if repeat > 1:
         command_parts.extend(("--repeat", str(repeat)))
+    if collect_only:
+        command_parts.append("--collect-only")
+    if nodeids_file is not None:
+        command_parts.extend(("--agent-nodeids-file", str(nodeids_file)))
+    if require_isolated:
+        command_parts.append("--agent-require-isolated")
     command_parts.append("-q")
     command = tuple(command_parts)
     environment = os.environ.copy()
     environment["AGENT_TEST_RUN_ID"] = run_id
     environment["AGENT_TEST_PHASE"] = phase
     environment["AGENT_TEST_CASE_SUITE"] = case_suite
+    environment.update(environment_overrides or {})
 
     timed_out = False
     error: str | None = None
@@ -308,6 +320,8 @@ def run_workflow(
     """Run smoke, conditionally run business cases, and always build a report."""
     if config.repeat < 1:
         raise ValueError("repeat 必须是正整数")
+    if config.business_workers < 1 or config.business_workers > 4:
+        raise ValueError("business_workers 必须在 1 到 4 之间")
     if config.suite not in CASE_SUITES:
         raise ValueError(f"未知业务测试套件：{config.suite}")
     if config.business_paths and config.suite != "child":
@@ -335,7 +349,11 @@ def run_workflow(
     )
     smoke_passed = smoke_gate_passed(smoke)
     business: PhaseExecution | None = None
-    if smoke_passed:
+    if smoke_passed and config.business_workers > 1:
+        from agent_test_tool.parallel_runner import run_parallel_business
+
+        business = run_parallel_business(config, run_id, run_directory, process_runner)
+    elif smoke_passed:
         business = _run_pytest_phase(
             phase="business",
             selection="e2e and not smoke",
@@ -366,6 +384,7 @@ def run_workflow(
             None if business is not None else "冒烟测试未全部通过，未执行业务测试"
         ),
         "business_selection": {
+            "workers": config.business_workers,
             "suite": config.suite,
             "source": config.business_selection_source,
             "path_count": len(config.business_paths),

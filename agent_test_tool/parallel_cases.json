@@ -1,0 +1,2420 @@
+{
+  "schema_version": 1,
+  "dependencies": {
+    "test_cases/conftest.py": "b74ca0d8e1685789dc19c46d4894f1fbcd565c6f68c066a6a82897568f9fa1dd",
+    "configs/mother_cases_v3.json": "570f6859faadb4e604474aac40953c1f583c500be9a20b702027beb77e611349"
+  },
+  "scenario_dependencies": {
+    "test_cases/base.py": "daa1b5412cd80571db140f6d156e06253a644317cef676f423954f076239f7ad",
+    "test_cases/mother_cases/base.py": "96e0b36bb1fd55a150a85413c8ee09801dee516b61a58481ec13655e3121016e",
+    "test_cases/mother_cases/p2_proxy.py": "a35d94624e706f2c671ca7ba9d942498236d937b7091b16f06160ca6baf65773",
+    "test_cases/mother_cases/relaxed.py": "76a893fac8faaf80df1edcff08f63982894eee5a7ff0b8bc230eb678c43c09cf",
+    "test_cases/security.py": "2664ae84272f25b83eb25820e903eb00f2043c5c8f728f70587b89d2e29e1e62",
+    "test_cases/mother_cases/p2_identity.py": "2e27e5798f5a54132d67173d53578e9e441aef1d81631dadcff360e10a6b9aba",
+    "test_cases/mother_cases/p1_output.py": "9902f5db168e362a08d766f77503f5c8cee38566a7523551bc4fb78c3bfc2087",
+    "test_cases/scenarios/protected_configuration_extraction.py": "7fb5ec366babd7fd80c3e25cba5711a71e1ec12ebf3156a44afaecb3f1e57d88",
+    "test_cases/scenarios/tool_result_detection_d2.py": "bb31bc628cc23ff8ecd07d7027261ac704d1e64c10113b87671150d51169ba96",
+    "test_cases/scenarios/input_defense_outcome_d2.py": "be882242dd2b12fb73765dac85858423efa347e0f0984e5a6c77977713f005ba",
+    "test_cases/scenarios/roleplay_constraint_bypass.py": "fc86d44b5c1c75fe5d4b8c434036e285ada4823eed1c77937a22da633d8b51e5",
+    "test_cases/scenarios/transformed_output_detection.py": "30accdacafec63cef8b8a0961814d067a7dbd8d4932d722f24c56e34e7ef0df2",
+    "test_cases/scenarios/cross_session_intent_consistency.py": "950f7519a9d1e62f43b59ff5351405696dc28cb71930f7c3ad8469151110a7c1",
+    "test_cases/scenarios/plaintext_input_detection.py": "75cb9b3973fa441c5438ef1e1169cf5626f2ea42bdfb32ddc11b82d9ce411c39",
+    "test_cases/scenarios/progressive_high_risk_handoff.py": "1dda8018d792c24cd68d5e88f7c2b8d1c4df56415d7287821c08807b0362f7bc"
+  },
+  "groups": {
+    "test_cases.mother_cases.p2_proxy": [
+      "test_cases/base.py",
+      "test_cases/mother_cases/base.py",
+      "test_cases/mother_cases/p2_proxy.py",
+      "test_cases/mother_cases/relaxed.py",
+      "test_cases/security.py"
+    ],
+    "test_cases.mother_cases.p2_identity": [
+      "test_cases/base.py",
+      "test_cases/mother_cases/base.py",
+      "test_cases/mother_cases/p2_identity.py",
+      "test_cases/mother_cases/p2_proxy.py",
+      "test_cases/mother_cases/relaxed.py",
+      "test_cases/security.py"
+    ],
+    "test_cases.mother_cases.p1_output": [
+      "test_cases/base.py",
+      "test_cases/mother_cases/base.py",
+      "test_cases/mother_cases/p1_output.py",
+      "test_cases/mother_cases/relaxed.py",
+      "test_cases/security.py"
+    ],
+    "test_cases.scenarios.protected_configuration_extraction": [
+      "test_cases/base.py",
+      "test_cases/scenarios/protected_configuration_extraction.py",
+      "test_cases/security.py"
+    ],
+    "test_cases.scenarios.tool_result_detection_d2": [
+      "test_cases/base.py",
+      "test_cases/scenarios/tool_result_detection_d2.py",
+      "test_cases/security.py"
+    ],
+    "test_cases.scenarios.input_defense_outcome_d2": [
+      "test_cases/base.py",
+      "test_cases/scenarios/input_defense_outcome_d2.py",
+      "test_cases/security.py"
+    ],
+    "test_cases.scenarios.roleplay_constraint_bypass": [
+      "test_cases/base.py",
+      "test_cases/scenarios/roleplay_constraint_bypass.py",
+      "test_cases/security.py"
+    ],
+    "test_cases.scenarios.transformed_output_detection": [
+      "test_cases/base.py",
+      "test_cases/scenarios/transformed_output_detection.py",
+      "test_cases/security.py"
+    ],
+    "test_cases.scenarios.cross_session_intent_consistency": [
+      "test_cases/base.py",
+      "test_cases/scenarios/cross_session_intent_consistency.py",
+      "test_cases/security.py"
+    ],
+    "test_cases.scenarios.plaintext_input_detection": [
+      "test_cases/base.py",
+      "test_cases/scenarios/plaintext_input_detection.py",
+      "test_cases/security.py"
+    ],
+    "test_cases.scenarios.progressive_high_risk_handoff": [
+      "test_cases/base.py",
+      "test_cases/scenarios/progressive_high_risk_handoff.py",
+      "test_cases/security.py"
+    ]
+  },
+  "cases": {
+    "test_cases/mother_cases/test_tc_5_1a_d1_01.py": {
+      "sha256": "5eb9c5329ce0825cfafc72dd62defbf4d2a21af4650c0736a7b35c20cbc1d34a",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1a_d1_02.py": {
+      "sha256": "d6f56e7f66e0873578ecc2da23bbbf673bc03c68234f3b368eca05f9b14ad1bc",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1a_d2_01.py": {
+      "sha256": "06bc4baaf4657c2decad6d18dce81302663972849dbaaa82e83e34dc4f47dfdf",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1a_d2_02.py": {
+      "sha256": "072d67cbaa027798d629e01d79955f024cec200b7b81c21e1350c2e5668c59e2",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1a_d3_01.py": {
+      "sha256": "12515a39c0b084c442021bdb4726864c42e5e193691c1a76295fc467aa7eff31",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1b_d1_01.py": {
+      "sha256": "15bd32b27297a379f537df634b1f9c42835fa71992a4940a66060c6a75003cd0",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1b_d2_01.py": {
+      "sha256": "a904ef28d293c206087bae653924ef8dc540f659a03ec5e77f0cefa0576c5c91",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1b_d2_02.py": {
+      "sha256": "10943cd21d5d35a9a132e6ce873a5542073bf1ff98e173038207113d0535c48e",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1b_d4_01.py": {
+      "sha256": "b1da5a1770e0448d4469f36a3667b6e9c6683939875473ca603edb5acf3b2319",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1b_d5_01.py": {
+      "sha256": "7f4e018228d39adbf1db9a6e7064f8549c76a0f2a80b22bb474d1501e214ac64",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1b_d5_02.py": {
+      "sha256": "764be6d34c6f87d3d6449f7d7c388964132d1c3d27c1524e94b14837d0bb93fa",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1c_d1_01.py": {
+      "sha256": "2664fd84bf987756e1ceba21201c0dea91bde1d0cb275f224ae38f664fe347f7",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1c_d2_01.py": {
+      "sha256": "b7223e7be384e9d8106bc5253ed14a14ecffcc7dfb32309950e5d3b1b926a8f9",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1c_d2_02.py": {
+      "sha256": "691fdd975dd8304e164fd09dc5a324012cd71250cb479c686f6b3fae25adbf95",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1c_d4_01.py": {
+      "sha256": "210052f5c69ddc058c425cf77441207a92286aa9dd857f24e0ca82b70962febb",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1c_d5_01.py": {
+      "sha256": "e3d9ee25243f931bdda3952ace06e59354fb5ce704d2f6945b4ef522835d1bd1",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_1c_d5_02.py": {
+      "sha256": "894b1310dc9b398c202d75e8f987de2648ee83594b45bd45d2ce8febfcec8c9b",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2a_d6_01.py": {
+      "sha256": "d515c30dfa9708fb93b044046905935c18379826c234657da03e5c02acbabb0d",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2c_d4_02.py": {
+      "sha256": "c2c12c3ffec7ee95d8e07c8885f4908c5e315acc0b0d0399a55e8e3810a4dcbb",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2d_d1_01.py": {
+      "sha256": "3de2e02ac872d96769fa4001d18d26a873bb31bc91d473215d02a24243e76084",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2d_d2_01.py": {
+      "sha256": "f920927f6da7259ad0fea282348b0df33018f55e2d9aa0dc9f43d4619c14bc46",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2d_d2_02.py": {
+      "sha256": "f0d019b3a813abec25eb24bf9c88cf7c6407473cefe601f1b11139776cab1517",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2d_d3_01.py": {
+      "sha256": "6f0f79616c895a10375cb013777c4f0c85fead81e052d3f0689b5fe9900c7cbc",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2d_d3_02.py": {
+      "sha256": "f914d07fd8cb3a81cf7b0c5fc90d79b8d10ecdf3dd96b7412e5779f7e1e02ac5",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2d_d3_03.py": {
+      "sha256": "6d6ef99d528a65da5948e5be1f4d22e852f4c1a53e3f936fe9d141c09b761fce",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2d_d6_01.py": {
+      "sha256": "641ba4a54ef663212615aec848ee7ab5233d5e3181b2a5fee6fd0f022b04405b",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2e_d1_01.py": {
+      "sha256": "bf0b5d7062472191a6f878481e3e77aae636391452688f122ae08d9fcbe885f2",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2e_d2_01.py": {
+      "sha256": "682e06a85bc1afd48d4bbea96abb6127acc254e32bcf35d5aba440d36b88d46d",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2e_d2_02.py": {
+      "sha256": "bbcbc4ddf4c892081c555bde0032cc7434151cec66f504f78a78d172a0a5fa79",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2e_d2_03.py": {
+      "sha256": "b3846e0eca71993126050a9b8ba83d332f6239c5826a1b8dea94b8153d96919d",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2e_d3_01.py": {
+      "sha256": "c34ea5a542d36d32dfab56f9f16c123cf7af82545176452c194aef2bbfb8e450",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2e_d3_02.py": {
+      "sha256": "78d8c336edf9f830ba059b1b9f328a03cd71d8fc5232dfea40c307322ee19962",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2e_d3_03.py": {
+      "sha256": "e9814fa3a5a479befe510ce99b43db8f6836b9104abea601e47b7b4a563b63ed",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_2e_d6_01.py": {
+      "sha256": "24f55f52b4fe11d4ab6013f0b0e4031460b9446804d40736799477336fcfc7da",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3a_d1_01.py": {
+      "sha256": "02bee3690dff034bc8fef7ad394ebf24f1c872a2157e24d8d6ccffc31f3db767",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3a_d1_02.py": {
+      "sha256": "19729ea1746ac88be9b0c1e6cc88ba2c77c60afa5764db897c10717ec26a7030",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3a_d2_01.py": {
+      "sha256": "3e98f5ec5be4564baafbe59d9ba0ee346415ffcfc27299bca2885b06a71e7193",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3a_d2_02.py": {
+      "sha256": "049e4af42ca581be3169339edea059c5963adba60bac09ec9095ad3b0f9c2bba",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3a_d3_01.py": {
+      "sha256": "d2a5edac7c897748ac171d3ad1b973dce9484a4bed98998e3cfcc22724c242ca",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3a_d3_02.py": {
+      "sha256": "21bb39b8068137cf7eba947a851660ac213588bbc602dcf864e4f95cb2675583",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3a_d4_01.py": {
+      "sha256": "c2d020ffd7b3e459b2137bd8753aff3e41b3368628fbec8f3d925968e813466e",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3b_d1_01.py": {
+      "sha256": "d4924f68d57222abfdf9e52b69e2ea1815a57bd5e96365e1a75138d734d2def9",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3b_d1_02.py": {
+      "sha256": "ca235e83d1c3c25d35148fa5b7c8d128c9762c10d387293fcee32fb15b8e6c09",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3b_d2_01.py": {
+      "sha256": "19b807fecee2e1307685a873b4d9844f81e837540ac29b89de53c01a15c51954",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3b_d2_02.py": {
+      "sha256": "a55e6228ca66f6af49c6fc09654585aea92abd3f01ce073e77e8942d4dd7055e",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3b_d4_01.py": {
+      "sha256": "78c934eead9d32685c273fe28e4e768abfbba0ad6810802ca2aa6be64a9013e2",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3b_d5_01.py": {
+      "sha256": "73b5307ad1f7e550b0c466642068bc9a618cd3c8dd83187f810bc48cbcf8f20b",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3b_d5_02.py": {
+      "sha256": "61b0416f08dd064041ff98c3921389fae240cba3cc599f65e75204a289d42d07",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3c_d1_01.py": {
+      "sha256": "d2931d91c80408bb3bf2edfd923d4c8f834883a2141ec5a86d69e4a6115783b0",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3c_d1_02.py": {
+      "sha256": "90939965b0559c179a7b263c936db90056fbb8abe3a55fdc16650364f7ec7132",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3c_d2_01.py": {
+      "sha256": "88dd80207820028fbc6f66b6c75ce43ea94f5e1f3ac4d862f055d30368e0d5c2",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3c_d2_02.py": {
+      "sha256": "df89ee429115c7f2b8a15a45868a01adb35dca544ced32e785e25b829b058f56",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3c_d3_01.py": {
+      "sha256": "4e686918d273536d4a79de1941435222cd54afbfa0125463287fa23dcdf2112d",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3c_d4_01.py": {
+      "sha256": "696d16ef0e47bbef031e09e9582c87055dddc488fa26a145b9eb632db350e881",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3c_d5_01.py": {
+      "sha256": "caadf32e1473ed4e75479855ec376efd3aad2a4f62344dcf1955e40d92b24aff",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_3c_d5_02.py": {
+      "sha256": "107a1eb78e25beee341b30e7f7754513285532120f40fc372b65f0889aa68801",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4a_d1_01.py": {
+      "sha256": "816f7e4c1d5755db26b61bf947354cccc40e235f4a218026965fb4650cd8bf8b",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4a_d1_02.py": {
+      "sha256": "0cf342dcd2994f9dd4fc26dde1d2d50ed267408a32381abc35e1cdf0b8592967",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4a_d2_01.py": {
+      "sha256": "3e17a8ae5bc78c19ca797d7d05bc8b0c49f012f73787f17d726355ecc66ef3f0",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4a_d2_02.py": {
+      "sha256": "eb3fc97adbe0c424621b6c268e70ccfe8760d2861bf6eabc09a497873f818c68",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4a_d3_01.py": {
+      "sha256": "325cb9807bc3c75ea8e1641b2c221a3105621e0deb5f5267ffc976bc0407acf1",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4a_d5_01.py": {
+      "sha256": "b66c7dbb6c80da6f36320cbb01d1fc0185878877213a8c33c90dd837f9636a31",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4a_d5_02.py": {
+      "sha256": "47bfd61a8e2ea6e36b07620bf7487e72d359a6d09c01c0119b72d4f9640ad39d",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4c_d1_01.py": {
+      "sha256": "a2f9e041850a8079d1fe66b1dafc29bcce441cbfa1731caddaca3e37ed8cf763",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4c_d1_02.py": {
+      "sha256": "31ca48bad6e80abc65ead0a1b1f5667ebcc8fa4149a6d78945b3b2ff39eee201",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4c_d2_01.py": {
+      "sha256": "8af1a6cef91d0a0ff16696c75481c634de9fe6bb3e0f7bdacc761237101c9236",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4c_d2_02.py": {
+      "sha256": "539de83cf7fa4edcae9d7c53e1d10b0125227b41aeaf0e5eb6bd27809fca7cd6",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4c_d3_02.py": {
+      "sha256": "c1a0905d5cb91930fe35fb59f42d888237367097e802137bc4227e9fa43e34e9",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4c_d4_01.py": {
+      "sha256": "ba2578ea28b321df68ad02a684e6ca3b1f558bb79f42c7ec924f8ed4ad3f7b06",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_4c_d5_01.py": {
+      "sha256": "96e33e22faa8ec82d68200f94204c00fb175ef66b7a2259f98001ab41f54956c",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_5_5e_d2_01.py": {
+      "sha256": "1ca24b53660fc6503ec30402a69f7ac042bfc70ce06a73d2c8377ac4e528cb1c",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1a_d1_01.py": {
+      "sha256": "34212e5e8112dca9c2ff0bc7bd84f026a5b293e1fc65a4c79d06a3e961bc2845",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1a_d1_02.py": {
+      "sha256": "b6b74c5dc7a8af151084799d1f600c06f9dacb5b2781794040a3d5e708e9591c",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1a_d2_01.py": {
+      "sha256": "33b755f89fc44011fe895bc617191806073972090b23d79e6611d5d5ae5e7674",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1a_d2_02.py": {
+      "sha256": "f0dfb6d180cfebaa3618b30f9fcf6fcc735fd490a42ef5658ff652dc532dc80c",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1a_d3_01.py": {
+      "sha256": "72b32246d185de8ad126184448d13931a04cc30db29e9bb17140fe0e70f701f0",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1a_d3_02.py": {
+      "sha256": "95205b7c3422468695e9a9dd3870d5033776ab203bde9eb883549a3f0f35afc1",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1a_d4_01.py": {
+      "sha256": "755c11ca2717c93bacc1e6d614ea61b502cebc8022fa196b05ef5ff28822a5d0",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1a_d5_01.py": {
+      "sha256": "d7083fd0782958dee7a1b87526475e70561ced8f21101585c07a7ec00285b934",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1a_d5_02.py": {
+      "sha256": "744e73fab2edc29a4a05b2df85389d5632c4d58b8a454c3948fabd16a340c3ca",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1b_d4_01.py": {
+      "sha256": "19ca13975fc1dd4345bdc9379cdb0404b438f573df03520ccda2454c7392893f",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1b_d6_01.py": {
+      "sha256": "a9ec434db3d53b4c57fa26a8d669aa94653d65f4770173160930e58e53e80599",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1d_d2_01.py": {
+      "sha256": "f3f4ea8c273746f54c942ccbb692abb9ef10b7d2e96e17bc558f0e86b80676f8",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1d_d5_01.py": {
+      "sha256": "c8960ad5998f8100fe1a2fd317dc1f69fc7cf490bb62e4ae9305e4bdb981e6a6",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1d_d5_03.py": {
+      "sha256": "7854c2461b3f84cd0b25248c621e37e4eae609359ff17f306dc011d59cff9c73",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_1d_d6_01.py": {
+      "sha256": "8445849311adc2077355738b59382224ea55ddd37058388b2b30ad80b9531711",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2a_d1_01.py": {
+      "sha256": "c2010609a8f22cf24ce01d707452b01ada4430b990e5fc36db39044fe298717b",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2a_d1_02.py": {
+      "sha256": "bb212c248dd376a3433a91543d43a65fdbb8a674a0139063d5ea136a39b1c0c5",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2a_d2_01.py": {
+      "sha256": "2bb46a2baf641ffc7944a8977c516609471a028d98b9704dc16915a59cfdb73e",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2a_d2_02.py": {
+      "sha256": "8be9431597f649e10a8c9656a56ba86d6562acfb23f398896b14342a919a41f4",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2a_d3_01.py": {
+      "sha256": "954822c92fada8c3a17e0227e5b0f1bc1ba17df13889d2508360bed930581f2f",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2a_d3_02.py": {
+      "sha256": "03780246c8da260e59ae8c4ac8c565b3eb82854366fd677c25c7d562b6f26b4e",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2a_d5_01.py": {
+      "sha256": "d957828a58e5d9beceeb9aee92694bcc0bb4452e10b15ce36d2a5fc23fd2680c",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2b_d1_01.py": {
+      "sha256": "1793c1a29c6d1ff5a63ad636f6ad06519199bfcccea99da4ac5f67490559bd32",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2b_d1_02.py": {
+      "sha256": "5aa3ef6e5f98425aeb203d6ffcebeb16835f8afe36f583b1ee1b503501621efb",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2b_d2_01.py": {
+      "sha256": "c9eb28068d0e5f4f7e5508dff0ac6c20e0608664c1184e876a21b42e34dfbee7",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2b_d2_02.py": {
+      "sha256": "fe6abcc9a96df266e2019610ca1caa50312748f0e6d874676956cfd7418d6965",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2b_d4_01.py": {
+      "sha256": "e2801b52800b09d7f449d29fd91b334c06da7ef74b44c474e7a4c5a7de71ead6",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2b_d5_01.py": {
+      "sha256": "4ea1f24b5d795cb009710d263822d350f46aa5881d21ffd15afe23b93b8d964e",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2b_d5_02.py": {
+      "sha256": "bb40a99ccb81910804232694d137ceeb740b9f5f113b1adff8aa8066dfc6f209",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2c_d1_01.py": {
+      "sha256": "2fb0146ab09b354e1b2a0161e3c9f2fa12f226ad315560620d8c5bde4b081885",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2c_d1_02.py": {
+      "sha256": "a69a944ca2dfc599b3f6285996dea67c14c70e47227fa91f7d963c136e9c1f08",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2c_d2_01.py": {
+      "sha256": "7035cb962a2769fdec7237f0ee7468222c2db97a86b74cb8615e2708d0af327a",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2c_d2_02.py": {
+      "sha256": "3e962b68fd69f1bf969b468fb3b0daba1f5718ba0b5660dba37bef657dd2f057",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2c_d3_01.py": {
+      "sha256": "c996e1c29a4fc0fa5f2451d54cd709b44c7987296a8413c8e40306cea1be19c4",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2c_d3_02.py": {
+      "sha256": "e12696dd0940c3569a58355e9ec1aa585b3478bed695a5db87165de7cfaaaf4c",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2c_d5_01.py": {
+      "sha256": "9069a843bf5adabd8dc350b91629b9a48b231df119ba0ed2fca1f242c817568f",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2c_d5_02.py": {
+      "sha256": "3d06501b360d9c28fd9b920e31a677292fe2d1804b7f4b40cad3c73b63108623",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2d_d1_01.py": {
+      "sha256": "0398b9af842c48a3aaaf8c50aafde28b80b7957fa4d12fd387f54ce8982f1391",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2d_d1_02.py": {
+      "sha256": "bfc109d0d7516931f67c70156d9d0b359006aeb85014f60246560e79f9916c95",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2d_d2_01.py": {
+      "sha256": "bb007f32f2951eac943b28e994272d0d2b751161f96ed0a58e04608189119dc4",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2d_d2_02.py": {
+      "sha256": "3abbcdb9394b4ac746646e643f82c9d6f7558b8becc97133d57c07f5ae90491c",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2d_d3_01.py": {
+      "sha256": "714a929cc40ee09222a684082a856e5c225a40ee644818de5e94acd401aa5d1e",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2d_d3_02.py": {
+      "sha256": "0f473b84de3e926dcb415f26ba768bf51310cbbb0c77b5f5cec63db9d44d8610",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2e_d1_01.py": {
+      "sha256": "2eb2d31e9325f19ac12eeab6006aeef2a3fc73222a981e65bd4ff125d1bb6cc1",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2e_d1_02.py": {
+      "sha256": "99a15e0983ff1b02720a635c08551191c463a6e11e3a0add2e037d6651c557a7",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2e_d2_01.py": {
+      "sha256": "3dfa2d3c8107e6f80a00ea49aef4e78a7637aa645272cfab964ecab4b64ba94a",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2e_d2_02.py": {
+      "sha256": "a3bc8dca7f018fa0aad46f40d3a39e1b5b037c25cc22627fa6928343922103a6",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2e_d3_01.py": {
+      "sha256": "180e8a25e5f0acc92663096c8d37223b906c42d451ea5f7745d4a26855dfc5c0",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2e_d5_01.py": {
+      "sha256": "a6c4d9e7f2c6ca41428b264b4d6895597599db9ef72acbed7f05bef2dbf86c5c",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2e_d5_02.py": {
+      "sha256": "06874becc03ba3e935c4b70eab448d590f8f3fb0fa57bc6f0544f0464b83b9a2",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2f_d1_01.py": {
+      "sha256": "4667c154cf27a0249df6b4cbbf061cc8f1a980ed40c3bbb2600994db06a31fd2",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2f_d1_02.py": {
+      "sha256": "13484b71b18218d8da9e0bd5cc59304243a3ab386b107d3bdef27c223f86b8f9",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2f_d2_01.py": {
+      "sha256": "2c307be535ad8f5ae0a27ceff3caa2d276de3f47aa2a1661ac7db9df936c70b1",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2f_d2_02.py": {
+      "sha256": "665a9f881709f7f9022c829005e9b855231f62354677428c736d978270e22d4d",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2f_d3_01.py": {
+      "sha256": "df57c81c19dd4445f9b423d1c9264091780ed8270c50e860bdb3276f0dfa8665",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2f_d5_01.py": {
+      "sha256": "23a691bffe0c80f35fed5ed2fc1c99a8a87de50172759b462ba7ab36951de196",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2f_d5_02.py": {
+      "sha256": "1c0dcdd04f09b3cf569c93168fe4c679b8213ac784039118723f91d3e8e44bd0",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2h_d1_01.py": {
+      "sha256": "6a2502fc4a76d7f53b5c900cffb3b66959a3bbb01b9e1a806b984ed9fecab726",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2h_d1_02.py": {
+      "sha256": "a2f9a05e73178d620293a0c1302adfe4e5b1de33898e7e884f1bc5add658406b",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2h_d2_01.py": {
+      "sha256": "b8821013b4c7bfd20b462bdfc97765a7960031c8be419326e12726bd16d979d0",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2h_d3_01.py": {
+      "sha256": "cf4f0121a55798110c9b36ac709b24dc89d54d03e7c694b158ac47c757ad8cb0",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2h_d5_01.py": {
+      "sha256": "5d15afaa2fb67d6df79289e229dd458ef01f901da8ee95e8544af0028f4394fc",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2h_d5_02.py": {
+      "sha256": "a3f69961aa09824ebba53666796aa7f19b2267820fcdfb8f0e45cc62268b3f79",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_2h_d5_03.py": {
+      "sha256": "74ba205cde6f9ea2dddc4ca4e33147786de7697e65555f4a81e191a9b1602c47",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4a_d1_01.py": {
+      "sha256": "8dfb574a9535b714d2b4269bb4a695c6b70f210b16f6905c477e9850450ea4a6",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4a_d1_02.py": {
+      "sha256": "344824e16d20f12d19ae7a4ffd5fdf1dc8becdb2ca5e5baed1b455490b31ca97",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4a_d2_01.py": {
+      "sha256": "462aa8ad4c817ac00dfc6b7fbaaaaba61bb749c273180bbbca5d987f2f2778d8",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4a_d2_02.py": {
+      "sha256": "443ddffa959ab104a198c3de665725022f1e78a8c0afe352b1ecaf2f28450d30",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4a_d2_03.py": {
+      "sha256": "3520e020163d2ad1545fb5eec8af4466a782efd646b2dd56f66ff677f8eeaf08",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4a_d3_01.py": {
+      "sha256": "0f626e41a8d15f182b72b4fce04842e381cc758a7a121a6efb2504e737839252",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4a_d3_02.py": {
+      "sha256": "63ed62c41598d0469bd277f93f7263f83eed3394eaf3086b868b1e2b8a5557cb",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4a_d4_01.py": {
+      "sha256": "e1ad4fade333a794c989c88373b2a5271d1268d490da74e800d6b552de6e5d88",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4a_d6_01.py": {
+      "sha256": "1ac84be3f57e9e819c2862a34f2e0d4e116efb91d910970013bf714d916a9237",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4b_d1_01.py": {
+      "sha256": "c77130bc6ca49db30ef92d1bba50fa298c3009af08e0d2f8e4be80e270f7ac9b",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4b_d1_02.py": {
+      "sha256": "ded1ddca11c051aa7e22f6830a0c1012b99e1648f94769d49d70c67343686636",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4b_d2_01.py": {
+      "sha256": "360ce7cfbc49c3344b44ee352ae7526de68bb55a56a6e6f3a118ea5e40d27ea1",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4b_d2_02.py": {
+      "sha256": "66ce70134ca97bc302d1c08bace98e0c89a4a8a305bc07f1d176e939786f3508",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4b_d3_01.py": {
+      "sha256": "b575d4983c75edd8708235a6de72146e4a01a3bc6657f876147815cd6dcdff06",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4b_d5_01.py": {
+      "sha256": "ecdd2c352b5f82a2d11c8692b16bddcb99a8608711fb885ac8319ebba188be88",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4b_d5_02.py": {
+      "sha256": "69fab798fc7d776223ab24e947dafd79cf185e0a251f135f615261757755769d",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4c_d1_01.py": {
+      "sha256": "56f42bc42b3b9bf4be53678bb46bab9e7758c8e7c49cdd06d23fa4911423e6bf",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4c_d1_02.py": {
+      "sha256": "8def685e8dabbbd26ba7def736a11d82a445d3544e6fb970998fb50c817bd94f",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4c_d2_02.py": {
+      "sha256": "70258e48ee2c5eb4c8f4cd970557e2ebd464e93660687d7af9845c951ed52000",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4c_d3_02.py": {
+      "sha256": "3013556109586d4cb8ae0b865a09ed5ffc02ac54ca9b94a5a9a97de478e17d82",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4c_d5_01.py": {
+      "sha256": "280be35dc48fe9176bb834baaa0e6015b67776c7ec44dbb5d5b94e8c3951e611",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4d_d1_01.py": {
+      "sha256": "f5d6b67f1702336d5d55aed60b6ddfcad3997f05bc47352257a2135311dbd9da",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4d_d2_01.py": {
+      "sha256": "00a6aff91729dace1f8301c11ce61ecae3c1408f48716ac24b47fd13129055a1",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4d_d5_01.py": {
+      "sha256": "ea0247b6cefb63027b77c752a3487f8bdd2d078d6cde9790506de364a667aeb9",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4d_d5_02.py": {
+      "sha256": "fb9442cfcf8ccb623d24f27a70818f72ff75036d65677ccf18c245ee73b1b9e3",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4e_d1_01.py": {
+      "sha256": "34817c2aff0b9219e08daef82917bfa11535a2a2f61bd62a2480be516974b23d",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4e_d1_02.py": {
+      "sha256": "ef25bdb39980a02aa334f67c15390d1e7475adebbb43c9f4d4ee74af43219c08",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4e_d2_01.py": {
+      "sha256": "929e0e282c01771053e63e4b7966dd0ddcfa39839923d487b6386064930833c8",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4e_d2_02.py": {
+      "sha256": "cbb3a1a9fe304fb3f688a88d9caa4eb1cba6175e01284b887229446afda776e0",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4e_d3_01.py": {
+      "sha256": "f1f9c0c2b3bf93585a54d8a905926875c65e82b8dd9e41e9849c03ab93ccab33",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4e_d5_01.py": {
+      "sha256": "958ea866b5e521312fb86ffbefd40c94bda3cc94fdde08c9d24acc54b42845c2",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4f_d1_01.py": {
+      "sha256": "c8a0d2515c4a4331798344067f6d7ccb1d5b046927645642cf32957e04016a4f",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4f_d1_02.py": {
+      "sha256": "4db219a268ebe0d5113bb1c57538018750cf2929415264cef8e68bd1d0465d4b",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4f_d2_01.py": {
+      "sha256": "6674fadd7cea6ff13fbc5575bd403e55f631994a4552a1e9b38cadb1523f03cf",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4f_d2_02.py": {
+      "sha256": "edde39407ed9be3d77f5816b049b6ab182f3094bc6e06947dd749dbd4416db4f",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4f_d3_01.py": {
+      "sha256": "83a5e1442b835a1fab591ca394833c2cf9475bec566cdb847517e8848a98df2a",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_6_4f_d3_02.py": {
+      "sha256": "ce758525e805efba34b467aaa840f390cc88886374cf167a500ef5aea074351b",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1a_d1_01.py": {
+      "sha256": "71f700617f6f8f372e77d781a209352a8df91f223615946352b0ad9f7ea1a536",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1a_d1_02.py": {
+      "sha256": "b0eb4a20ead0b0360e63d9c2caad17e52322a061a8e0c619738dcd021d378337",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1a_d2_01.py": {
+      "sha256": "afe0f42cd534d17d1936c4b101a6ba134e28b1f58c7306e4024c2eb5f495f966",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1a_d2_02.py": {
+      "sha256": "6cd072b12d57757bdbe629742fecc3b781e336f98c113ba8edb2a12561bcb2be",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1a_d4_01.py": {
+      "sha256": "0a008b25b387b3df24344dd64c95ad5b197edb59fdfb575fbe06bdbcf39ddf7e",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1a_d5_01.py": {
+      "sha256": "ca21ec4844a27d72eb41bd051989725a3e56fd33c7f1cb6d587faf2391b839d6",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1b_d1_01.py": {
+      "sha256": "d3bc01aa34e60401739137ce9a2a6ff31c46aba2daff19a460818cf60ff357b6",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1b_d1_02.py": {
+      "sha256": "258748bd8e27a81a75df1330aa7cb3e25328489c183f722bc2faf3e2c5fe54e7",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1b_d2_01.py": {
+      "sha256": "8ac160cacad432b2b1c2b135f9ca54e94681db0f86e4cceadd2dde3f805d58a9",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1b_d2_02.py": {
+      "sha256": "52b14c7e0295b2fcb9ad1b4120841e583005555430bbaefcc2f60662726a4623",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1b_d4_01.py": {
+      "sha256": "702b776e4996157e65bf94785cf1764450b24b850a108a78307ecf53af13b31d",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1b_d5_01.py": {
+      "sha256": "4b5d01fbb17b8cea84be18e8019fd7b2ea3cea1282e0c7712c1e16878e86fcf3",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1b_d5_02.py": {
+      "sha256": "98cc93039751c725dee06844992cdafa02ac80a33eaf330bfc6bbac3610dd70d",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1c_d1_02.py": {
+      "sha256": "b4fa435caddee41655178e81b4b6f11904ad2108c184555fb262a4a7c0c488d5",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1c_d2_02.py": {
+      "sha256": "1a253466c10580235127d44b801b2502f69ef8ae09dae05542044cc90e4e78a1",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1c_d5_02.py": {
+      "sha256": "057a44125aba451fa253a5f55eaab42e7e99e03f3296b0a00e40da77ec81e0f2",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_1c_d6_01.py": {
+      "sha256": "e55a1e330793e759bc4f50a874c53307cf3cab29f9816fbff855f495a5199177",
+      "group": "test_cases.mother_cases.p1_output",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2a_d1_01.py": {
+      "sha256": "e94e878b368f9a317d4aaf40c1df9ae39fa61af4426e61fe07ef9ad69e1e808f",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2a_d1_02.py": {
+      "sha256": "99fa7fe83dc64d4cc2e46bc070e0c1fe635295e0347851b610f0634e140d73c5",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2a_d2_01.py": {
+      "sha256": "3c1d1bcbc131e9636a7bd4acd01751c2cc20a7d4418e6df7038f2593fd63cd37",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2a_d2_02.py": {
+      "sha256": "55696e66338c32dd8e3265bb099e86b2798622ff745ae51a9d75cead1b93767c",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2a_d3_01.py": {
+      "sha256": "09edc0eafea59f7a4995ff27028c6b5b66821a958537c30bad4ddfc5f2a1c354",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2a_d4_01.py": {
+      "sha256": "78912c35410d8ef8eec9a41f44ecbb60eb5191305b6f52d794e28a680d168280",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2a_d5_01.py": {
+      "sha256": "29a73ca4c6a7254c19811dd002f9168d0bfc342e60c5e960b9fed130c5241d90",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2a_d5_02.py": {
+      "sha256": "6e384837f145751bd7f763c5c8d48770f7975894e72420d0526f9129e3d40812",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2b_d1_01.py": {
+      "sha256": "6cfd15499a02ec30b33fa9e1f126f2ac3969a3e6dd9a2cb24e77b9ffb77defbb",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2b_d1_02.py": {
+      "sha256": "6a1c65f63d992cf4c376c53b7eae691eb637f4e5f787d1f88df65afd26757f8d",
+      "group": "test_cases.mother_cases.p2_proxy",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2b_d2_01.py": {
+      "sha256": "fcfcc6d45b926b131d9555a2590dedefdf9009ec36f12a76b70377ce9b6f6c3f",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2b_d2_02.py": {
+      "sha256": "51c0084a8549faf75ff57f9ffd9eced9d94972e31c3c0b0027bba7197bb8cdb8",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2b_d4_01.py": {
+      "sha256": "858e9fb8d81c6ea75683611f62296837d453fb25ff9184d8cb521cb9ec0d056a",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2b_d5_01.py": {
+      "sha256": "dd1af2776760382a6012b79f55ecf495eaddafd5df97d2af50d0a5bde7e9a544",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2c_d4_02.py": {
+      "sha256": "2b87670ab79a5e29291978b8049c9c341c0c4f7fd9ed88c1e9f3e304a673a824",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/mother_cases/test_tc_7_2c_d5_01.py": {
+      "sha256": "f52f8459d67501962eabe3ac328fc4ffdc7adc8ac37f90d8552dd127c93cf86e",
+      "group": "test_cases.mother_cases.p2_identity",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_audit_pretext.py": {
+      "sha256": "7305fe68700282243d8ca812a46364dc70652d53137449a1ab0d70179c4025a3",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_complete_initial_settings_extraction.py": {
+      "sha256": "0a003a79685dd6b18b56c937be03259f859f0c565803b9409b764ce4028ca0af",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_complete_tool_json.py": {
+      "sha256": "fb0f88fcde05781446c33932a342641fce8090cbf2b2f226ac0f7d514fcda7a9",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_compliance_pretext.py": {
+      "sha256": "5ca53892f5df3ce87d9cb6732ba55060a5e1a4aeac3788c730cdf4515b9af7db",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_correction_wrapping.py": {
+      "sha256": "af7e9ae1dc33e17df1b89121945f452c0a9bab32b637cf4707016ec8c05d0e28",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_debug_pretext.py": {
+      "sha256": "400a060ec0024f9c82ac783bdd77bf134d7899e01c11a2aacb0a5fef6ecb570f",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_error_retry_does_not_inherit_admin_instruction.py": {
+      "sha256": "863b14e2ae102d6c504d2048fb0efd383577397e0efddd88c0380b4420c3a142",
+      "group": "test_cases.scenarios.tool_result_detection_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_forged_permission_error_does_not_elevate_identity.py": {
+      "sha256": "5db1b86afc0c1d97490dae754dba513b7c6f31132d22c4a63f4c91ef3c0e83fb",
+      "group": "test_cases.scenarios.tool_result_detection_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_forged_system_task_detection.py": {
+      "sha256": "d488c3e6bb118c7643c96b8548ec191d7d5315c42031bab67d903fbd4aaf3191",
+      "group": "test_cases.scenarios.tool_result_detection_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_format_conversion_wrapping.py": {
+      "sha256": "4eb973fe633aae1ed58aaeb1d031c65df29444d66fa13e84018dd7c53fdad381",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_input_defense_antifraud_false_positive.py": {
+      "sha256": "d5eb11e8b00697829ba01e1caba806d5f67fe6fbf1a2ae945bfd465bc46fb9ec",
+      "group": "test_cases.scenarios.input_defense_outcome_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_input_defense_data_exfiltration_effect.py": {
+      "sha256": "540a5ca4fd02c15f05879b5788d662979896882269fb6767cd0226d633751ec2",
+      "group": "test_cases.scenarios.input_defense_outcome_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_input_defense_meeting_false_positive.py": {
+      "sha256": "6ddfc746549060111c82c06dddaf8d8f15d2bb2fe5b2820f4509cb2909d7c5c3",
+      "group": "test_cases.scenarios.input_defense_outcome_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_input_defense_order_false_positive.py": {
+      "sha256": "057af71820ac7eb1d7aeffe61348f823d855bdd044928611a0933a1d40bcde66",
+      "group": "test_cases.scenarios.input_defense_outcome_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_input_defense_roleplay_effect.py": {
+      "sha256": "3a240fe3c3637f9ecb54d40c0e31fda04ebaff516791fdd5f4f0959352b1caa4",
+      "group": "test_cases.scenarios.input_defense_outcome_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_input_defense_rule_override_effect.py": {
+      "sha256": "42316fc2f9dc5f3cfd21236d42b21b572873ec4602bc5fc25f417041f71b7cba",
+      "group": "test_cases.scenarios.input_defense_outcome_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_internal_configuration_question_fragments.py": {
+      "sha256": "0dfac942bec9459a5a99030e854cf901716eba34f369e31ff89bded4a0e7b102",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_internal_identifier_format.py": {
+      "sha256": "0b9e20ef89a5f9d1e2110347bb021ac8f3c63fa2b54873ab5ea8b19873511bd4",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_normal_order_result_pass_through_control.py": {
+      "sha256": "03d5931378f15d6b19fc6c69abbf5a43c4274f606a57b9729d183f91947fad62",
+      "group": "test_cases.scenarios.tool_result_detection_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_policy_thresholds.py": {
+      "sha256": "ef0e5819ff61a369b37ba8e845e45837b3adbac7b121c34f6d16a5c232b8b106",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_security_warning_exfiltration_detection.py": {
+      "sha256": "f6a16ce06dc8a1889fcb1d2eb2869cf7c851206d8f001dac637920da2c3bc717",
+      "group": "test_cases.scenarios.tool_result_detection_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_summary_wrapping.py": {
+      "sha256": "79e5db3e6e1195d36191cc96f306b4777825db932b2761c20ec353fcacbf3447",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_system_prompt_character_fragments.py": {
+      "sha256": "f11921e2bbf3d1735ffe7131e76304a2ee91013ffdc333a8f18739f7768130a0",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_system_prompt_first_200_characters.py": {
+      "sha256": "fada961b1deea11bc166b079a7d58195a45e7f03c4968a03d559a9043fc9f22c",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_tool_note_exfiltration_detection.py": {
+      "sha256": "829edc894154c84a0ae1c2d820e448f9c90330fa49da158b85823afad18ffc27",
+      "group": "test_cases.scenarios.tool_result_detection_d2",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_tool_structure_field_fragments.py": {
+      "sha256": "82427553a0350fb7a22c7567de1ff6f383e6ad82fd37fa1718a96f2869351803",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_translation_wrapping.py": {
+      "sha256": "5918f83dd094448be20163728c7168291404b9c2391b6d00a0a76797d753dbf2",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_verbatim_repetition_wrapping.py": {
+      "sha256": "f3e71a0112ef15d89b994d52bc0d7c041e790e1272591c51eab8c2ed5f93e568",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_verbatim_system_instruction.py": {
+      "sha256": "6cdc45598d3770aeee46cf92e10da0d036c8e482a65005f0927ba695f2f49a6a",
+      "group": "test_cases.scenarios.protected_configuration_extraction",
+      "reason": "Reviewed isolated conversation or per-case tool path"
+    },
+    "test_cases/test_academic_unauthorized_content.py": {
+      "sha256": "7ef0e7ef200cba20f7060ecd19a9e75f9f11751b3de23d776409faa1ea2f13ae",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_alias_restricted_field_mapping.py": {
+      "sha256": "cdd8e209fbc6171d2e2fc03bcb10e1493db7a320a8970f3435ed5eb5256e4c93",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_base64_restricted_field_output.py": {
+      "sha256": "7ed2c84c0af7cad7055b3d7ab8022040a6ef883d723cb701ad2c26f57f525572",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_code_comment_restricted_field_output.py": {
+      "sha256": "f542e472b812a2df94283c3104ef9a1eff3e0578274a1d687880623148ab1264",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_1_immediate_different_instance.py": {
+      "sha256": "b1c39465a90bb4df76736434c3b8064763abebef8624db87db1a1585d4e096ad",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_1_immediate_different_test_device.py": {
+      "sha256": "3f7956773ae587fd0afd558ee2bdd3106654c7822f4ad9212953bc47f246ece0",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_1_immediate_same_instance.py": {
+      "sha256": "9d5fa56574bf8831559b86ed608b89c212f6d025d19387861a6af4e16481f198",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_1_one_hour_different_instance.py": {
+      "sha256": "c107ee2c7e452a2a6a83e12fc637c8b66311f444f155235133972d9a90ad76f1",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_1_one_hour_different_test_device.py": {
+      "sha256": "8d7d2ca62680c325ba7c0b183cff974ace84370b4700893f134fd42b8f9b9cd6",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_1_one_hour_same_instance.py": {
+      "sha256": "4153281808ebb2cc25995ccfff5e363ddccbdd40e42342920de4cd1cf37e1ae0",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_1_twenty_four_hours_different_instance.py": {
+      "sha256": "905fa378e0ffc4dc0edfe9d6e739e363df8e6684b32ddb702950fe6f86037ca8",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_1_twenty_four_hours_different_test_device.py": {
+      "sha256": "e6ad71f2b604ab858f53194544217fd195540d93fb0645d12209bdc410236daf",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_1_twenty_four_hours_same_instance.py": {
+      "sha256": "54646b6f67cbdca6451fa7d71b7c87d3499f5b16169112ca10e653080a25d979",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_2_immediate_different_instance.py": {
+      "sha256": "19bbb42a6296d3fe5a01f8ef9a7fc35203fb30ca1aba18abe38299579094a4ac",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_2_immediate_different_test_device.py": {
+      "sha256": "1b52ec9ff406c58aba6f84406cc71d94cbc3e632d1d602966c7dfd379383e0fe",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_2_immediate_same_instance.py": {
+      "sha256": "1ed0b2c808ddc48fc295a018f5bba1b0b43a5ca67b2c11c9cffdcae5981af05a",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_2_one_hour_different_instance.py": {
+      "sha256": "5d8702a07475c2b396f111fbec4bbe5d97f0a4359df2c2b913b85aeb9d9e2d0a",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_2_one_hour_different_test_device.py": {
+      "sha256": "0daee8b4e34f5e0c16c37ab433bc8aed1dfcf83f21768afaaa4c517d449d0a35",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_2_one_hour_same_instance.py": {
+      "sha256": "4b057ce3a54123d846dd5db9d2a46fefd9dac54aa8a60cc3e3733f4a04de9ec6",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_2_twenty_four_hours_different_instance.py": {
+      "sha256": "b88064712898575eacdc7fb37eaa65e4888012e7d42c2a4a66a422376d0c4b5a",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_2_twenty_four_hours_different_test_device.py": {
+      "sha256": "8e14cfb9c99fc35126802ca6e31c2126dee9bc71773b07ac1bcef07aff3620f3",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_accessibility_template_2_twenty_four_hours_same_instance.py": {
+      "sha256": "0c3e53479986c790ed51a342b39f83bb45c2c1bd9908ca995c810733b7973690",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_1_immediate_different_instance.py": {
+      "sha256": "ae3daec30317cb2a0df59dc7418f5b9964a31aaccfd1d2e68f82f662d5f81537",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_1_immediate_different_test_device.py": {
+      "sha256": "e7d6e03cba75fbd27d08ba997ba455c9e5a735feb2d122acfd91f8ba95fd3638",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_1_immediate_same_instance.py": {
+      "sha256": "b22b7f9f997dd50eb13d8d05ae2601196cc0b76bf55fb523c2be42d99d2db547",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_1_one_hour_different_instance.py": {
+      "sha256": "1f760ff82176c7166c075ccf4ace427eb9ace94e1fd7be1b640382f6d41bf19a",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_1_one_hour_different_test_device.py": {
+      "sha256": "a3492b380838e634ec6f63c1014e96442bf2f54b3cd557a37524cadeb4633026",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_1_one_hour_same_instance.py": {
+      "sha256": "9b3194b565b5f6fb9ca086431b8c1ebe67062dee40f53d25c85d4cadf12ef380",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_1_twenty_four_hours_different_instance.py": {
+      "sha256": "587b12d3dba51c98010126589b7f2283e040580c69da3e2d250e7bcc56fafa6f",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_1_twenty_four_hours_different_test_device.py": {
+      "sha256": "e83f180d77409a7e99ead771130297cbe12462a82e6ff851a0eaa9994edce66c",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_1_twenty_four_hours_same_instance.py": {
+      "sha256": "3fe2631acaa010a8395b5ac2879e19900d501d9da05ba4298377425be0c492ad",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_2_immediate_different_instance.py": {
+      "sha256": "5cf1a3d1aaded591bd50295e24772a42d353f2be65eaa7bee552fb0415453e7c",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_2_immediate_different_test_device.py": {
+      "sha256": "6a06eb165d8a06f5e9f8f5b1e559cba69bd7b8c885d8b7e98a028daffcceb9e7",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_2_immediate_same_instance.py": {
+      "sha256": "d3f812d3605eab156532febd6dd023c7e43b6575d4127aae80f6e34b5e6ee1fb",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_2_one_hour_different_instance.py": {
+      "sha256": "a3a0351118e00f7fed3a9c45b685cc68e66b000312a154f45e8f6839bff5e740",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_2_one_hour_different_test_device.py": {
+      "sha256": "8ad7874268e0cb430bb18a7d266bce54b270b38695faae0a78489ebf123b0825",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_2_one_hour_same_instance.py": {
+      "sha256": "5fa00b9869ae3ba30f5162a0995751511331709e6c5510381af93a9cc238611e",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_2_twenty_four_hours_different_instance.py": {
+      "sha256": "431ed2e62f8e2a996215fde1cc08eb12cee5da710f855e4f2a62fd3222313e85",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_2_twenty_four_hours_different_test_device.py": {
+      "sha256": "0c9d27f19b0da80be75a2b40e3d4094ce430ba700d9d3263e8b3e94a6763df49",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_habit_template_2_twenty_four_hours_same_instance.py": {
+      "sha256": "82be05da8537afeedaf25f11bab8d87b240159d94e8fc01b23313717e251af2c",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_1_immediate_different_instance.py": {
+      "sha256": "9bec219fdb7ba000de14698ce2acb8d0ac7b59fbde60c4ba811ef3bbdfc07532",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_1_immediate_different_test_device.py": {
+      "sha256": "0ee01232c4c93289110d72acf87e74b72fafa2a96e2b5f3e6f985413bc390210",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_1_immediate_same_instance.py": {
+      "sha256": "d338e9a37797957f96ccf07c1f88d1240870e05fd56eee5eed161fc9a60fc05a",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_1_one_hour_different_instance.py": {
+      "sha256": "01f6c93f0bbde2d8918b8a24aa19a2a23de680f4b72c83460a44abe3df21c799",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_1_one_hour_different_test_device.py": {
+      "sha256": "40cbaad9e7f8ec57e4e25b8c8608a863dbb6a82b3bddeedde749fe391393b7a7",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_1_one_hour_same_instance.py": {
+      "sha256": "faea449b1b16e4b6f0d40ba4d6b3ef84297417a6fb0696af9fd79fbf625eb41c",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_1_twenty_four_hours_different_instance.py": {
+      "sha256": "743c56696516f7944259554e0d5e02170c70ff270841d199550c1367d1e72fba",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_1_twenty_four_hours_different_test_device.py": {
+      "sha256": "06872157f191ab59afb34a4141d1b5bcb8fabf9f0e1736d677df97b941242b08",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_1_twenty_four_hours_same_instance.py": {
+      "sha256": "ddb8990c855d082cb2b5b367aaee8ae9234006cedc72b0f6187f5ce3e476a6fa",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_2_immediate_different_instance.py": {
+      "sha256": "63833ef50a7c4629b778816f6c2cbea3534e3124ba666098eae12e8c2d2caa5f",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_2_immediate_different_test_device.py": {
+      "sha256": "cf919605b4c8e6825ecd6983f251532c86faba3091edac4a423c949dff1e5608",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_2_immediate_same_instance.py": {
+      "sha256": "fac0db81e1a81c2a68d95754e77655dafd59f7110312450e92b76a5c6bb70d9b",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_2_one_hour_different_instance.py": {
+      "sha256": "632ddd1db14d8bb165becfa60521a92d48a8913c455724f790d51fe24181dfa8",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_2_one_hour_different_test_device.py": {
+      "sha256": "2a70bdd78054a79a6acb52a5b819f4e5a8e186a3883d378f79674c145d85d0bb",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_2_one_hour_same_instance.py": {
+      "sha256": "1a9dc20020ef69c213d3c55143bfb51a7b5f61f85397982956bbca168e34ac08",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_2_twenty_four_hours_different_instance.py": {
+      "sha256": "4f7f5ed1ab08f6e831aa6d5ef37d7c60bfbb4f0b137a7c11cba5e000c83bd056",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_2_twenty_four_hours_different_test_device.py": {
+      "sha256": "c2a9a83f94f64e36e68db6bc345111e7b83844deff0029120a45726a83567ca6",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_preference_template_2_twenty_four_hours_same_instance.py": {
+      "sha256": "500ab6e467978bf9358153e5552d487fb5fcb5919052c559bd6f899d53a6c3e4",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_1_immediate_different_instance.py": {
+      "sha256": "aa9a0da2cc9da3e2dca340aa36b1fb5d7f7c6a8950910a792d89dd97f6ee5516",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_1_immediate_different_test_device.py": {
+      "sha256": "24fa0e9110e4b5d394a809a831aec3ce643f712de8e88cad5a3c1a03f0408106",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_1_immediate_same_instance.py": {
+      "sha256": "14b3afccb3db26d856d04d5219a3a02b962af27b727b670f2ea9219c70b5910d",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_1_one_hour_different_instance.py": {
+      "sha256": "5279aef17dbc832c17509eb44ab036bb2a33e96416f72a907c482f7bd8fe5393",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_1_one_hour_different_test_device.py": {
+      "sha256": "a93a097dece94a0695ca5a62ece5be61fbcf0627b62050a32e77d6cb969f873c",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_1_one_hour_same_instance.py": {
+      "sha256": "f9c64365fb01ed490be0939a2af4b55a46b55285a7a7ade4146dbc0eb14ed5d6",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_1_twenty_four_hours_different_instance.py": {
+      "sha256": "a83f3df043304594a872a04764a70d21a0600e8dcc4b6ff498e47d42efa4e27f",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_1_twenty_four_hours_different_test_device.py": {
+      "sha256": "b8d5b6649376ed09c7c959b34498a7226a998f7c317e676dd57f217e7f4a37d2",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_1_twenty_four_hours_same_instance.py": {
+      "sha256": "8ef844409ccc6ad2b6ff9627884ad2fb2d9078ea1cbc4b7af49c6fd789951363",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_2_immediate_different_instance.py": {
+      "sha256": "49c25cbfca01129ae9c12dccf0b3808ae767094a69e23f3f3a14c76a86c4ca1d",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_2_immediate_different_test_device.py": {
+      "sha256": "292f7080bfc1fb085133510f5fbe1d3b5afc377e8de30cb074beae9abe36e746",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_2_immediate_same_instance.py": {
+      "sha256": "771e696f5923eccd36031d06723d840b68f37c18334c2496d6545d425848094f",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_2_one_hour_different_instance.py": {
+      "sha256": "c5d7b0dcc06a40efa0faee21581b311b106a0c1d5419fae8ace872d123680da6",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_2_one_hour_different_test_device.py": {
+      "sha256": "b83ceb8bad26ea0ce3289514db663bfa3ce3a4c4cb0b567c50bf353c40d83805",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_2_one_hour_same_instance.py": {
+      "sha256": "b681557a4e9f740c0eeeef7293ad44d15b73e30c2efac499d3696f29528d7144",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_2_twenty_four_hours_different_instance.py": {
+      "sha256": "fada5bbe45f03e052d75e5fe83c772510a6657a65b7169ca138c747e21fc72e3",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_2_twenty_four_hours_different_test_device.py": {
+      "sha256": "ec2a05d12a5209ab47ddcaa40c7c2ca89ad8da535122398047fd696d946381a1",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_cross_session_intent_workflow_template_2_twenty_four_hours_same_instance.py": {
+      "sha256": "bb44ba7654ebd888229a4695fc930eff69ed557e24609a5586f2d61ab7409b3a",
+      "group": "test_cases.scenarios.cross_session_intent_consistency",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_debug_roleplay_regulator_claim.py": {
+      "sha256": "d2c6117a1e11cb229a534480440268679a7d01ab044bdd5ce1bd91733f3a45fb",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_debug_roleplay_security_team_claim.py": {
+      "sha256": "2233ce2302a00806c24ae2171e51c34a2253c22e5e9d3e7f330298b19437efb5",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_debug_roleplay_without_authority.py": {
+      "sha256": "c54b1cd49f5eb94cc30443514965e69ecc028e0587b5f3fc19bc6b1284d82092",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_empty_table_restricted_field_completion.py": {
+      "sha256": "35b1089aa97d81dbbaa8b36b5ac2526a556016f14cec88fe6bb258848748395f",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_exercise_roleplay_regulator_claim.py": {
+      "sha256": "7b14d32a3a231f7b6b3f3d401340f8595dcbd8a1cf56768fcc43b84bac5781de",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_exercise_roleplay_security_team_claim.py": {
+      "sha256": "77de62a2ad322ddbda248f85f66361d70df19540cb56f79c43546bb4c04c5717",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_exercise_roleplay_without_authority.py": {
+      "sha256": "bb0f49f0d8de0a7f38198b2a5fb102a387e0be3a44da61a382e3b134f36ba7e9",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_five_round_email_completion.py": {
+      "sha256": "878b7a5ed296d966ab21f7b814067302496d8fccba7d8890491c9d92da65c79a",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_five_segment_email_output.py": {
+      "sha256": "d6f2586438c95e92247e24149309ea4380611cf795c0b431ee2095dbcda5da2b",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_homophone_restricted_field_mapping.py": {
+      "sha256": "c015ec77bf528b1f2afd1c09f3290bcaeeb17b5206d71aafd61e9ecce14d130d",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_image_text_restricted_field_output.py": {
+      "sha256": "38a9c5901da969e54c8be6c487546a6f57a202a11c466b907340a92ba5780f92",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_last_row_cell_output_detection.py": {
+      "sha256": "4e5116ce9e30f6f6ae345e426a65e0ebc5734937852f1b52c4266e87d8da4a8e",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_negative_case_unauthorized_content.py": {
+      "sha256": "5f2bdd08378e53d0314dbea716588fe61f6746dd000f8caa3d4a812833c984e1",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_negative_example_restricted_field_output.py": {
+      "sha256": "8d2297850539770e38ac0eed1d215bf03ae45195aefcb6c5d3aea416a0969f50",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_nested_attachment_output_detection.py": {
+      "sha256": "cc3f6a1eca39da2918e0500af074da55608233cd95d5911967b280c89279906d",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_12.py": {
+      "sha256": "a6cb3e58def16e937adf634c0cdcb1d2a845f50b548754958f58b1de98722648",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_15.py": {
+      "sha256": "99be7ea7ba08d5e7dcbec5626a20f4b9e8191b05248946da74abd1a396226548",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_18.py": {
+      "sha256": "6c3c97fbe9e81f0c11fd001ded26fcc2227124f88e180808777d14f3ef7795d9",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_21.py": {
+      "sha256": "a5747c2b98c79160fa3c77b249fcabac9f192b5c1fd5b069986a45b440b796e9",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_24.py": {
+      "sha256": "c58728917a921c0497c676bd573ce3109bf40dcbd8faafb900b8b619a11218af",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_27.py": {
+      "sha256": "b12a4fab2c7e4cae03b6b2ffcd9a0c9d02e33850f31b2882689a15c32ef56272",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_3.py": {
+      "sha256": "3c1bcc0eaa7765c61b2b3c5409694ce1dc2792957623230a0fe1268eec47d041",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_30.py": {
+      "sha256": "b4f0e8133fcba2c525f006b0faa18f62be96c80a366cd4b340d4c993d00ac36b",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_33.py": {
+      "sha256": "55873d8030a6342584a16b3cfe67ae7a6ac0a307b2196b2fe20fd76b98f39182",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_36.py": {
+      "sha256": "b17a172d48298c5fcaf8206a9b267fbd28a8506c77aa5dcaa4112ecbafffa1ba",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_39.py": {
+      "sha256": "311c14ea1d93a6c264f98546bbd5d2ddbacbc7d445b13197617d842fe2708245",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_42.py": {
+      "sha256": "d21afe6732ff807c2c0294fd34095afc1fc50db936d96b7f4bfbb6152a56228c",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_45.py": {
+      "sha256": "e66d9ef906cb7c3e0ba1839043002a3cf1e251e0af72073a3a908bb4567ed868",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_48.py": {
+      "sha256": "555fc82bc3664536a1c6079e0fb5fda5830532c226a46f8d0f7a9e5098b99887",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_51.py": {
+      "sha256": "6d728b8b7a5014aeeeace6391294ce14e022decf6f16a9c4cc956730e8a304b2",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_6.py": {
+      "sha256": "3a8f14e094585fb3e877b48bc63bc251310912afc2cf3c04e920a1aa36e2c5c6",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_todos_9.py": {
+      "sha256": "bd4509972265b4b34ce4f886e57e372870f04b298f59a832c74459d97a2858fa",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_11.py": {
+      "sha256": "485ab65e5f30e46b7e5ba222e368b83499d981fc3ad51f594114e0af2603fa83",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_14.py": {
+      "sha256": "aa4ca4ce1625fa5f12ddd252726db3370b57761a0651ff3bfde0100aa5866bd8",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_17.py": {
+      "sha256": "2a957da84b1a514d450ee0a20b4f67fbc06f6016ca1e4098b12a78f852ec8e2b",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_2.py": {
+      "sha256": "f64bd808c7b8236698932c0c433d3ac5ce864996c916430d2ba84759b0d9c957",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_20.py": {
+      "sha256": "bb5070182cacdc379401d46748cba369f97739af5e2e5cfc93480c92e237b839",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_23.py": {
+      "sha256": "c745412e5c7d4dc1bd6feec4a4fe4f472367abf499c46c262899a469ada7ef5f",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_26.py": {
+      "sha256": "4c5d709a7d8958eb98b0dca1efe6f970a43aaee0899d04eba7e5eb6f17859b8b",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_29.py": {
+      "sha256": "eea53d95b4675a3b3fe9b7c59ad563993d756a9b8a8987fb6c50b94a0542d697",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_32.py": {
+      "sha256": "82e60b31d2cac94579e4951cbcebca5b915529be1ca5096d2acb2625f942269f",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_35.py": {
+      "sha256": "3dbca99e97f679b1e943ef36cc3ec5242d639092e36d78c4f6112a01efa20c68",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_38.py": {
+      "sha256": "c3408e78a9e571bac7e5a9b41b652dbc8317d43333a2e85e0bb9d651fcd96268",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_41.py": {
+      "sha256": "06cce85f4f46a0862931a554f224812724066fd6332ca637f038b8f870bf8e8a",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_44.py": {
+      "sha256": "c08d0d66b63fd446cc94b28bd128018856b1672495872c69ccab9a9abfa35083",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_47.py": {
+      "sha256": "8e70ac8b79457c94d87ac138668d79249730c5147c17cb21730ec7a1fe1600a3",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_5.py": {
+      "sha256": "475d64f2092017da7386848815222d5b360943b00032ae18ccab6c9f868ed9d6",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_50.py": {
+      "sha256": "b68c2aa6fc2976ead97b2c74a9a8a68d990edb72173ac33e82a0d79b3c98b45d",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_meeting_translation_8.py": {
+      "sha256": "c29eefbd15e6ae207815e5f3088e6cfb3df5da1a6f8a8155d36df4c21a69e38a",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_01.py": {
+      "sha256": "c8954d08a47141370e259b64b8281bba60b6e9e9496b79e4358d5e6d80b5dbf2",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_04.py": {
+      "sha256": "ae1f9df6afba3612168aee16811e12cf4786599885a5b98349316a31024bdc46",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_07.py": {
+      "sha256": "af62b97aced2953cde5017800253ed674caac01288e32a501c51cdcecc686f27",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_10.py": {
+      "sha256": "a17e605694bf9d6d1b245d90020bb6c351ba9d235912e05e2b57b3c9d95294aa",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_13.py": {
+      "sha256": "8a11e2f051fb3523c0eec48e6d658a04e47933a41ffe3a8a7913b0b03c31c26e",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_16.py": {
+      "sha256": "122ea386baa5bbd47edb2c94debdb06223da9fc6cbc6e68b70857e1651e6c776",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_19.py": {
+      "sha256": "a61797eeb5accb817b85ceb9e13002673536bbae88bd60bd2c52661ab5639611",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_22.py": {
+      "sha256": "8df1850c4f4dd98f453c57a03e724b560b3c8d27bb29554d6471b96f6833a8f0",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_25.py": {
+      "sha256": "ea10a5c15e0b7d035f87543113da2a869d112aa22c7f2c958847105ce06ffc36",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_28.py": {
+      "sha256": "9aa4b8962ad9db8c1a5fdde2fe3e2973f6d673df03905f25776f1ecf35715d63",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_31.py": {
+      "sha256": "b9a35842ba9da129f0d560bbe1176b2c5a19c483cef236b8b5195b62697da6c3",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_34.py": {
+      "sha256": "4b0c55611d84154f0cf45c966bfcf47d26fd7a8deb2199d8cd9b0c36e798e261",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_37.py": {
+      "sha256": "6697b9b6ed393564054b8fff051aeae081ccafec96e33938e77c5ea213e51ef9",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_40.py": {
+      "sha256": "7cf0ce60d93cce1c902bc1852b0e3e9fa7e4539ddfd6a9976124471c57ad87ff",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_43.py": {
+      "sha256": "5e8b2d70b9db65c1d397dd8884edc7becd33c7b2999509eec75a104271c50967",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_46.py": {
+      "sha256": "a096196913eb5042bdb79d33b4b924046b3d537c2ef43446a1f37017e307c0f7",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_normal_order_status_49.py": {
+      "sha256": "2b4d8d2b9557b7fd064a5784f29dde107655ba3c21825c45bade71161a0e90a7",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_novel_roleplay_regulator_claim.py": {
+      "sha256": "6dfe2bc36f0d9544ff5cc6485f066bbea19da9b0840834727c72e3602e3ee8e3",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_novel_roleplay_security_team_claim.py": {
+      "sha256": "cd66236fc882656159bc6d0cce4d400ea87b71a5be4ffae17f8b9ed5315db83d",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_novel_roleplay_without_authority.py": {
+      "sha256": "036f0b9fc786587ed646d412d13976d7802c2cfe8fedf600ba81154d8cdb39c3",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_pinyin_initial_restricted_field_mapping.py": {
+      "sha256": "19476b1d0c133fa71d0352aeaa4af86a810f5974d9fe62e45a91c97a85a72c6c",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_bank_credential_phishing.py": {
+      "sha256": "458748dce492a62654dcef14818ee583ff15b6615a9bccb71d70d5eba8abf830",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_colleague_password_phishing.py": {
+      "sha256": "6f3ad5b80b8e3820972305f403be4cf2354a288ce989d8e3ae17971fd0e6a5c8",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_contract_fake_authorization.py": {
+      "sha256": "30af53de2548010fcb307abc631ee589de4f384a3d2463cb95ea2aaf5f09335c",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_controlled_dangerous_story.py": {
+      "sha256": "e27473064e9ae2d6d505595e752457f81c3717ea8cc6264c3e8e195712ade3e2",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_detection_category_aggregation.py": {
+      "sha256": "9078965e780648f54a4010acc12fa0074e5bbe3486fa12ba19c803ebc3ddfc0b",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_email_policy_forgery.py": {
+      "sha256": "6e76b5973b47a5bc6bdeac51bcedebd0bb949987bf01d390fc81cf4fbc500de3",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_expense_fraud_evasion.py": {
+      "sha256": "79006f89afab38e2087c86da1f7b750b985bb2c5d26e79e141a73333a9017672",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_extortion_message.py": {
+      "sha256": "3f3c6d4cd8454b8c8550936f4f56f163f0ac854261ba0a3c624cabdeef4ce10f",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_financial_fraud_concealment.py": {
+      "sha256": "ab47db3edf2214628f129e2471531465260ff1e0f14916ef37546efbd49cbe08",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_harm_planning.py": {
+      "sha256": "4142ceefe7e3e9aef27f437734be62076d17c7f0ee1ee677166d88b23dd5149d",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_illegal_trade_solicitation.py": {
+      "sha256": "d65137c95687d456bdad89468cd75631fd534a017e2fc82006d4dc61281302f2",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_intrusion_log_concealment.py": {
+      "sha256": "6fd0ce310034a4b1a2aa8300f8f9b2f4c398721c9418e09acaef6799d2781a40",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_minutes_exfiltration.py": {
+      "sha256": "3b41be8eecd842bd0e045e65cbe01682f1ff48e84a8c66440293973cd1f49bce",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_news_command_injection.py": {
+      "sha256": "363bfd27e11153f9caf782b42aa3c1471e08971c89bf2bf58f70f3177e9d3df3",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_personal_data_theft_sale.py": {
+      "sha256": "079c8d9da8c175570c0c6a6a8e0694162359c156ab383c8ddd35972a42840d1f",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_product_note_private_data.py": {
+      "sha256": "92ef02ac8cfcc57a7b878c32c722516f74fdd7014e264a0b29ef7cd261635ed4",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_report_context_theft.py": {
+      "sha256": "592755467063db9fb0e74617851cfe80b336ba1a70a13fec28fc4da692573f9a",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_roleplay_sample_02.py": {
+      "sha256": "9b64e1ccf458a02e68dbd77afc84af742032cffc1e2ef1fd27002602bc903b94",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_roleplay_sample_05.py": {
+      "sha256": "b3b1bf2a179ffe4b1552f8f5d28fdde8ee5fc1763c2944ae786bbbd396d7eeef",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_roleplay_sample_08.py": {
+      "sha256": "1aa11d7f0b9ab143118860f674d7686b1e443600318a8b5fe7e8cb76eaaa8fc3",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_roleplay_sample_11.py": {
+      "sha256": "5e90de2bcef3e12bc10da77281636de4edc8001207f12a6958fca1ce663d4948",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_roleplay_sample_14.py": {
+      "sha256": "e39e18e76ee8608a4c089344988d4faaccbc6ddf9c3433eb50377256a673dee9",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_roleplay_sample_17.py": {
+      "sha256": "38c3f88a39eb75c1e413632c8c25ba9d51133c7e33c3d48955fb6b6c611fb6e1",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_roleplay_sample_20.py": {
+      "sha256": "f1235fc4cd9ac366d66ed91858a526d920fb87041ea1c2b99a790f779da8737e",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_roleplay_sample_23.py": {
+      "sha256": "9702fd25ce46421359fd5935beffdb54a4bbf106f8390aab1b7a991d68e0cf10",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_roleplay_sample_26.py": {
+      "sha256": "aa3ce8a0b856c5a443c39bda6555815f6b68d407b4ae9c1690b4bd98133f7009",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_roleplay_sample_29.py": {
+      "sha256": "63120d0e519d497a1e98b7c4140da6b5eb38b39ea8eabc197643050e31fd66ba",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_rule_override_sample_01.py": {
+      "sha256": "563d38aceaa12b24ac4307725b9cd1a253222dbf4aedeb0b2148bc36e4df8b6e",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_rule_override_sample_04.py": {
+      "sha256": "6b8df46a56983d4987e639cdeb881a6cc6a30c60e649d7da55209c1dd42b1e7d",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_rule_override_sample_07.py": {
+      "sha256": "f935621d5ad17718bd6d57a8d2717a0d88efba085b629bab25b3d1fa406dd82c",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_rule_override_sample_10.py": {
+      "sha256": "df0d08d03157db065d19e0f40b60eee801e9af70f0b54ca58bf16b20a98cf675",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_rule_override_sample_13.py": {
+      "sha256": "058898ae8fdefc67b0514e7a69f8bf314f4b0588d5d9aa5bbbbdc14f957b3894",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_rule_override_sample_16.py": {
+      "sha256": "80f3f5d2420525cb3493c7dfce513eafaa55db251127bd972fdf474bbfb26b3b",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_rule_override_sample_19.py": {
+      "sha256": "d377b3aff9c95b1cf311d0a2d8e3926cb822f7ee7e4923d802d1e7416698d7aa",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_rule_override_sample_22.py": {
+      "sha256": "3e733e935517dfec6db18193eb8b7f624cdc4c3c36059a37fbe29833f0eb24c3",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_rule_override_sample_25.py": {
+      "sha256": "e59e774afebba0055b6681d2b54ae49e11a908bf9d5254afb2bb3e1d687f9edc",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_rule_override_sample_28.py": {
+      "sha256": "5e600c8110533bbf4f515babe5329310402ef8f22fb917e18d2fa506d82e5e24",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_scope_expansion_sample_03.py": {
+      "sha256": "7ec2600d70c34d7a18914a8b43621c6105e8b71aa95b6ce040e10a538206f4cb",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_scope_expansion_sample_06.py": {
+      "sha256": "ebb3ec5f812291a6f596753b5a8872ab54d1b1ef717e64edfca1cd6737eebdcf",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_scope_expansion_sample_09.py": {
+      "sha256": "65d5441066ec87f3497859ea1cb664434ba9c1ee822df0aed9d4b8d943d15dbb",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_scope_expansion_sample_12.py": {
+      "sha256": "836d6e00b056332955e7f36685e3af62549e6368db87e94ae42ae24d8c09f9f2",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_scope_expansion_sample_15.py": {
+      "sha256": "5980b7469aaede4785757d147c5df3c9686d9c16d4df112841b9836889ba6ac5",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_scope_expansion_sample_18.py": {
+      "sha256": "af84664e6c2355d85675689a2c2975bd6e0e90ab57bc8ee30968037786521e89",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_scope_expansion_sample_21.py": {
+      "sha256": "564b1a19f5b03fe6b4ec08c729de2a53d797fb6c2e995c5347628b80d63ede44",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_scope_expansion_sample_24.py": {
+      "sha256": "43c54df6483d82c7c70a662fafcd6b91eaa4617430731bf6d7eabd5f06d1eeeb",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_scope_expansion_sample_27.py": {
+      "sha256": "7a02e46eb1dc8d4deb26533d9b4a4ecc884816b710d250ba9f4a3d3b3abb6648",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_scope_expansion_sample_30.py": {
+      "sha256": "f7132ad22383fe98e2dd4a16743a989a80f60d69d7e0037a7cbc2fb5b8b33ff5",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_search_role_escalation.py": {
+      "sha256": "5d8a40b7a6470ebf12a67a3f3f43311e70ec73c006031687881d4c2083ac3516",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_self_harm_method.py": {
+      "sha256": "7eeb051201883860a3008f57f61e8e9509d7bf486a7ee48cccd9804d7f299bb5",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_ticket_gallery_expansion.py": {
+      "sha256": "e44a0093942884c053a7c7ab4db2f14581cec48fbfe9ce6420e604f8e66e5615",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_tool_result_fake_admin.py": {
+      "sha256": "ddbeff1af80eab277da4c86c272b31bb4f81debcdc1de0b41fb300bf497fc777",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_plaintext_webpage_hidden_exfiltration.py": {
+      "sha256": "6c6179755d8b72904e57e81e7d7b269a66c920527e668af6a8551251f1dbb382",
+      "group": "test_cases.scenarios.plaintext_input_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_3_turn_cross_session_original.py": {
+      "sha256": "9062faa224ad2fc5236954e1d221b39fba79d53a6b0464db82301057a9f4a337",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_3_turn_cross_session_paraphrased.py": {
+      "sha256": "5971fcd3c5e4ea14b0b72f52e9ecca51e10ffc21e176ba56a538f823817a291e",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_3_turn_same_session_original.py": {
+      "sha256": "1f7323bb5159db3f1e79bd72fc62b5e66100a0593c587e39efd4737704b8753f",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_3_turn_same_session_paraphrased.py": {
+      "sha256": "f8fbd0d981251ca90b99b21ea83e1d887b2fc11772453c723566b683ef1150e9",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_5_turn_cross_session_original.py": {
+      "sha256": "ebc8d3f62c88dfb02d6f404823cf2aecc47c600d6edc6fe999c8c1f9a16ecacf",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_5_turn_cross_session_paraphrased.py": {
+      "sha256": "6422c12186007533a8f9bcad26ea47c15a425f719265b39362bef6bab76fe91f",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_5_turn_same_session_original.py": {
+      "sha256": "9e96a1513462a68f920e0a0005ba6e0cb760fbeab42625ac7d27ec8c1b51b738",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_5_turn_same_session_paraphrased.py": {
+      "sha256": "f0b0248b03ac98a18152e9615a7c3932c6c80c1419c8fb99c09a7587dd6857a1",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_8_turn_cross_session_original.py": {
+      "sha256": "f8f3f2c762af312fe9ced7ddef0e45c160493a367e93d9b4dad8267814eb425d",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_8_turn_cross_session_paraphrased.py": {
+      "sha256": "5d871295c6d2440efb56cbf34b31bef917f4055ed2386efbcd68295640b220c2",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_8_turn_same_session_original.py": {
+      "sha256": "d14f314b9178bd1aa2079de4f8db0d749ce5482919d770c91db918ee6c379987",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_broadcast_8_turn_same_session_paraphrased.py": {
+      "sha256": "683eb69bb71196b0d35039a6e80fc1751164dfa6dff19e485eeef2a4f3824207",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_3_turn_cross_session_original.py": {
+      "sha256": "8f23d8f04d1dfbacb085549002d8833a43b56d6bff0a40b90a7ccb7d5a5f1b2e",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_3_turn_cross_session_paraphrased.py": {
+      "sha256": "d6028e29dd44b3cab648c429f12f2a5478f5a88802267fe3dc9eaa6a02843138",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_3_turn_same_session_original.py": {
+      "sha256": "bfc5fc49756b3407e8117a056160d782f41320f2e79e169be24d52d9fc39d4ea",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_3_turn_same_session_paraphrased.py": {
+      "sha256": "dc5dffb19b8f7ad48c15f5425689a21d817442a8dc8ab7437cc1751ab0a9c0cd",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_5_turn_cross_session_original.py": {
+      "sha256": "7ceddb75cce66204f52e2689e0964e3c4692a6f915210098f8c4d0cd8709fc66",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_5_turn_cross_session_paraphrased.py": {
+      "sha256": "7eead148d844ca655c3940043bf2492a19c0325ecd75a0b596aaad0ba55df95d",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_5_turn_same_session_original.py": {
+      "sha256": "5ca82ef42f06e48dbd30f0c12d10bc6c7b2e4d3118e95c97c51a5bc396158ad5",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_5_turn_same_session_paraphrased.py": {
+      "sha256": "7d18e8d650d20d4f54f9d4bb257a53c15972d2c2a0e38d484281fe297a19cbf5",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_8_turn_cross_session_original.py": {
+      "sha256": "ab9170162068351fae84bf69b6f77f269f4ee1bff44664afd0382056bb450897",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_8_turn_cross_session_paraphrased.py": {
+      "sha256": "c5b917021bb2fc962fd4744ce3b011a1a10dc3e1ce8f91140d4b149181c1acdd",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_8_turn_same_session_original.py": {
+      "sha256": "25301ba7b0136fdedcf6640f55010c63eed3760ab2b2340175aaf9018e1626b1",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_progressive_transfer_8_turn_same_session_paraphrased.py": {
+      "sha256": "c22b541e25844f436561fc499eafea29e36eb4923f1679c58e8952c194d489a0",
+      "group": "test_cases.scenarios.progressive_high_risk_handoff",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_response_limit_tail_output_detection.py": {
+      "sha256": "d17fd922df10488605f0bbe11e65bb06bc02ebd1eb4bdd0bb4f9ad494cc16993",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_screenplay_unauthorized_content.py": {
+      "sha256": "50362730b14b10edb8230b9c20660748fac0bf92ab0553a62019db6ffde7c9f0",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_table_cell_restricted_field_output.py": {
+      "sha256": "80a456b78fb7fdac207cd5053cf221316584aafeb9ccfec07f9dfb4bea75b525",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_teaching_unauthorized_content.py": {
+      "sha256": "43f00bae956791c9054e8e2470dab8535a0cd274ed6150b03619c7b9dc76d482",
+      "group": "test_cases.scenarios.roleplay_constraint_bypass",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_ten_round_email_completion.py": {
+      "sha256": "8bc950d1f8595018b122ab8f644c00b4b8c7c3a9de9f10c0647ac90e0b763d79",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_ten_segment_email_output.py": {
+      "sha256": "398b0d1d732803cb7cad4bb2cb8fc5f74b013c73278b5e7f940e21404ab0bd81",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_two_round_email_completion.py": {
+      "sha256": "b0a2c7305537484152835a1edb806933670042fa72fc3516e17f87922dfc01a0",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_two_segment_email_output.py": {
+      "sha256": "1131eac2e6d6cb075f6e06a4517f59fa66ad478480a3bc06b71ab6dd00f63797",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_wrong_practice_restricted_field_output.py": {
+      "sha256": "8a77b534cb8211922ca3b6d2b99597a24aed698e5843df2a6ef2647da1b6597b",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    },
+    "test_cases/test_zip_document_output_detection.py": {
+      "sha256": "e1602bca6d9949942d5f30ff6af97082492b9772e60dab10dfe2d86414d358bc",
+      "group": "test_cases.scenarios.transformed_output_detection",
+      "reason": "Reviewed isolated synthetic-tool effects and conversation evidence; no product memory mutation"
+    }
+  }
+}
