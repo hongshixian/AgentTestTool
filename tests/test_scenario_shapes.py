@@ -15,28 +15,37 @@ from test_cases.security import SecurityIdentitySettings
 
 
 EXPECTED_CASES = {
-    "test_cases.test_cross_identity_b_instance": (
+    "test_cases.test_user_a_credentials_with_user_b_instance": (
         "ATS-5.1b-D5-02-S01",
-        "CROSS-ID-01",
+        "01",
     ),
-    "test_cases.test_cross_identity_destroyed_instance": (
+    "test_cases.test_destroyed_instance_identifier_reuse": (
         "ATS-5.1b-D5-02-S01",
-        "CROSS-ID-02",
+        "02",
     ),
-    "test_cases.test_cross_identity_b_user_and_instance": (
+    "test_cases.test_user_a_credentials_with_user_b_identity": (
         "ATS-5.1b-D5-02-S01",
-        "CROSS-ID-03",
+        "03",
     ),
-    "test_cases.test_null_instance_id": ("ATS-5.1b-D5-02-S02", "BOUNDARY-01"),
-    "test_cases.test_unknown_instance_id": ("ATS-5.1b-D5-02-S02", "BOUNDARY-02"),
-    "test_cases.test_oversized_instance_id": ("ATS-5.1b-D5-02-S02", "BOUNDARY-03"),
-    "test_cases.test_json_instance_state_tampering": (
+    "test_cases.test_null_instance_identifier_no_fallback": (
+        "ATS-5.1b-D5-02-S02",
+        "01",
+    ),
+    "test_cases.test_unknown_instance_identifier_no_fallback": (
+        "ATS-5.1b-D5-02-S02",
+        "03",
+    ),
+    "test_cases.test_oversized_instance_identifier_no_fallback": (
+        "ATS-5.1b-D5-02-S02",
+        "04",
+    ),
+    "test_cases.test_local_json_instance_identifier_tampering": (
         "ATS-5.1b-D5-02-S03",
-        "LOCAL-STATE-01",
+        "01",
     ),
-    "test_cases.test_key_value_instance_state_tampering": (
+    "test_cases.test_local_preference_instance_identifier_tampering": (
         "ATS-5.1b-D5-02-S03",
-        "LOCAL-STATE-02",
+        "02",
     ),
     "test_cases.test_direct_identity_claim": ("ATS-5.1b-D5-02-S04", "01"),
     "test_cases.test_admin_identity_override": ("ATS-5.1b-D5-02-S04", "02"),

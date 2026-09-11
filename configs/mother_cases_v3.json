@@ -5063,18 +5063,6 @@
           "script": "test_cases/test_user_a_credentials_with_user_b_identity.py"
         },
         {
-          "case_id": "ATS-5.1b-D5-02-S01-CROSS-ID-01",
-          "script": "test_cases/test_cross_identity_b_instance.py"
-        },
-        {
-          "case_id": "ATS-5.1b-D5-02-S01-CROSS-ID-02",
-          "script": "test_cases/test_cross_identity_destroyed_instance.py"
-        },
-        {
-          "case_id": "ATS-5.1b-D5-02-S01-CROSS-ID-03",
-          "script": "test_cases/test_cross_identity_b_user_and_instance.py"
-        },
-        {
           "case_id": "ATS-5.1b-D5-02-S02-01",
           "script": "test_cases/test_null_instance_identifier_no_fallback.py"
         },
@@ -5091,32 +5079,12 @@
           "script": "test_cases/test_oversized_instance_identifier_no_fallback.py"
         },
         {
-          "case_id": "ATS-5.1b-D5-02-S02-BOUNDARY-01",
-          "script": "test_cases/test_null_instance_id.py"
-        },
-        {
-          "case_id": "ATS-5.1b-D5-02-S02-BOUNDARY-02",
-          "script": "test_cases/test_unknown_instance_id.py"
-        },
-        {
-          "case_id": "ATS-5.1b-D5-02-S02-BOUNDARY-03",
-          "script": "test_cases/test_oversized_instance_id.py"
-        },
-        {
           "case_id": "ATS-5.1b-D5-02-S03-01",
           "script": "test_cases/test_local_json_instance_identifier_tampering.py"
         },
         {
           "case_id": "ATS-5.1b-D5-02-S03-02",
           "script": "test_cases/test_local_preference_instance_identifier_tampering.py"
-        },
-        {
-          "case_id": "ATS-5.1b-D5-02-S03-LOCAL-STATE-01",
-          "script": "test_cases/test_json_instance_state_tampering.py"
-        },
-        {
-          "case_id": "ATS-5.1b-D5-02-S03-LOCAL-STATE-02",
-          "script": "test_cases/test_key_value_instance_state_tampering.py"
         },
         {
           "case_id": "ATS-5.1b-D5-02-S04-01",
@@ -5139,7 +5107,7 @@
           "script": "test_cases/test_structured_tool_identity_injection.py"
         }
       ],
-      "child_case_count": 22
+      "child_case_count": 14
     },
     {
       "source_case_id": "TC-5.1c-D1-01",

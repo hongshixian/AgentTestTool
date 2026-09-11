@@ -89,14 +89,14 @@ test_cases/
 ├── test_agent_identity.py
 ├── test_multi_turn.py
 ├── test_file_creation.py
-├── test_cross_identity_b_instance.py
-├── test_cross_identity_destroyed_instance.py
-├── test_cross_identity_b_user_and_instance.py
-├── test_null_instance_id.py
-├── test_unknown_instance_id.py
-├── test_oversized_instance_id.py
-├── test_json_instance_state_tampering.py
-├── test_key_value_instance_state_tampering.py
+├── test_user_a_credentials_with_user_b_instance.py
+├── test_destroyed_instance_identifier_reuse.py
+├── test_user_a_credentials_with_user_b_identity.py
+├── test_null_instance_identifier_no_fallback.py
+├── test_unknown_instance_identifier_no_fallback.py
+├── test_oversized_instance_identifier_no_fallback.py
+├── test_local_json_instance_identifier_tampering.py
+├── test_local_preference_instance_identifier_tampering.py
 ├── test_direct_identity_claim.py
 ├── test_admin_identity_override.py
 ├── test_forged_system_identity.py
@@ -174,12 +174,12 @@ README.md
 - 一个测试用例使用一个独立的代码文件。
 - 最终场景级 JSON 中每个 `test_samples[].test_prompts[]` 都是可独立执行的 test case；不得把同一 Test Sample 的多个 Test Prompt 聚合在同一个测试文件中。
 - Test Sample ID 直接采用 JSON 中对应 `test_samples[].sample_id` 的值，例如 `ATS-5.1b-D5-02-S01`。
-- Test case ID 使用 `<Test Sample ID>-<Prompt ID>` 组合并保持全局唯一，例如 `ATS-5.1b-D5-02-S01-CROSS-ID-01`。
+- Test case ID 使用 `<Test Sample ID>-<Prompt ID>` 组合并保持全局唯一，例如 `ATS-5.1b-D5-02-S01-01`；Prompt ID 使用数字编号，避免再引入语义化旧 ID。
 - `ATS` 表示可执行的自动化测试样本；`5.1b` 表示来源条款，`D5` 表示评测维度，`02` 表示该条款和维度下的源用例序号，`S01` 表示从源用例泛化出的测试样本序号。
 - Test case 文件必须声明 `TEST_CASE_ID`、`TEST_SAMPLE_ID` 和 `TEST_PROMPT_ID`，并与 JSON 来源及测试类文档字符串保持一致。
 - 原始用例 ID `TC-<条款编号>-D<维度编号>-<源用例序号>` 和场景 ID `SCN-<条款编号>-D<维度编号>-<源用例序号>-<场景序号>` 只用于来源追溯，不作为 pytest 测试类的主用例 ID。
 - 文件名使用 `test_<用例英文简称>.py` 格式，全小写并采用 snake_case，例如 `test_agent_identity.py`；文件名中不包含测试用例 ID。
-- 测试类名使用 `Test<规范化TestCaseID><用例英文简称>` 格式并采用 PascalCase。规范化时移除 ID 中的连字符和句点，并将字母统一为大写；例如 `ATS-5.1b-D5-02-S01-CROSS-ID-01` 可对应 `TestATS51BD502S01CrossID01BInstanceReplay`。
+- 测试类名使用 `Test<规范化TestCaseID><用例英文简称>` 格式并采用 PascalCase。规范化时移除 ID 中的连字符和句点，并将字母统一为大写；例如 `ATS-5.1b-D5-02-S01-01` 可对应 `TestATS51BD502S0101UserACredentialsWithUserBInstance`。
 - 测试方法名必须以 `test_` 开头并采用 snake_case，例如 `test_agent_returns_identity_response`。
 - 测试类名中的规范化 ID 和类文档字符串中的完整 ID 必须对应同一个测试用例。
 
@@ -200,13 +200,13 @@ README.md
 ```python
 """Verify that account A credentials cannot replay account B's instance identifier."""
 
-TEST_CASE_ID = "ATS-5.1b-D5-02-S01-CROSS-ID-01"
+TEST_CASE_ID = "ATS-5.1b-D5-02-S01-01"
 TEST_SAMPLE_ID = "ATS-5.1b-D5-02-S01"
-TEST_PROMPT_ID = "CROSS-ID-01"
+TEST_PROMPT_ID = "01"
 
 
-class TestATS51BD502S01CrossID01BInstanceReplay(AgentTestCase):
-    """测试用例 ID：ATS-5.1b-D5-02-S01-CROSS-ID-01
+class TestATS51BD502S0101UserACredentialsWithUserBInstance(AgentTestCase):
+    """测试用例 ID：ATS-5.1b-D5-02-S01-01
 
     测试用例名称：A 凭据搭配 B 有效实例标识
 

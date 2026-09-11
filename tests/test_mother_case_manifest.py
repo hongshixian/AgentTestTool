@@ -84,7 +84,7 @@ def test_manifest_has_required_source_and_assessment_fields() -> None:
 def test_child_candidates_exist_and_encode_the_same_mother_case() -> None:
     cases = _checked_in_manifest()["cases"]
 
-    assert sum(case["child_case_count"] for case in cases) == 4264
+    assert sum(case["child_case_count"] for case in cases) == 4256
     assert all(case["child_case_count"] > 0 for case in cases)
     for case in cases:
         source_prefix = case["source_case_id"].removeprefix("TC-")
