@@ -102,7 +102,7 @@ class PDFReportGenerator:
         return output_path
 
     def build_story(self, report: ReportData) -> list[Flowable]:
-        """Build the smoke-gated four-chapter Platypus story."""
+        """Build the smoke-gated three-chapter Platypus story."""
         story: list[Flowable] = []
         story.extend(self._cover(report))
         story.append(PageBreak())
@@ -110,8 +110,6 @@ class PDFReportGenerator:
         if report.smoke_passed:
             story.append(PageBreak())
             story.extend(self._overall_section(report))
-            story.append(PageBreak())
-            story.extend(self._clause_results_section(report))
             story.append(PageBreak())
             story.extend(self._clause_details_section(report))
         return story
@@ -194,40 +192,9 @@ class PDFReportGenerator:
         ])
         return contents
 
-    def _clause_results_section(self, report: ReportData) -> list[Flowable]:
-        contents: list[Flowable] = [
-            Paragraph("三、条款级测试结果", self.styles["section"]),
-        ]
-        for index, group in enumerate(self._clause_groups(report), start=1):
-            statistics = calculate_statistics(group.results)
-            clause_contents: list[Flowable] = [
-                Paragraph(
-                    _mixed_safe(
-                        f"3.{index} {group.section_title}",
-                        self.fonts.latin_bold,
-                    ),
-                    self.styles["subsection"],
-                ),
-                self._clause_information_table(group),
-                Spacer(1, 3 * mm),
-                self._pie_chart(
-                    statistics,
-                    empty_message="该条款没有测试结果",
-                ),
-                Spacer(1, 3 * mm),
-                self._statistics_table(statistics),
-            ]
-            contents.extend(
-                [
-                    KeepTogether(clause_contents),
-                    Spacer(1, 7 * mm),
-                ]
-            )
-        return contents
-
     def _clause_details_section(self, report: ReportData) -> list[Flowable]:
         contents: list[Flowable] = [
-            Paragraph("四、各部分用例明细", self.styles["section"]),
+            Paragraph("三、各部分用例明细", self.styles["section"]),
         ]
         include_representative_path = bool(report.mother_results)
         for index, group in enumerate(self._clause_groups(report), start=1):
@@ -235,7 +202,7 @@ class PDFReportGenerator:
                 [
                     Paragraph(
                         _mixed_safe(
-                            f"4.{index} {group.section_title}",
+                            f"3.{index} {group.section_title}",
                             self.fonts.latin_bold,
                         ),
                         self.styles["subsection"],
@@ -253,33 +220,6 @@ class PDFReportGenerator:
 
     def _clause_groups(self, report: ReportData) -> tuple[ClauseResultGroup, ...]:
         return group_results_by_clause(report.business_results, self.clauses)
-
-    def _clause_information_table(self, group: ClauseResultGroup) -> Table:
-        clause = group.clause
-        values = (
-            (
-                clause.security_domain,
-                clause.standard_clause,
-                clause.title,
-                clause.original_text,
-            )
-            if clause is not None
-            else ("未匹配条款", "—", "无法从用例 ID 识别来源条款", "—")
-        )
-        rows: list[list[object]] = [
-            [
-                self._header_cell(value, compact=True)
-                for value in ("安全域", "国标章条", "条款标题", "条款原文")
-            ],
-            [self._cell(value, compact=True) for value in values],
-        ]
-        table = Table(
-            rows,
-            colWidths=[25 * mm, 25 * mm, 50 * mm, 82 * mm],
-            repeatRows=1,
-        )
-        table.setStyle(self._table_style(font_size=7))
-        return table
 
     def _pie_chart(
         self,

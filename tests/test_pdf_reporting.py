@@ -151,9 +151,10 @@ class TestPDFReporting:
         assert "二、整体测试结果" not in text
         assert "三、条款级测试结果" not in text
         assert "四、各部分用例明细" not in text
+        assert "三、各部分用例明细" not in text
         assert "业务测试未执行" in text
 
-    def test_passing_smoke_uses_the_new_four_chapter_structure(
+    def test_passing_smoke_uses_the_three_chapter_structure(
         self,
         tmp_path: Path,
     ) -> None:
@@ -187,12 +188,13 @@ class TestPDFReporting:
         text = _paragraph_text(story)
 
         assert "二、整体测试结果" in text
-        assert "三、条款级测试结果" in text
+        assert "三、条款级测试结果" not in text
+        assert "四、各部分用例明细" not in text
+        assert "三、各部分用例明细" in text
         assert "3.1 基础安全-5.1 a)" in text
         assert "3.2 交互安全-6.1 b)" in text
-        assert "四、各部分用例明细" in text
-        assert "4.1 基础安全-5.1 a)" in text
-        assert "4.2 交互安全-6.1 b)" in text
+        assert "4.1 基础安全-5.1 a)" not in text
+        assert "4.2 交互安全-6.1 b)" not in text
         assert "2.1 四态结果分布" not in text
         assert "2.2 用例明细" not in text
         long_tables = [
@@ -203,21 +205,6 @@ class TestPDFReporting:
         assert len(long_tables[1]._cellvalues) == 3
         assert len(long_tables[2]._cellvalues) == 3
         assert "代表路径" not in _table_text(long_tables[-1])[0]
-
-        tables = [item for item in _walk_flowables(story) if type(item) is Table]
-        clause_tables = [
-            item
-            for item in tables
-            if _table_text(item)[0]
-            == ["安全域", "国标章条", "条款标题", "条款原文"]
-        ]
-        assert len(clause_tables) == 2
-        assert _table_text(clause_tables[0])[1] == [
-            "基础安全",
-            "5.1 a)",
-            "实例唯一身份标识与安全责任主体关联",
-            "智能体应用实例应具备唯一身份标识。",
-        ]
         output = generator.generate(
             _report(smoke_status=AssessmentStatus.PASS, business_results=business),
             tmp_path / "complete-report.pdf",
@@ -252,6 +239,7 @@ class TestPDFReporting:
         text = _paragraph_text(story)
 
         assert "二、整体测试结果" in text
+        assert "三、各部分用例明细" in text
         assert "母用例代表路径" not in text
         assert "子用例展开路径" not in text
         detail_tables = [
@@ -274,13 +262,10 @@ class TestPDFReporting:
             for item in _walk_flowables(story)
             if type(item) is Table and _table_text(item)[0][0] == "测评结果"
         ]
-        assert len(statistic_tables) == 2
+        assert len(statistic_tables) == 1
         overall_statistics = _table_text(statistic_tables[0])
-        clause_statistics = _table_text(statistic_tables[1])
         assert overall_statistics[1][1] == "1"
         assert overall_statistics[2][1] == "1"
-        assert clause_statistics[1][1] == "1"
-        assert clause_statistics[2][1] == "1"
         output = PDFReportGenerator(clauses=(TEST_CLAUSES[1],)).generate(
             _report(
                 smoke_status=AssessmentStatus.PASS,
