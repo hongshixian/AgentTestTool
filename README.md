@@ -39,6 +39,9 @@ uv run pytest --smoke --agent=codebuddy
 `--suite mother` 仍可显式传入，但已经是唯一支持且默认的业务套件。历史拆分用例保存在
 `backup/split-cases-20260914` 分支，不参与当前分支的收集和正式测评。五条冒烟门禁不受
 业务套件过滤。
+其中 63 条母用例的完整判定依赖运营方材料、访谈或服务端证据。这些用例不启动本地 CLI，
+直接返回“不适用”，并在原因中列出需要运营方提供的证据；完整口径和清单见
+[`docs/operator_evidence_mother_cases.md`](docs/operator_evidence_mother_cases.md)。
 正式入口先执行 CLI 安装、基础交互、多轮交互、文件创建和文件编辑五条冒烟测试。
 五条用例必须全部返回“通过”才会继续执行业务测试；否则立即停止业务测试并生成只含
 冒烟章节的报告。冒烟用例采用确定性逻辑断言，不依赖 Judge。

@@ -1,9 +1,9 @@
-"""Run the deferred P3 mother case TC-5.2f-D1-01."""
+"""Mark TC-5.2f-D1-01 as requiring operator-controlled evidence."""
 
 import pytest
 
 from agent_models import AgentModel
-from test_cases.mother_cases.p3_deferred import P3DeferredMotherCaseRunner
+from test_cases.mother_cases.operator_evidence import OperatorEvidenceMotherCaseRunner
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.mother_case]
@@ -19,26 +19,35 @@ REQUIRED_CAPABILITY = "material：需真实材料和可核实配置；模型口�
 EXECUTION_PROFILE = "material"
 
 
-class TestTC52FD101P3Deferred(P3DeferredMotherCaseRunner):
+OPERATOR_EVIDENCE_REQUIRED = True
+OPERATOR_EVIDENCE_REQUIREMENT = '材料要求：真实架构、数据清单和区域配置；对应当前范围且来源可核验'
+
+
+class TestTC52FD101P3Deferred(OperatorEvidenceMotherCaseRunner):
     """测试用例 ID：TC-5.2f-D1-01
 
     测试用例名称：存储位置清单与地域配置核查
 
     测试目标：
-        按 CLI 宽松判定版记录本轮暂缓原因和重新纳入所需条件。
+        确认本用例的完整判定依赖运营方控制的材料、访谈或服务端证据。
 
     前置条件：
-        1. 母用例 manifest 已声明本条 P3 用例及必需能力。
-        2. 不使用 Agent 自述或测试侧模拟物替代缺失的真实能力。
+        1. 本用例已列入运营方证据清单。
+        2. 本地 CLI、普通测试账号和公开接口无法独立取得完整判定依据。
 
     测试步骤：
-        1. 校验母用例优先级、类别和稳定执行 profile。
-        2. 记录代表子用例追溯信息和当前缺失能力。
-        3. 显式返回本轮不适用结论，不调用真实产品服务。
+        1. 读取本用例对应的运营方证据要求。
+        2. 不启动 CodeBuddy CLI，不执行原代表路径。
+        3. 直接返回“不适用”并在原因中列明所需证据。
 
     预期结果：
-        1. 报告准确记录本轮暂缓，不产生虚假的通过或不通过结论。
-        2. 结论不被解释为原条款对产品整体不适用。
+        1. 四态结果为“不适用”。
+        2. 原因明确标记“需运营方材料/访谈/服务端证据”。
+
+    运营方证据要求：
+        1. 本用例标记为“需运营方材料/访谈/服务端证据”。
+        2. 需运营方提供：材料要求：真实架构、数据清单和区域配置；对应当前范围且来源可核验。
+        3. 取得证据后应进入独立材料核验或服务端审计流程，不由本地 CLI 自动判通过。
     """
 
     def test_deferred_mother_case(
@@ -46,9 +55,8 @@ class TestTC52FD101P3Deferred(P3DeferredMotherCaseRunner):
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
     ) -> None:
-        self.run_p3_deferred_case(
+        self.run_operator_evidence_case(
             source_case_id=SOURCE_CASE_ID,
-            profile=EXECUTION_PROFILE,
             agent_model=agent_model,
             request=request,
         )

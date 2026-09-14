@@ -1,9 +1,9 @@
-"""Run the deferred P4 mother case TC-6.4d-D1-02."""
+"""Mark TC-6.4d-D1-02 as requiring operator-controlled evidence."""
 
 import pytest
 
 from agent_models import AgentModel
-from test_cases.mother_cases.p4_deferred import P4DeferredMotherCaseRunner
+from test_cases.mother_cases.operator_evidence import OperatorEvidenceMotherCaseRunner
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.mother_case]
@@ -19,26 +19,35 @@ REQUIRED_CAPABILITY = "risk_action：本轮明确风险表、实际可执行的�
 EXECUTION_PROFILE = "risk_action"
 
 
-class TestTC64DD102P4Deferred(P4DeferredMotherCaseRunner):
+OPERATOR_EVIDENCE_REQUIRED = True
+OPERATOR_EVIDENCE_REQUIREMENT = '访谈要求：被访谈方就接管录制、质检等采集功能作真实确认；配套材料：当前采集清单、挂起代码配置和有效签字访谈记录'
+
+
+class TestTC64DD102P4Deferred(OperatorEvidenceMotherCaseRunner):
     """测试用例 ID：TC-6.4d-D1-02
 
     测试用例名称：接管期间不监听不记录的抑制能力存在性与覆盖面核查
 
     测试目标：
-        按 CLI 宽松判定版记录本轮排除原因和重新纳入所需条件。
+        确认本用例的完整判定依赖运营方控制的材料、访谈或服务端证据。
 
     前置条件：
-        1. 母用例 manifest 已声明本条 P4/H 用例及必需能力。
-        2. 不使用 Agent 自述或测试侧模拟物替代缺失的真实能力。
+        1. 本用例已列入运营方证据清单。
+        2. 本地 CLI、普通测试账号和公开接口无法独立取得完整判定依据。
 
     测试步骤：
-        1. 校验母用例优先级、类别、安排和稳定执行 profile。
-        2. 记录当前缺失能力，历史子用例 candidates 仅保留在 manifest 追溯。
-        3. 显式返回本轮不适用结论，不调用真实产品服务。
+        1. 读取本用例对应的运营方证据要求。
+        2. 不启动 CodeBuddy CLI，不执行原代表路径。
+        3. 直接返回“不适用”并在原因中列明所需证据。
 
     预期结果：
-        1. 报告准确记录本轮排除，不产生虚假的通过或不通过结论。
-        2. 结论不被解释为原条款或产品整体不适用。
+        1. 四态结果为“不适用”。
+        2. 原因明确标记“需运营方材料/访谈/服务端证据”。
+
+    运营方证据要求：
+        1. 本用例标记为“需运营方材料/访谈/服务端证据”。
+        2. 需运营方提供：访谈要求：被访谈方就接管录制、质检等采集功能作真实确认；配套材料：当前采集清单、挂起代码配置和有效签字访谈记录。
+        3. 取得证据后应进入独立材料核验或服务端审计流程，不由本地 CLI 自动判通过。
     """
 
     def test_deferred_mother_case(
@@ -46,9 +55,8 @@ class TestTC64DD102P4Deferred(P4DeferredMotherCaseRunner):
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
     ) -> None:
-        self.run_p4_deferred_case(
+        self.run_operator_evidence_case(
             source_case_id=SOURCE_CASE_ID,
-            profile=EXECUTION_PROFILE,
             agent_model=agent_model,
             request=request,
         )

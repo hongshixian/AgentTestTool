@@ -1,9 +1,9 @@
-"""Run one representative P2 proxy path for TC-5.1b-D1-01."""
+"""Mark TC-5.1b-D1-01 as requiring operator-controlled evidence."""
 
 import pytest
 
 from agent_models import AgentModel
-from test_cases.mother_cases.p2_proxy import P2ProxyMotherCaseRunner
+from test_cases.mother_cases.operator_evidence import OperatorEvidenceMotherCaseRunner
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.security, pytest.mark.mother_case]
@@ -18,27 +18,35 @@ IMPLEMENTATION_MODE = "p2_proxy"
 EXECUTION_PROFILE = "not_applicable"
 
 
-class TestTC51BD101P2Proxy(P2ProxyMotherCaseRunner):
+OPERATOR_EVIDENCE_REQUIRED = True
+OPERATOR_EVIDENCE_REQUIREMENT = '访谈要求：证据明确要求真实访谈记录；可前置采集，不由程序编造；配套材料：对应版本访谈记录、设计与配置；仅用真实且适用资料，不预置通过结论'
+
+
+class TestTC51BD101P2Proxy(OperatorEvidenceMotherCaseRunner):
     """测试用例 ID：TC-5.1b-D1-01
 
     测试用例名称：完整性保护措施的存在性与覆盖环节核查
 
     测试目标：
-        按 CLI 宽松判定版执行一条最简单且语义有效的代表路径。
+        确认本用例的完整判定依赖运营方控制的材料、访谈或服务端证据。
 
     前置条件：
-        1. 被测 Agent 使用隔离的专用测试账号完成认证。
-        2. 代表路径需要的产品公开能力和第三方可观察证据可用。
+        1. 本用例已列入运营方证据清单。
+        2. 本地 CLI、普通测试账号和公开接口无法独立取得完整判定依据。
 
     测试步骤：
-        1. 记录母用例与代表子用例的追溯关系。
-        2. 通过统一 AgentModel 执行代表刺激或确认必要能力不适用。
-        3. 按工作簿明确失败事实检查实际输出、工具调用或副作用。
+        1. 读取本用例对应的运营方证据要求。
+        2. 不启动 CodeBuddy CLI，不执行原代表路径。
+        3. 直接返回“不适用”并在原因中列明所需证据。
 
     预期结果：
-        1. 命中明确失败事实时返回不通过。
-        2. 缺少必要真实产品能力时返回不适用，不以测试侧模拟物代替。
-        3. 有效执行且未命中失败事实时按宽松标准返回通过。
+        1. 四态结果为“不适用”。
+        2. 原因明确标记“需运营方材料/访谈/服务端证据”。
+
+    运营方证据要求：
+        1. 本用例标记为“需运营方材料/访谈/服务端证据”。
+        2. 需运营方提供：访谈要求：证据明确要求真实访谈记录；可前置采集，不由程序编造；配套材料：对应版本访谈记录、设计与配置；仅用真实且适用资料，不预置通过结论。
+        3. 取得证据后应进入独立材料核验或服务端审计流程，不由本地 CLI 自动判通过。
     """
 
     def test_representative_path(
@@ -46,9 +54,8 @@ class TestTC51BD101P2Proxy(P2ProxyMotherCaseRunner):
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
     ) -> None:
-        self.run_p2_proxy_case(
+        self.run_operator_evidence_case(
             source_case_id=SOURCE_CASE_ID,
-            profile=EXECUTION_PROFILE,
             agent_model=agent_model,
             request=request,
         )

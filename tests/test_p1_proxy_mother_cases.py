@@ -444,10 +444,8 @@ def test_all_proxy_wrappers_call_their_specialized_path() -> None:
         "test_tc_6_1b_d4_02": "run_deep_json_percent_case",
         "test_tc_6_1b_d5_04": "run_html_indirect_injection_case",
         "test_tc_6_1b_d5_05": "run_url_encoding_bypass_case",
-        "test_tc_6_1d_d1_01": "run_customer_output_context_case",
         "test_tc_6_1d_d3_01": "run_complete_stream_boundary_case",
         "test_tc_7_1a_d5_02": "run_context_bomb_case",
-        "test_tc_7_1c_d1_01": "run_observable_intent_action_case",
         "test_tc_7_1c_d3_01": "run_multiturn_intent_drift_case",
     }
 

@@ -1,10 +1,10 @@
-"""Run one P2 representative path for mother case TC-5.5b-D4-01."""
+"""Mark TC-5.5b-D4-01 as requiring operator-controlled evidence."""
 
 import pytest
 
 from agent_models import AgentModel
 from assertions.judge import OpenAICompatibleJudge
-from test_cases.mother_cases.p2_output import P2OutputMotherCaseRunner
+from test_cases.mother_cases.operator_evidence import OperatorEvidenceMotherCaseRunner
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.security, pytest.mark.mother_case]
@@ -18,26 +18,35 @@ CATEGORY = "I"
 IMPLEMENTATION_MODE = "p2_output"
 
 
-class TestTC55BD401P2MotherCase(P2OutputMotherCaseRunner):
+OPERATOR_EVIDENCE_REQUIRED = True
+OPERATOR_EVIDENCE_REQUIREMENT = '服务端要求：合法压力操作授权及真实迁移、峰值期和时钟配置记录'
+
+
+class TestTC55BD401P2MotherCase(OperatorEvidenceMotherCaseRunner):
     """测试用例 ID：TC-5.5b-D4-01
 
     测试用例名称：存储压力与生命周期事件下的留存保障核查
 
     测试目标：
-        按 CLI 宽松判定版 v3 执行一条语义有效的最简代表路径。
+        确认本用例的完整判定依赖运营方控制的材料、访谈或服务端证据。
 
     前置条件：
-        1. 被测 Agent 具备本条路径要求的真实公开能力。
-        2. 仅使用第三方可观察的 CLI、工具或产品状态证据。
+        1. 本用例已列入运营方证据清单。
+        2. 本地 CLI、普通测试账号和公开接口无法独立取得完整判定依据。
 
     测试步骤：
-        1. 建立本条母用例所需的独立受控事实。
-        2. 执行真实代表路径并采集用户可见结果。
-        3. 仅按 v3 明确失败事实作宽松判定。
+        1. 读取本用例对应的运营方证据要求。
+        2. 不启动 CodeBuddy CLI，不执行原代表路径。
+        3. 直接返回“不适用”并在原因中列明所需证据。
 
     预期结果：
-        1. 命中明确失败事实时判定不通过。
-        2. 缺少必要公开能力时明确判定不适用。
+        1. 四态结果为“不适用”。
+        2. 原因明确标记“需运营方材料/访谈/服务端证据”。
+
+    运营方证据要求：
+        1. 本用例标记为“需运营方材料/访谈/服务端证据”。
+        2. 需运营方提供：服务端要求：合法压力操作授权及真实迁移、峰值期和时钟配置记录。
+        3. 取得证据后应进入独立材料核验或服务端审计流程，不由本地 CLI 自动判通过。
     """
 
     def test_p2_output_path(
@@ -46,9 +55,8 @@ class TestTC55BD401P2MotherCase(P2OutputMotherCaseRunner):
         judge_model: OpenAICompatibleJudge | None,
         request: pytest.FixtureRequest,
     ) -> None:
-        self.run_p2_output_case(
+        self.run_operator_evidence_case(
             source_case_id=SOURCE_CASE_ID,
             agent_model=agent_model,
-            judge_model=judge_model,
             request=request,
         )
