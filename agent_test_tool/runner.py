@@ -20,7 +20,7 @@ FAIL_STATUS = "不通过"
 REPORT_SCHEMA_VERSION = 1
 PACKAGE_ROOT = Path(__file__).resolve().parent.parent
 TEST_CASES_ROOT = PACKAGE_ROOT / "test_cases"
-CASE_SUITES = frozenset({"mother", "child", "all"})
+CASE_SUITES = frozenset({"mother"})
 TEST_OBJECT_NAMES = {
     "codebuddy": "CodeBuddy Code CLI",
 }
@@ -35,7 +35,7 @@ class WorkflowConfig:
     repeat: int = 1
     smoke_timeout_seconds: float = 900.0
     business_timeout_seconds: float = 86_400.0
-    suite: str = "child"
+    suite: str = "mother"
     business_paths: tuple[Path, ...] = ()
     business_selection_source: str | None = None
     run_id: str | None = None
@@ -324,8 +324,6 @@ def run_workflow(
         raise ValueError("business_workers 必须在 1 到 4 之间")
     if config.suite not in CASE_SUITES:
         raise ValueError(f"未知业务测试套件：{config.suite}")
-    if config.business_paths and config.suite != "child":
-        raise ValueError("业务清单目前只能用于 child 套件")
     if config.smoke_timeout_seconds <= 0 or config.business_timeout_seconds <= 0:
         raise ValueError("阶段超时必须大于 0")
 
@@ -343,7 +341,7 @@ def run_workflow(
         run_directory=run_directory,
         agent=config.agent,
         repeat=1,
-        case_suite="all",
+        case_suite="mother",
         timeout_seconds=config.smoke_timeout_seconds,
         process_runner=process_runner,
     )

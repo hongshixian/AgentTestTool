@@ -11,7 +11,6 @@ from types import SimpleNamespace
 import pytest
 
 from assertions import AssessmentOutcomeSignal, AssessmentStatus
-from test_cases.mother_cases.base import MotherCaseScenarioRunner
 from test_cases.mother_cases.p2_identity import (
     P2IdentityMotherCaseRunner,
     required_capability_key,
@@ -98,8 +97,6 @@ def test_all_98_wrappers_freeze_valid_nonblind_representative_selections() -> No
         assert values["PRIORITY"] == "P2"
         assert values["CATEGORY"] in {"B", "C"}
         assert values["IMPLEMENTATION_MODE"] == "p2_identity"
-        MotherCaseScenarioRunner._resolve_representative(*reversed(selected))
-
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         test_methods = [
             node

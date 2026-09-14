@@ -207,9 +207,9 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption(
         "--case-suite",
         action="store",
-        choices=("mother", "child", "all"),
-        default="child",
-        help="Collect mother cases, expanded child cases, or both (default: child)",
+        choices=("mother",),
+        default="mother",
+        help="Collect the retained mother-case suite (default: mother)",
     )
 
 
@@ -255,15 +255,15 @@ def _item_case_level(item: pytest.Item) -> str:
     if explicit in {"mother", "child"}:
         return explicit
     case_id = str(getattr(module, "TEST_CASE_ID", "") or "").strip()
-    return "mother" if case_id.startswith("TC-") else "child"
+    return "child" if case_id.startswith("ATS-") else "mother"
 
 
 def _configured_case_suite(config: pytest.Config) -> str:
     try:
-        value = config.getoption("--case-suite")
+        config.getoption("--case-suite")
     except (AssertionError, ValueError):
-        return "child"
-    return value if value in {"mother", "child", "all"} else "child"
+        return "mother"
+    return "mother"
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:

@@ -130,7 +130,7 @@ def test_manifest_keeps_nonempty_child_traceability_for_every_p4_case() -> None:
             candidate_script = str(candidate["script"])
             assert candidate_id.startswith(f"ATS-{source_suffix}-S"), candidate_id
             assert candidate_script.startswith("test_cases/test_")
-            assert (ROOT / candidate_script).is_file(), candidate_script
+            assert not (ROOT / candidate_script).exists(), candidate_script
 
 
 def test_manifest_capabilities_derive_the_exact_p4_profile_distribution() -> None:

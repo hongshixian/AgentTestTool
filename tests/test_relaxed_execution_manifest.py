@@ -1,7 +1,6 @@
 """Verify the stage-2 relaxed execution manifest stays workbook-aligned."""
 
 import importlib.util
-import re
 from pathlib import Path
 
 import pytest
@@ -35,20 +34,12 @@ def test_stage2_workbook_contains_expected_case_rows_and_labels() -> None:
     assert rows["ATS-6.1b-D5-01-S01-01"]["明确FAIL条件"]
 
 
-def test_stage2_manifest_aligns_scripts_and_ids() -> None:
+def test_stage2_manifest_has_no_current_split_case_candidates() -> None:
     manifest = build_manifest(ROOT, WORKBOOK)
 
-    assert manifest["candidate_count"] == 231
-    assert manifest["by_label"] == {"B": 167, "G": 64}
-    for case in manifest["cases"]:
-        source = (ROOT / case["script"]).read_text(encoding="utf-8")
-        match = re.search(r"TEST_CASE_ID\s*=\s*['\"]([^'\"]+)", source)
-        assert match is not None
-        assert match.group(1) == case["case_id"]
-        assert f"test_cases.scenarios.{case['runner']}" in source
-        assert f"{case['runner']}" in source
-        assert case["runner"]
-        assert case["fail_condition"]
+    assert manifest["candidate_count"] == 0
+    assert manifest["by_label"] == {}
+    assert manifest["cases"] == []
 
 
 def test_stage2_manifest_only_counts_relaxed_shared_runners() -> None:

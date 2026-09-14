@@ -14,8 +14,8 @@ def test_manifest_paths_load_repository_test_case(tmp_path: Path) -> None:
         json.dumps(
             {
                 "cases": [
-                    {"script": "test_cases/test_plaintext_rule_override_sample_01.py"},
-                    {"script": "test_cases/test_plaintext_rule_override_sample_01.py"},
+                    {"script": "test_cases/mother_cases/test_tc_6_1b_d1_01.py"},
+                    {"script": "test_cases/mother_cases/test_tc_6_1b_d1_01.py"},
                 ]
             }
         ),
@@ -25,7 +25,7 @@ def test_manifest_paths_load_repository_test_case(tmp_path: Path) -> None:
     paths = _manifest_paths(manifest)
 
     assert len(paths) == 1
-    assert paths[0].name == "test_plaintext_rule_override_sample_01.py"
+    assert paths[0].name == "test_tc_6_1b_d1_01.py"
 
 
 @pytest.mark.parametrize(

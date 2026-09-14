@@ -1,10 +1,9 @@
-"""Verify mother cases safely delegate to one expanded representative case."""
+"""Verify mother cases execute one retained representative scenario."""
 
 from __future__ import annotations
 
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
 
 import pytest
 
@@ -20,67 +19,37 @@ REPRESENTATIVE_CHILD_ID = "ATS-6.1b-D5-01-S01-01"
 SOURCE_CASE_ID = "TC-6.1b-D5-01"
 
 
-def _synthetic_module(monkeypatch: pytest.MonkeyPatch, test_method: Any) -> None:
-    module_name = "test_cases.test_complete_initial_settings_extraction"
-    test_class = type(
-        "TestSyntheticRepresentative",
-        (),
-        {
-            "__module__": module_name,
-            test_method.__name__: test_method,
-        },
-    )
-    module = SimpleNamespace(
-        __name__=module_name,
-        TEST_CASE_ID=REPRESENTATIVE_CHILD_ID,
-        TestSyntheticRepresentative=test_class,
-    )
-    monkeypatch.setattr(mother_base.importlib, "import_module", lambda _name: module)
-
-
-def test_resolve_representative_accepts_matching_script_and_id() -> None:
-    test_class, test_method = MotherCaseScenarioRunner._resolve_representative(
-        REPRESENTATIVE_SCRIPT,
+def test_resolve_representative_accepts_registered_path() -> None:
+    runner = MotherCaseScenarioRunner._resolve_representative(
         REPRESENTATIVE_CHILD_ID,
+        REPRESENTATIVE_SCRIPT,
     )
 
-    assert test_class.__name__ == "TestATS61BD501S0101CompleteInitialSettings"
-    assert test_method.__name__ == "test_complete_initial_settings_extraction"
+    assert callable(runner)
 
 
-def test_resolve_representative_rejects_script_id_mismatch() -> None:
-    with pytest.raises(ValueError, match="ID 与脚本不匹配"):
+def test_resolve_representative_rejects_legacy_script_mismatch() -> None:
+    with pytest.raises(ValueError, match="ID 与历史脚本不匹配"):
         MotherCaseScenarioRunner._resolve_representative(
-            REPRESENTATIVE_SCRIPT,
-            "ATS-6.1b-D5-01-S01-NOT-THE-SCRIPT-ID",
-        )
-
-
-@pytest.mark.parametrize(
-    "representative_script",
-    [
-        "../test_cases/test_complete_initial_settings_extraction.py",
-        "test_cases/../test_cases/test_complete_initial_settings_extraction.py",
-        "/tmp/test_complete_initial_settings_extraction.py",
-    ],
-)
-def test_resolve_representative_rejects_path_escape(
-    representative_script: str,
-) -> None:
-    with pytest.raises(ValueError, match="脚本路径无效"):
-        MotherCaseScenarioRunner._resolve_representative(
-            representative_script,
             REPRESENTATIVE_CHILD_ID,
+            "test_cases/test_not_the_selected_child.py",
         )
 
 
-def test_run_representative_supplies_all_supported_fixtures(
+def test_resolve_representative_rejects_unregistered_id() -> None:
+    with pytest.raises(ValueError, match="代表路径未注册"):
+        MotherCaseScenarioRunner._resolve_representative(
+            "ATS-UNKNOWN",
+            REPRESENTATIVE_SCRIPT,
+        )
+
+
+def test_run_representative_supplies_standard_context(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     received: dict[str, object] = {}
 
-    def test_supported(
-        self: object,
+    def representative(
         agent_model: object,
         judge_model: object,
         request: object,
@@ -88,7 +57,6 @@ def test_run_representative_supplies_all_supported_fixtures(
     ) -> None:
         received.update(
             {
-                "instance": self,
                 "agent_model": agent_model,
                 "judge_model": judge_model,
                 "request": request,
@@ -96,7 +64,11 @@ def test_run_representative_supplies_all_supported_fixtures(
             }
         )
 
-    _synthetic_module(monkeypatch, test_supported)
+    monkeypatch.setattr(
+        mother_base,
+        "resolve_representative_path",
+        lambda _case_id, _script: representative,
+    )
     ledger = SimpleNamespace(record=lambda *_args: None)
     agent_model = SimpleNamespace(environment=SimpleNamespace(ledger=ledger))
     judge_model = object()
@@ -112,33 +84,12 @@ def test_run_representative_supplies_all_supported_fixtures(
         repeat_index=7,
     )
 
-    assert received["agent_model"] is agent_model
-    assert received["judge_model"] is judge_model
-    assert received["request"] is request
-    assert received["repeat_index"] == 7
-
-
-def test_run_representative_rejects_unsupported_fixture(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    def test_unsupported(self: object, tmp_path: object) -> None:
-        raise AssertionError("unsupported representative method must not run")
-
-    _synthetic_module(monkeypatch, test_unsupported)
-    ledger = SimpleNamespace(record=lambda *_args: None)
-    agent_model = SimpleNamespace(environment=SimpleNamespace(ledger=ledger))
-    request = SimpleNamespace(node=SimpleNamespace(user_properties=[]))
-
-    with pytest.raises(RuntimeError, match="不支持的 fixture：tmp_path"):
-        MotherCaseScenarioRunner().run_representative_case(
-            source_case_id=SOURCE_CASE_ID,
-            representative_child_id=REPRESENTATIVE_CHILD_ID,
-            representative_script=REPRESENTATIVE_SCRIPT,
-            agent_model=agent_model,
-            judge_model=None,
-            request=request,
-            repeat_index=0,
-        )
+    assert received == {
+        "agent_model": agent_model,
+        "judge_model": judge_model,
+        "request": request,
+        "repeat_index": 7,
+    }
 
 
 @pytest.mark.parametrize("status", list(AssessmentStatus))
@@ -155,16 +106,20 @@ def test_run_representative_records_linkage_and_propagates_four_state_signal(
         else (),
     )
 
-    def test_conclusion(
-        self: object,
+    def representative(
         agent_model: object,
+        _judge_model: object,
         request: object,
         repeat_index: int,
     ) -> None:
         assert repeat_index == 3
         AgentTestCase()._conclude(request, agent_model, verdict)
 
-    _synthetic_module(monkeypatch, test_conclusion)
+    monkeypatch.setattr(
+        mother_base,
+        "resolve_representative_path",
+        lambda _case_id, _script: representative,
+    )
     ledger = EvidenceLedger(tmp_path / "evidence", run_id="mother-run")
     agent_model = SimpleNamespace(environment=SimpleNamespace(ledger=ledger))
     request = SimpleNamespace(node=SimpleNamespace(user_properties=[]))

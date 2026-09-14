@@ -281,6 +281,34 @@ def find_child_cases(root: Path) -> dict[str, list[dict[str, str]]]:
     return grouped
 
 
+def load_historical_child_cases(root: Path) -> dict[str, list[dict[str, str]]]:
+    """Load traceability retained after expanded child scripts are removed."""
+
+    manifest_path = root / "configs" / "mother_cases_v3.json"
+    if not manifest_path.is_file():
+        return {}
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    cases = payload.get("cases") if isinstance(payload, dict) else None
+    if not isinstance(cases, list):
+        return {}
+    grouped: dict[str, list[dict[str, str]]] = {}
+    for case in cases:
+        if not isinstance(case, dict):
+            continue
+        source_case_id = case.get("source_case_id")
+        candidates = case.get("representative_child_candidates")
+        if not isinstance(source_case_id, str) or not isinstance(candidates, list):
+            continue
+        normalized = [
+            {"case_id": str(child["case_id"]), "script": str(child["script"])}
+            for child in candidates
+            if isinstance(child, dict) and "case_id" in child and "script" in child
+        ]
+        if normalized:
+            grouped[source_case_id] = normalized
+    return grouped
+
+
 def _literal_assignments(path: Path) -> dict[str, Any]:
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     values: dict[str, Any] = {}
@@ -420,9 +448,11 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
 
 
 def build_manifest(root: Path, workbook_path: Path) -> dict[str, Any]:
-    """Build a deterministic manifest from the workbook and repository scripts."""
+    """Build a manifest, retaining historical child traceability when needed."""
 
     child_cases = find_child_cases(root)
+    if not child_cases:
+        child_cases = load_historical_child_cases(root)
     mother_implementations = find_mother_implementations(root)
     cases: list[dict[str, Any]] = []
     for source_case in read_mother_cases(workbook_path):

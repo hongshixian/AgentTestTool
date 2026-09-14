@@ -16,12 +16,12 @@ def clear_policy_caches():
     policy._manifest.cache_clear()
 
 
-def test_reviewed_cases_have_valid_dependencies_and_cover_both_suites():
+def test_reviewed_mother_cases_have_valid_dependencies():
     manifest = policy._manifest()
     for script in manifest["cases"]:
         assert policy.case_execution_policy(policy.ROOT / script)[0] == "isolated", script
-    assert sum("mother_cases/" in script for script in manifest["cases"]) >= 190
-    assert sum("mother_cases/" not in script for script in manifest["cases"]) >= 200
+    assert len(manifest["cases"]) >= 190
+    assert all("mother_cases/" in script for script in manifest["cases"])
 
 
 def test_unknown_and_shared_memory_cases_remain_exclusive(tmp_path):

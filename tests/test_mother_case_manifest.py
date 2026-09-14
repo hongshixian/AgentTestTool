@@ -81,7 +81,7 @@ def test_manifest_has_required_source_and_assessment_fields() -> None:
     )
 
 
-def test_child_candidates_exist_and_encode_the_same_mother_case() -> None:
+def test_historical_child_candidates_encode_the_same_mother_case() -> None:
     cases = _checked_in_manifest()["cases"]
 
     assert sum(case["child_case_count"] for case in cases) == 4256
@@ -90,7 +90,8 @@ def test_child_candidates_exist_and_encode_the_same_mother_case() -> None:
         source_prefix = case["source_case_id"].removeprefix("TC-")
         for child in case["representative_child_candidates"]:
             assert child["case_id"].startswith(f"ATS-{source_prefix}-S")
-            assert (ROOT / child["script"]).is_file()
+            assert child["script"].startswith("test_cases/test_")
+            assert not (ROOT / child["script"]).exists()
 
 
 def test_mother_implementation_metadata_is_read_without_importing_wrappers(
