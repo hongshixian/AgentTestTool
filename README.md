@@ -272,6 +272,14 @@ dispatched、received、completed 和 returned 阶段。网络拦截属于 Q04 �
 标记为 Agent 原生日志或厂商提供的完整 Trace；模型提出工具调用也不能单独证明工具已经
 执行。
 
+重建完成后，框架还会把每个 Agent session 转换为一个 `ATIF-v1.7` trajectory，作为
+可移植的旁路产物保存为 `trajectory.json`；一次 Trace 包含多个 session 时，使用带稳定
+内容哈希的 `trajectory_*.json` 文件。转换保留显式模型输出、公开 reasoning、工具调用与
+结果关联，并把本项目更细的生命周期、采集状态和限制放在 `extra.agent_test_tool` 中。
+ATIF 不替代原始网络正文、证据权威边界或质量元数据；现有断言和 Judge 输入仍使用
+`reconstructed_agent_trace`。当前阶段转换失败只记录 `atif_exporter/export_failed` 诊断，
+不改变原 Trace 的四态结果；后续断言将按能力逐步迁移为消费 ATIF trajectory facts。
+
 下游确定性断言可以使用 `assert_reconstructed_trace_ready()`、
 `assert_model_context_contains()` 和 `assert_tool_lifecycle()`。这些断言只接受状态为
 `available` 且采集器健康、无丢失事件的 Trace；部分响应、无法关联或采集失败不能作为

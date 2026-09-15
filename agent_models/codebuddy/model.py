@@ -51,6 +51,7 @@ from agent_models.local_state import LocalStateAction, LocalStateRequest
 from agent_models.memory import MemoryStateRequest
 from agent_models.result import AuthResult, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
+from evidence_collectors.atif import AtifConverter
 from evidence_collectors.base import (
     CollectionCheckpoint,
     CollectorHealthState,
@@ -158,6 +159,7 @@ class CodeBuddyAgentModel(AgentModel):
         self._collector_manager = collector_manager
         self._test_case_id = test_case_id
         self._trace_adapter = CodeBuddyTraceAdapter()
+        self._atif_converter = AtifConverter()
         self._trace_turns: list[TraceTurnObservation] = []
         self._trace_lock = threading.RLock()
         self._interactive_trace_windows: dict[str, _TraceWindowStart] = {}
@@ -1076,6 +1078,7 @@ class CodeBuddyAgentModel(AgentModel):
             observed_at=observed_at,
         )
         trace_payload = trace.to_payload()
+        self._archive_atif_trajectories(trace)
         correlations = self._trace_correlation(trace, turns)
         model_calls: list[tuple[str, str, dict[str, JsonValue]]] = []
         for session in trace_payload["sessions"]:
@@ -1267,6 +1270,61 @@ class CodeBuddyAgentModel(AgentModel):
             ),
         )
         return records
+
+    def _archive_atif_trajectories(self, trace: AgentTrace) -> None:
+        """Export portable ATIF without changing the authoritative Trace result."""
+
+        try:
+            trajectories = self._atif_converter.convert(trace)
+        except Exception as error:
+            # ATIF is an auxiliary interoperability artifact during migration.
+            self.environment.ledger.record(
+                "atif_exporter",
+                "export_failed",
+                {"error_type": type(error).__name__, "message": str(error)},
+            )
+            return
+        try:
+            multiple = len(trajectories) > 1
+            references: list[dict[str, JsonValue]] = []
+            for trajectory in trajectories:
+                payload = trajectory.to_payload()
+                name = self._atif_artifact_name(payload, multiple=multiple)
+                path = self._save_or_reuse_trace_artifact(name, payload)
+                references.append(self._artifact_reference(path, turn_id="", kind="atif"))
+            self.environment.ledger.record(
+                "atif_exporter",
+                "export_completed",
+                {"trajectory_count": len(trajectories), "artifacts": references},
+            )
+        except (TypeError, ValueError, KeyError) as error:
+            self.environment.ledger.record(
+                "atif_exporter",
+                "export_failed",
+                {"error_type": type(error).__name__, "message": str(error)},
+            )
+
+    def _atif_artifact_name(
+        self,
+        payload: dict[str, JsonValue],
+        *,
+        multiple: bool,
+    ) -> str:
+        if multiple:
+            return self._trace_artifact_name("trajectory", payload)
+        path = self.environment.evidence_directory / "trajectory.json"
+        if not path.exists():
+            return "trajectory"
+        try:
+            existing = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return self._trace_artifact_name("trajectory", payload)
+        redacted = self.environment.ledger.redact(payload)
+        return (
+            "trajectory"
+            if existing == redacted
+            else self._trace_artifact_name("trajectory", payload)
+        )
 
     @staticmethod
     def _network_evidence_exchange(

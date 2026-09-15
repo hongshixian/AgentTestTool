@@ -218,6 +218,94 @@ def test_network_bodies_are_archived_in_bounded_hash_anchored_chunks(tmp_path):
     model.close()
 
 
+def test_atif_trajectory_is_archived_beside_existing_trace_artifacts(tmp_path):
+    model = _model(tmp_path)
+    trace = AgentTrace(
+        run_id=model.environment.run_id,
+        product="codebuddy",
+        sessions=(
+            AgentSession(
+                "session-1",
+                turns=(AgentTurn("turn-1", 0, "prompt"),),
+            ),
+        ),
+    )
+
+    model._archive_atif_trajectories(trace)
+
+    payload = json.loads(
+        (model.environment.evidence_directory / "trajectory.json").read_text()
+    )
+    assert payload["schema_version"] == "ATIF-v1.7"
+    assert payload["session_id"] == "session-1"
+    assert any(
+        event["kind"] == "export_completed"
+        for event in model.environment.ledger.events
+    )
+    model.close()
+
+
+def test_atif_conversion_failure_does_not_change_trace_evidence_status(tmp_path):
+    model = _model(tmp_path)
+    trace = AgentTrace(
+        run_id=model.environment.run_id,
+        product="codebuddy",
+        sessions=(),
+    )
+
+    class _BrokenConverter:
+        def convert(self, _trace):
+            raise RuntimeError("unsupported mapping")
+
+    model._atif_converter = _BrokenConverter()
+    records = model._trace_records(
+        EvidenceRequest("sample", "prompt", 1, EvidencePhase.AFTER),
+        trace,
+        turns=(),
+        collector_errors=(),
+        network_artifacts=(),
+    )
+
+    reconstructed = next(
+        item for item in records if item.evidence_id == "reconstructed_agent_trace"
+    )
+    assert reconstructed.status.value == "available"
+    assert any(
+        event["kind"] == "export_failed"
+        for event in model.environment.ledger.events
+    )
+    model.close()
+
+
+def test_later_atif_snapshot_does_not_overwrite_or_reuse_stale_trajectory(tmp_path):
+    model = _model(tmp_path)
+    first = AgentTrace(
+        run_id=model.environment.run_id,
+        product="codebuddy",
+        sessions=(AgentSession("session-1"),),
+    )
+    second = AgentTrace(
+        run_id=model.environment.run_id,
+        product="codebuddy",
+        sessions=(
+            AgentSession(
+                "session-1",
+                turns=(AgentTurn("turn-1", 0, "new prompt"),),
+            ),
+        ),
+    )
+
+    model._archive_atif_trajectories(first)
+    model._archive_atif_trajectories(second)
+
+    assert len(list(model.environment.evidence_directory.glob("trajectory*.json"))) == 2
+    original = json.loads(
+        (model.environment.evidence_directory / "trajectory.json").read_text()
+    )
+    assert original["steps"] == []
+    model.close()
+
+
 def test_trace_records_are_turn_scoped_and_claim_only_observed_tool_stages(tmp_path):
     model = _model(
         tmp_path,
