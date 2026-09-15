@@ -258,6 +258,18 @@ def _item_case_level(item: pytest.Item) -> str:
     return "child" if case_id.startswith("ATS-") else "mother"
 
 
+def _item_requires_network_capture(item: pytest.Item) -> bool:
+    """Start the proxy only for cases that may execute black-box Agent actions."""
+
+    module = getattr(item, "module", None)
+    if bool(getattr(module, "OPERATOR_EVIDENCE_REQUIRED", False)):
+        return False
+    implementation_mode = str(
+        getattr(module, "IMPLEMENTATION_MODE", "") or ""
+    ).strip().casefold()
+    return implementation_mode != "deferred"
+
+
 def _configured_case_suite(config: pytest.Config) -> str:
     try:
         config.getoption("--case-suite")
@@ -301,7 +313,11 @@ def agent_model(request: pytest.FixtureRequest, tmp_path) -> Iterator[AgentModel
     run_id = uuid.uuid4().hex
     evidence_directory = Path(request.config.getoption("--evidence-dir")).resolve() / run_id
     with AgentModelFactory.create(product, workspace=tmp_path,
-                                  evidence_directory=evidence_directory, run_id=run_id) as model:
+                                  evidence_directory=evidence_directory, run_id=run_id,
+                                  test_case_id=request.node.nodeid,
+                                  enable_network_capture=_item_requires_network_capture(
+                                      request.node
+                                  )) as model:
         request.node.user_properties.append(("evidence_directory", str(model.environment.evidence_directory)))
         model.environment.ledger.record("pytest", "case_started", {"node_id": request.node.nodeid})
         try:
