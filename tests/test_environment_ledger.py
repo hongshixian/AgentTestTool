@@ -221,6 +221,29 @@ def test_paths_never_overwrite_or_escape(tmp_path: Path) -> None:
     assert ledger.close()["healthy"]
 
 
+def test_large_unstructured_text_redaction_remains_bounded(tmp_path: Path) -> None:
+    ledger = EvidenceLedger(tmp_path / "evidence", run_id="large-text")
+
+    artifact = ledger.save_artifact("large_text", {"content": "四" * 250_000})
+
+    assert artifact.stat().st_size < 1_048_576
+
+
+def test_artifacts_have_a_larger_separate_bounded_capacity(tmp_path: Path) -> None:
+    ledger = EvidenceLedger(tmp_path / "evidence", run_id="large-artifact")
+
+    artifact = ledger.save_artifact("large_artifact", {"content": "x" * 1_200_000})
+
+    assert artifact.stat().st_size > 1_048_576
+    limited = EvidenceLedger(
+        tmp_path / "limited",
+        run_id="limited-artifact",
+        max_artifact_bytes=100,
+    )
+    with pytest.raises(EvidenceLedgerError, match="capacity"):
+        limited.save_artifact("too_large", {"content": "x" * 200})
+
+
 def test_empty_healthy_ledger_has_no_observation_proof(tmp_path: Path) -> None:
     with EvidenceLedger(tmp_path / "evidence") as ledger:
         health = ledger.health()

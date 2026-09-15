@@ -31,7 +31,7 @@ _SENSITIVE = re.compile(
     re.IGNORECASE,
 )
 _ASSIGNMENT = re.compile(
-    r"(?i)((?:password|passwd|secret|[\w-]*token|api[_-]?key|credential)"
+    r"(?i)((?:password|passwd|secret|[\w-]{0,64}token|api[_-]?key|credential)"
     r"\s*[=:]\s*)([^\s&,;]+)"
 )
 _HEADER = re.compile(r"(?im)(\b(?:authorization|proxy-authorization|cookie|set-cookie)\s*:\s*)[^\r\n]+")
@@ -60,6 +60,7 @@ class EvidenceLedger:
         workspace: Path | None = None,
         max_events: int = 100_000,
         max_event_bytes: int = 1_048_576,
+        max_artifact_bytes: int = 8_388_608,
         max_total_bytes: int = 67_108_864,
     ) -> None:
         self.directory = Path(directory).resolve()
@@ -67,7 +68,15 @@ class EvidenceLedger:
             root = Path(workspace).resolve()
             if self.directory == root or self.directory.is_relative_to(root) or root.is_relative_to(self.directory):
                 raise ValueError("Evidence and workspace directories must be disjoint")
-        if any(isinstance(v, bool) or not isinstance(v, int) or v <= 0 for v in (max_events, max_event_bytes, max_total_bytes)):
+        if any(
+            isinstance(value, bool) or not isinstance(value, int) or value <= 0
+            for value in (
+                max_events,
+                max_event_bytes,
+                max_artifact_bytes,
+                max_total_bytes,
+            )
+        ):
             raise ValueError("Evidence capacities must be positive integers")
         self.run_id = uuid4().hex if run_id is None else run_id
         if not isinstance(self.run_id, str) or not self.run_id or len(self.run_id) > 256:
@@ -85,7 +94,10 @@ class EvidenceLedger:
         self._closed = False
         self._manifest_hash: str | None = None
         self._bytes = 0
-        self._max_events, self._max_event_bytes, self._max_total_bytes = max_events, max_event_bytes, max_total_bytes
+        self._max_events = max_events
+        self._max_event_bytes = max_event_bytes
+        self._max_artifact_bytes = max_artifact_bytes
+        self._max_total_bytes = max_total_bytes
         self.directory.mkdir(mode=0o700, parents=True, exist_ok=True)
         if any(self.directory.iterdir()):
             raise ValueError("Evidence directory must be empty; existing evidence is never overwritten")
@@ -257,7 +269,10 @@ class EvidenceLedger:
                 content = _encode(self.redact(payload)) + b"\n"
             except (ValueError, TypeError, RecursionError):
                 self._fail("Artifact serialization failed")
-            if len(content) > self._max_event_bytes or self._bytes + len(content) > self._max_total_bytes:
+            if (
+                len(content) > self._max_artifact_bytes
+                or self._bytes + len(content) > self._max_total_bytes
+            ):
                 self._fail("Evidence capacity exceeded")
             path = self.directory / filename
             self._write_new(path, content)

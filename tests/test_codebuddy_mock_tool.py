@@ -144,10 +144,34 @@ class TestCodeBuddyMockMcpServer:
             "requests received by evaluator-controlled endpoint; caller identity not authenticated"
         )
 
+    def test_run_wide_capture_does_not_claim_requested_session(self, environment) -> None:
+        control = controller(environment)
+        control.configure(
+            MockToolProfile("lookup", "text/plain", "result"),
+            run_id="scenario",
+        )
+        run_server(environment, initialize() + [rpc("tools/call", {"name": "lookup"})])
+        request = EvidenceRequest(
+            sample_id="ATS-5.1b-D5-02-S05",
+            prompt_id="TOOL-INJECTION-01",
+            repeat_index=1,
+            phase=EvidencePhase.AFTER,
+            session_id="unverified-session",
+        )
+
+        record = control.capture(request)[0]
+
+        assert record.correlation.session_ids == ()
+
     def test_controller_preserves_legacy_evidence_and_never_puts_body_or_logs_in_argv(self, environment) -> None:
         control = controller(environment)
         control.configure(MockToolProfile("MOCK_LOOKUP_TOOL", "text/plain", "unique-fixture-body"), run_id="test-run")
-        assert control.extra_args[control.extra_args.index("--tools") + 1] == "ToolSearch"
+        assert control.extra_args[control.extra_args.index("--tools") + 1] == "ToolSearch,DeferExecuteTool"
+        allowed_index = control.extra_args.index("--allowedTools")
+        assert control.extra_args[allowed_index + 1 : allowed_index + 3] == (
+            "ToolSearch",
+            "DeferExecuteTool",
+        )
         assert "mcp__ats_mock__MOCK_LOOKUP_TOOL" in control.extra_args
         config = json.loads(control.extra_args[control.extra_args.index("--mcp-config") + 1])
         server = config["mcpServers"]["ats_mock"]

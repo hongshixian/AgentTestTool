@@ -147,6 +147,70 @@ class TestCodeBuddyDriver:
 
         assert observed_environment["CODEBUDDY_CONFIG_DIR"] == str(tmp_path)
 
+    def test_applies_collector_environment_to_every_managed_cli_launch(
+        self, monkeypatch, tmp_path
+    ) -> None:
+        environments: list[dict[str, str]] = []
+
+        def fake_run(command, **kwargs):
+            environments.append(dict(kwargs["env"]))
+            if "--bg" in command:
+                return subprocess.CompletedProcess(
+                    command, 0, "Backgrounded · task-1", ""
+                )
+            if "agents" in command:
+                return subprocess.CompletedProcess(command, 0, "[]", "")
+            return subprocess.CompletedProcess(command, 0, "", "")
+
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        driver = CodeBuddyDriver(
+            workspace=tmp_path,
+            config_dir=tmp_path,
+            process_environment_overrides={
+                "HTTPS_PROXY": "http://127.0.0.1:43123",
+                "NODE_EXTRA_CA_CERTS": str(tmp_path / "ca.pem"),
+            },
+        )
+
+        driver.send_prompt("test")
+        driver.start_background_task("test", name="task")
+
+        assert len(environments) == 3
+        assert all(
+            environment["HTTPS_PROXY"] == "http://127.0.0.1:43123"
+            and environment["NODE_EXTRA_CA_CERTS"] == str(tmp_path / "ca.pem")
+            and environment["CODEBUDDY_CONFIG_DIR"] == str(tmp_path)
+            for environment in environments
+        )
+
+    def test_applies_collector_environment_to_interactive_session(
+        self, monkeypatch, tmp_path
+    ) -> None:
+        observed: dict[str, str] = {}
+
+        class FakeSession:
+            def __init__(self, **kwargs):
+                observed.update(kwargs["environment"])
+
+        monkeypatch.setattr(
+            "agent_models.codebuddy.driver.CodeBuddyInteractiveSession",
+            FakeSession,
+        )
+        driver = CodeBuddyDriver(
+            workspace=tmp_path,
+            config_dir=tmp_path,
+            process_environment_overrides={
+                "HTTPS_PROXY": "http://127.0.0.1:43123",
+                "NODE_EXTRA_CA_CERTS": str(tmp_path / "ca.pem"),
+            },
+        )
+
+        driver.start_session(session_id="session-1")
+
+        assert observed["HTTPS_PROXY"] == "http://127.0.0.1:43123"
+        assert observed["NODE_EXTRA_CA_CERTS"] == str(tmp_path / "ca.pem")
+        assert observed["CODEBUDDY_CONFIG_DIR"] == str(tmp_path)
+
     def test_model_does_not_advertise_or_fake_private_identity_context(
         self, monkeypatch, tmp_path
     ) -> None:

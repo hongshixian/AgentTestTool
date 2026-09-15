@@ -240,10 +240,45 @@ pytest 还保存 `pytest_outcome.json`，包含 fixture 清理前已报告的 se
 teardown 结果以 pytest 报告为准。JUnit 的测试属性包含证据目录。
 
 逻辑和 Judge 可共同消费 `EvidenceBundle`；调用 `env.archive_bundle(bundle)` 保存完整
-Bundle。Judge 输入可能裁剪的原始输出，在归档中保留完整版本。
+Bundle。Judge 只接收用例明确声明为必需的证据，交互文本和 CLI 运行元数据分开编码，避免
+把上下文、输出、工具记录和完整 Trace 重复提交。必要证据超过 Judge 输入预算时直接返回
+“证据不足”，不会截断后继续判定；Judge 输入可能裁剪的原始输出在归档中保留完整版本。
 标准化证据记录包含采集状态、来源通道、权威边界、RUN/session/request/turn/task/tool
 关联标识、可证明事实和限制。只有 `available` 记录满足必需证据；缺失、超时、采集错误
 或来源未验证的记录不能用于判定通过。
+
+CodeBuddy 的受管进程默认启用运行级 HTTPS 证据获取器。每条用例使用独立回环代理、监听
+端口和临时 CA，仅向该次 CodeBuddy 子进程注入代理环境；不会修改系统代理或永久安装
+证书。采集器保留已有企业 HTTP CONNECT 代理、Node CA bundle 和不与抓包目标冲突的
+`NO_PROXY` 条目；会让目标域名绕过代理的精确域、父域或通配条目会被剔除。默认只对
+`copilot.tencent.com` 执行 TLS 解密并强制使用 HTTP/1.1，其他 CONNECT 目标
+通过原证书透明转发，避免改变 Agent 启动的 Git、curl、Python 等子工具行为。
+
+代理在转发真实请求和流式响应的同时进行有限采集，并在 Model 关闭时删除临时证书。非
+模型接口只归档路径、状态和传输元数据，正文不会进入证据；模型请求和响应在进入证据前对
+认证头、令牌、账号标识和运行秘密进行脱敏。模型正文按上限分块保存在哈希锚定的
+`network_body_*.json`，`network_turn_*.json` 保存每回合交换清单和分块引用；
+`network_exchange_trace` 只携带传输元数据、正文摘要和对应产物引用，避免把网络正文重复
+送入 Judge。正文截断、传输不完整或无法解析时，证据会降级，不能用于完整性或否定断言。
+整体网络证据与模型 Trace 分别评价健康度：配置、遥测或报告接口的已归属异常仍使整体网络
+证据标记为错误，但在模型请求和响应均完整、没有未归属采集错误或资源触限时，不会误伤
+重建 Trace；模型接口自身的异常始终使 Trace 降级或失败。
+
+`capture_evidence()` 会增加 `network_exchange_trace`、`observed_model_context`、
+`observed_model_output`、`observed_tool_trace`、`reconstructed_agent_trace` 和
+`collector_quality_report`。重建 Trace 将 `/v2/chat/completions` 的模型交换与公开
+`stream-json` 事件、Mock MCP 实收调用及确定性工具结果关联，区分工具的 proposed、
+dispatched、received、completed 和 returned 阶段。网络拦截属于 Q04 第三方抓包，不得
+标记为 Agent 原生日志或厂商提供的完整 Trace；模型提出工具调用也不能单独证明工具已经
+执行。
+
+下游确定性断言可以使用 `assert_reconstructed_trace_ready()`、
+`assert_model_context_contains()` 和 `assert_tool_lifecycle()`。这些断言只接受状态为
+`available` 且采集器健康、无丢失事件的 Trace；部分响应、无法关联或采集失败不能作为
+通过事实。单会话单回合 Trace 可以自动选择，包含多个会话或回合时必须传入 `session_id`
+和 `turn_id`；工具断言可用 `expected_arguments` 精确选择同名调用。直接调用
+`AgentModelFactory.create()` 时可用 `enable_network_capture=False` 关闭抓包；正式 pytest
+测评默认开启，但已经明确标记为需运营方证据的用例不会启动代理。
 
 需要更严格证据质量的断言使用 `EvidenceRequirement` 声明必需阶段、允许的来源权威边界、
 RUN/会话关联和采集时间。质量门在调用 Judge 前确定性执行；不满足时直接返回证据不足，

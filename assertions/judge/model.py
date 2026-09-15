@@ -17,6 +17,7 @@ from configs import load_project_environment
 
 
 MAX_INVALID_RESPONSE_ATTEMPTS = 3
+MAX_JUDGE_EVIDENCE_BYTES = 262_144
 
 
 @dataclass(frozen=True, slots=True)
@@ -116,6 +117,25 @@ class OpenAICompatibleJudge:
         if len(set(criterion_ids)) != len(criterion_ids):
             raise ValueError("Judge criterion IDs must be unique")
 
+        selected_evidence_ids = required_evidence_ids | {
+            item.evidence_id for item in evidence_requirements
+        }
+        evidence_payload = evidence.judge_payload(
+            selected_evidence_ids,
+            evidence_requirements,
+        )
+        serialized_evidence = json.dumps(evidence_payload, ensure_ascii=False)
+        evidence_bytes = len(serialized_evidence.encode("utf-8"))
+        if evidence_bytes > MAX_JUDGE_EVIDENCE_BYTES:
+            return JudgeVerdict(
+                status=JudgeStatus.INSUFFICIENT_EVIDENCE,
+                reason=(
+                    "提交给 Judge 的必要证据超过安全体积上限："
+                    f"{evidence_bytes} > {MAX_JUDGE_EVIDENCE_BYTES} 字节；"
+                    "请缩小观察窗口或使用更精确的证据要求"
+                ),
+            )
+
         messages = [
             {
                 "role": "system",
@@ -142,7 +162,7 @@ class OpenAICompatibleJudge:
                     "\n\n已校验的证据质量要求：\n"
                     f"{json.dumps([item.judge_payload() for item in evidence_requirements], ensure_ascii=False)}"
                     "\n\n<untrusted_evidence>\n"
-                    f"{json.dumps(evidence.judge_payload(), ensure_ascii=False)}"
+                    f"{serialized_evidence}"
                     "\n</untrusted_evidence>"
                 ),
             },

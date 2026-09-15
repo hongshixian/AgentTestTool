@@ -105,9 +105,10 @@ class CodeBuddyMockToolController:
             config,
             "--strict-mcp-config",
             "--tools",
-            "ToolSearch",
+            "ToolSearch,DeferExecuteTool",
             "--allowedTools",
             "ToolSearch",
+            "DeferExecuteTool",
             *(str(item["name"]) for item in runtime.list_tools()),
             *(f"mcp__ats_mock__{item['name']}" for item in runtime.list_tools()),
             "--max-turns",
@@ -170,7 +171,6 @@ class CodeBuddyMockToolController:
                 ),
                 correlation=EvidenceCorrelation(
                     run_id=self.environment.ledger.run_id,
-                    session_ids=(request.session_id,) if request.session_id else (),
                 ),
                 proves=("评测方接收端实际收到的模拟工具请求及其确定性结果",),
                 limitations=(

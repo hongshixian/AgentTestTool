@@ -49,6 +49,8 @@ def test_factory_to_stdio_tools_and_archive_across_independent_runs(tmp_path, mo
         with AgentModelFactory.create("codebuddy", workspace=tmp_path / "workspace",
                                        evidence_directory=evidence_directory) as model:
             env = model.environment
+            assert model.capabilities.network_traffic_evidence
+            assert model.capabilities.reconstructed_agent_trace
             run_ids.append(env.run_id)
             env.workspace.write_text("input.txt", "baseline")
             model.configure_mock_tools(suite, run_id=env.run_id, initial_state={"writes": 0})

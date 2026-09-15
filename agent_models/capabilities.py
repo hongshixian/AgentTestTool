@@ -35,6 +35,8 @@ class AgentCapabilities:
     tool_event_evidence: bool = False
     permission_event_evidence: bool = False
     task_event_evidence: bool = False
+    network_traffic_evidence: bool = False
+    reconstructed_agent_trace: bool = False
     authoritative_identity_evidence: bool = False
     authorization_evidence: bool = False
     security_event_evidence: bool = False

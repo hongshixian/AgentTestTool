@@ -9,7 +9,7 @@ import shutil
 import subprocess
 import time
 import threading
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, Callable
 
@@ -37,6 +37,7 @@ class CodeBuddyDriver:
         executable: str = "codebuddy",
         default_timeout: float = 90.0,
         config_dir: Path | None = None,
+        process_environment_overrides: Mapping[str, str] | None = None,
     ) -> None:
         configured_dir = os.environ.get("CODEBUDDY_CONFIG_DIR")
         self.workspace = workspace
@@ -48,6 +49,15 @@ class CodeBuddyDriver:
             if configured_dir
             else Path.home() / ".codebuddy"
         )
+        overrides = dict(process_environment_overrides or {})
+        if any(
+            not isinstance(name, str)
+            or not name
+            or not isinstance(value, str)
+            for name, value in overrides.items()
+        ):
+            raise ValueError("process environment overrides must map names to strings")
+        self._process_environment_overrides = overrides
         self._interactive_sessions: list[CodeBuddyInteractiveSession] = []
         self._interactive_lock = threading.RLock()
         self._background_task_ids: set[str] = set()
@@ -129,8 +139,7 @@ class CodeBuddyDriver:
             command.append("--no-session-persistence")
         command.extend(extra_args)
 
-        process_environment = agent_process_environment()
-        process_environment["CODEBUDDY_CONFIG_DIR"] = str(self.config_dir)
+        process_environment = self._process_environment()
         if allow_tools:
             process_environment["CODEBUDDY_IS_SANDBOX"] = "1"
 
@@ -194,8 +203,7 @@ class CodeBuddyDriver:
         command.extend(("--permission-mode", permission_mode))
         command.extend(extra_args)
 
-        process_environment = agent_process_environment()
-        process_environment["CODEBUDDY_CONFIG_DIR"] = str(self.config_dir)
+        process_environment = self._process_environment()
 
         session: CodeBuddyInteractiveSession | None = None
 
@@ -258,8 +266,7 @@ class CodeBuddyDriver:
             command.extend(("--tools", ""))
         command.extend(extra_args)
         command.append(prompt)
-        process_environment = agent_process_environment()
-        process_environment["CODEBUDDY_CONFIG_DIR"] = str(self.config_dir)
+        process_environment = self._process_environment()
         if allow_tools:
             process_environment["CODEBUDDY_IS_SANDBOX"] = "1"
         completed = subprocess.run(
@@ -304,8 +311,7 @@ class CodeBuddyDriver:
     ) -> tuple[BackgroundTaskObservation, ...]:
         """Read the public JSON background-task inventory."""
 
-        process_environment = agent_process_environment()
-        process_environment["CODEBUDDY_CONFIG_DIR"] = str(self.config_dir)
+        process_environment = self._process_environment()
         completed = subprocess.run(
             [self.executable, "agents", "--jobs", "--all"],
             cwd=self.workspace,
@@ -367,8 +373,7 @@ class CodeBuddyDriver:
         """Read the public log stream retained for one background task."""
 
         self._validate_background_task_id(task_id)
-        process_environment = agent_process_environment()
-        process_environment["CODEBUDDY_CONFIG_DIR"] = str(self.config_dir)
+        process_environment = self._process_environment()
         completed = subprocess.run(
             [self.executable, "logs", task_id],
             cwd=self.workspace,
@@ -397,8 +402,7 @@ class CodeBuddyDriver:
         """Request termination through the public ``stop`` command."""
 
         self._validate_background_task_id(task_id)
-        process_environment = agent_process_environment()
-        process_environment["CODEBUDDY_CONFIG_DIR"] = str(self.config_dir)
+        process_environment = self._process_environment()
         completed = subprocess.run(
             [self.executable, "stop", task_id],
             cwd=self.workspace,
@@ -559,6 +563,12 @@ class CodeBuddyDriver:
     def _has_local_login_state(self) -> bool:
         storage = self.config_dir / "local_storage"
         return storage.is_dir() and any(storage.iterdir())
+
+    def _process_environment(self) -> dict[str, str]:
+        environment = agent_process_environment()
+        environment.update(self._process_environment_overrides)
+        environment["CODEBUDDY_CONFIG_DIR"] = str(self.config_dir)
+        return environment
 
 
 def _parse_output_items(raw_output: str) -> list[Any]:

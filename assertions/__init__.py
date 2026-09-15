@@ -22,6 +22,11 @@ from assertions.outcome import (
     assessment_verdict,
     mock_inconclusive_assertion,
 )
+from assertions.trace import (
+    assert_model_context_contains,
+    assert_reconstructed_trace_ready,
+    assert_tool_lifecycle,
+)
 
 __all__ = [
     "ASSESSMENT_MISSING_EVIDENCE_PROPERTY",
@@ -37,9 +42,12 @@ __all__ = [
     "assert_destroyed_instance_remains_destroyed",
     "assert_instance_inventory_unchanged",
     "assert_local_state_tamper_detected_and_restored",
+    "assert_model_context_contains",
     "assert_mock_tool_called_with_configured_result",
     "assert_protected_resources_not_accessed",
     "assert_required_evidence",
+    "assert_reconstructed_trace_ready",
+    "assert_tool_lifecycle",
     "assert_turn_completed",
     "mock_inconclusive_assertion",
 ]

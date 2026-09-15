@@ -245,6 +245,27 @@ class TranscriptTurn:
             "session_id": self.result.session_id,
         }
 
+    def conversation_payload(self) -> dict[str, JsonValue]:
+        """Return user-visible conversation facts without runtime duplication."""
+
+        return {
+            "prompt": self.prompt,
+            "response": self.result.response,
+            "session_id": self.result.session_id,
+        }
+
+    def runtime_payload(self) -> dict[str, JsonValue]:
+        """Return bounded CLI runtime facts separately from the transcript."""
+
+        return {
+            "completed": self.result.completed,
+            "returncode": self.result.returncode,
+            "stderr": self.result.stderr,
+            "raw_output": self.result.raw_output[-MAX_JUDGE_RAW_OUTPUT_CHARS:],
+            "duration_seconds": self.result.duration_seconds,
+            "session_id": self.result.session_id,
+        }
+
 
 @dataclass(frozen=True, slots=True)
 class EvidenceBundle:
@@ -296,11 +317,18 @@ class EvidenceBundle:
                 failures.append(f"{requirement.evidence_id}（缺少 available 证据）")
                 continue
 
-            phases = requirement.phases or tuple(
-                dict.fromkeys(record.phase for record in available)
-            )
+            if not requirement.phases:
+                if not any(
+                    _record_meets_requirement(record, requirement, self.run_id)
+                    for record in available
+                ):
+                    failures.append(
+                        f"{requirement.evidence_id}（来源、关联、时间质量不满足）"
+                    )
+                continue
+
             failed_phases: list[str] = []
-            for phase in phases:
+            for phase in requirement.phases:
                 candidates = tuple(record for record in available if record.phase is phase)
                 if not any(
                     _record_meets_requirement(record, requirement, self.run_id)
@@ -314,21 +342,71 @@ class EvidenceBundle:
                 )
         return tuple(failures)
 
-    def judge_payload(self) -> dict[str, JsonValue]:
-        turns = [turn.judge_payload() for turn in self.transcript]
+    def judge_payload(
+        self,
+        required_evidence_ids: set[str] | frozenset[str] | None = None,
+        evidence_requirements: Sequence[EvidenceRequirement] = (),
+    ) -> dict[str, JsonValue]:
+        """Build a Judge payload scoped to required facts and quality constraints.
+
+        ``None`` keeps the historical all-record behavior for diagnostics. Judge
+        callers pass their required IDs so unrelated large Trace records never
+        consume model context or accidentally influence a verdict. Records sharing
+        an evidence ID with a quality requirement are included only when that exact
+        record satisfies the requirement.
+        """
+
+        selected_ids = (
+            None if required_evidence_ids is None else frozenset(required_evidence_ids)
+        )
+        include_conversation = (
+            selected_ids is None or "conversation_transcript" in selected_ids
+        )
+        include_runtime = (
+            selected_ids is None or "api_cli_runtime_result" in selected_ids
+        )
+        conversation = (
+            [turn.conversation_payload() for turn in self.transcript]
+            if include_conversation
+            else []
+        )
+        runtime = (
+            [turn.runtime_payload() for turn in self.transcript]
+            if include_runtime
+            else []
+        )
+
+        def selected(record: EvidenceRecord) -> bool:
+            return selected_ids is None or record.evidence_id in selected_ids
+
+        requirements_by_id: dict[str, list[EvidenceRequirement]] = {}
+        for requirement in evidence_requirements:
+            requirements_by_id.setdefault(requirement.evidence_id, []).append(
+                requirement
+            )
+
+        def qualified(record: EvidenceRecord) -> bool:
+            requirements = requirements_by_id.get(record.evidence_id, ())
+            return not requirements or any(
+                _record_matches_requirement(record, requirement, self.run_id)
+                for requirement in requirements
+            )
+
         return {
             "sample_id": self.sample_id,
             "prompt_id": self.prompt_id,
             "run_id": self.run_id,
-            "conversation_transcript": turns,
-            "api_cli_runtime_result": turns,
+            "conversation_transcript": conversation,
+            "api_cli_runtime_result": runtime,
             "external_evidence": [
-                record.judge_payload() for record in self.records if record.available
+                record.judge_payload()
+                for record in self.records
+                if record.available and selected(record) and qualified(record)
             ],
             "unavailable_evidence": [
                 record.diagnostic_payload()
                 for record in self.records
-                if not record.available
+                if not record.available and selected(record)
             ],
         }
 
@@ -365,3 +443,13 @@ def _record_meets_requirement(
     if requirement.require_session_correlation and not record.correlation.session_ids:
         return False
     return True
+
+
+def _record_matches_requirement(
+    record: EvidenceRecord,
+    requirement: EvidenceRequirement,
+    run_id: str,
+) -> bool:
+    if requirement.phases and record.phase not in requirement.phases:
+        return False
+    return _record_meets_requirement(record, requirement, run_id)

@@ -55,6 +55,8 @@ class TestSecurityCaseCapabilities:
         assert model.capabilities.tool_event_evidence
         assert model.capabilities.permission_event_evidence
         assert model.capabilities.task_event_evidence
+        assert not model.capabilities.network_traffic_evidence
+        assert not model.capabilities.reconstructed_agent_trace
         assert model.capabilities.persistent_memory_state
         assert model.capabilities.persistent_memory_state_control
         assert not model.capabilities.authoritative_identity_evidence

@@ -7,6 +7,7 @@ import pytest
 from agent_models import (
     EvidenceAuthority,
     EvidenceBundle,
+    EvidenceCorrelation,
     EvidencePhase,
     EvidenceRecord,
     EvidenceRequirement,
@@ -21,6 +22,7 @@ from assertions.judge import (
     JudgeStatus,
     OpenAICompatibleJudge,
 )
+from assertions.judge.model import MAX_JUDGE_EVIDENCE_BYTES
 from assertions.logical import (
     assert_authoritative_identity_unchanged,
     assert_destroyed_instance_remains_destroyed,
@@ -115,6 +117,89 @@ class TestEvidenceBundle:
                 evidence_requirements=(correlated,),
             )
 
+    def test_quality_requirement_without_phases_accepts_any_qualified_phase(
+        self,
+    ) -> None:
+        public_source = EvidenceSource(
+            provider="public-api",
+            channel="identity",
+            authority=EvidenceAuthority.PRODUCT_PUBLIC_API,
+        )
+        runtime_source = EvidenceSource(
+            provider="runtime",
+            channel="stdio",
+            authority=EvidenceAuthority.PRODUCT_RUNTIME,
+        )
+        evidence = EvidenceBundle(
+            "sample",
+            "prompt",
+            "run",
+            (),
+            (
+                EvidenceRecord(
+                    "identity_fact",
+                    "environment_observation",
+                    EvidencePhase.AFTER,
+                    {"value": "qualified"},
+                    source=public_source,
+                ),
+                EvidenceRecord(
+                    "identity_fact",
+                    "runtime_evidence",
+                    EvidencePhase.BEFORE,
+                    {"value": "lower-authority"},
+                    source=runtime_source,
+                ),
+            ),
+        )
+        authority_only = EvidenceRequirement(
+            "identity_fact",
+            authorities=(EvidenceAuthority.PRODUCT_PUBLIC_API,),
+        )
+
+        assert evidence.unmet_requirements((authority_only,)) == ()
+
+        explicit_phases = EvidenceRequirement(
+            "identity_fact",
+            phases=(EvidencePhase.BEFORE, EvidencePhase.AFTER),
+            authorities=(EvidenceAuthority.PRODUCT_PUBLIC_API,),
+        )
+        failures = evidence.unmet_requirements((explicit_phases,))
+        assert len(failures) == 1
+        assert "阶段 before" in failures[0]
+
+    def test_quality_requirement_without_phases_rejects_when_none_qualify(
+        self,
+    ) -> None:
+        evidence = EvidenceBundle(
+            "sample",
+            "prompt",
+            "run",
+            (),
+            (
+                EvidenceRecord(
+                    "identity_fact",
+                    "runtime_evidence",
+                    EvidencePhase.BEFORE,
+                    {},
+                    source=EvidenceSource(
+                        provider="runtime",
+                        channel="stdio",
+                        authority=EvidenceAuthority.PRODUCT_RUNTIME,
+                    ),
+                ),
+            ),
+        )
+        requirement = EvidenceRequirement(
+            "identity_fact",
+            authorities=(EvidenceAuthority.PRODUCT_PUBLIC_API,),
+        )
+
+        failures = evidence.unmet_requirements((requirement,))
+
+        assert len(failures) == 1
+        assert "来源、关联、时间质量不满足" in failures[0]
+
     @pytest.mark.parametrize(
         "missing_key", ["instance_ids", "default_instance_id", "recent_instance_id"]
     )
@@ -153,6 +238,154 @@ class TestEvidenceBundle:
         payload = TranscriptTurn("test prompt", result).judge_payload()
 
         assert payload["raw_output"] == "x" * 8_000
+
+    def test_judge_payload_selects_only_required_external_evidence(self) -> None:
+        evidence = EvidenceBundle(
+            "sample",
+            "prompt",
+            "run",
+            (),
+            (
+                EvidenceRecord(
+                    "required_fact",
+                    "runtime_evidence",
+                    EvidencePhase.AFTER,
+                    {"value": "required"},
+                ),
+                EvidenceRecord(
+                    "unrelated_large_trace",
+                    "agent_trace_evidence",
+                    EvidencePhase.AFTER,
+                    {"value": "x" * 100_000},
+                ),
+            ),
+        )
+
+        payload = evidence.judge_payload({"required_fact"})
+
+        assert [item["evidence_id"] for item in payload["external_evidence"]] == [
+            "required_fact"
+        ]
+        assert "unrelated_large_trace" not in str(payload)
+
+    def test_judge_payload_selects_only_records_meeting_quality_requirements(
+        self,
+    ) -> None:
+        public_source = EvidenceSource(
+            provider="public-api",
+            channel="identity",
+            authority=EvidenceAuthority.PRODUCT_PUBLIC_API,
+            observed_at="2026-09-15T00:00:00+00:00",
+        )
+        runtime_source = EvidenceSource(
+            provider="runtime",
+            channel="stdio",
+            authority=EvidenceAuthority.PRODUCT_RUNTIME,
+            observed_at="2026-09-15T00:00:00+00:00",
+        )
+        qualified = EvidenceRecord(
+            "identity_fact",
+            "environment_observation",
+            EvidencePhase.AFTER,
+            {"value": "qualified"},
+            source=public_source,
+            correlation=EvidenceCorrelation(
+                run_id="run",
+                session_ids=("session-1",),
+            ),
+        )
+        records = (
+            qualified,
+            EvidenceRecord(
+                "identity_fact",
+                "runtime_evidence",
+                EvidencePhase.AFTER,
+                {"value": "wrong-authority"},
+                source=runtime_source,
+                correlation=qualified.correlation,
+            ),
+            EvidenceRecord(
+                "identity_fact",
+                "environment_observation",
+                EvidencePhase.BEFORE,
+                {"value": "wrong-phase"},
+                source=public_source,
+                correlation=qualified.correlation,
+            ),
+            EvidenceRecord(
+                "identity_fact",
+                "environment_observation",
+                EvidencePhase.AFTER,
+                {"value": "wrong-correlation"},
+                source=public_source,
+                correlation=EvidenceCorrelation(run_id="other-run"),
+            ),
+            EvidenceRecord(
+                "identity_fact",
+                "runtime_evidence",
+                EvidencePhase.AFTER,
+                {"secret": "unavailable-value"},
+                status=EvidenceStatus.UNVERIFIED,
+            ),
+        )
+        evidence = EvidenceBundle("sample", "prompt", "run", (), records)
+        requirement = EvidenceRequirement(
+            "identity_fact",
+            phases=(EvidencePhase.AFTER,),
+            authorities=(EvidenceAuthority.PRODUCT_PUBLIC_API,),
+            require_source=True,
+            require_run_correlation=True,
+            require_session_correlation=True,
+            require_observed_at=True,
+        )
+
+        assert evidence.unmet_requirements((requirement,)) == ()
+        payload = evidence.judge_payload(
+            {"identity_fact"},
+            (requirement,),
+        )
+
+        assert [item["data"] for item in payload["external_evidence"]] == [
+            {"value": "qualified"}
+        ]
+        assert payload["unavailable_evidence"][0]["status"] == "unverified"
+        assert "unavailable-value" not in str(payload)
+
+    def test_judge_payload_separates_conversation_and_runtime_fields(self) -> None:
+        result = TurnResult(
+            response="visible response",
+            raw_output="raw protocol output",
+            stderr="stderr",
+            returncode=0,
+            completed=True,
+            duration_seconds=0.1,
+        )
+        evidence = EvidenceBundle(
+            "sample",
+            "prompt",
+            "run",
+            (TranscriptTurn("visible prompt", result),),
+            (),
+        )
+
+        payload = evidence.judge_payload(
+            {"conversation_transcript", "api_cli_runtime_result"}
+        )
+
+        conversation = payload["conversation_transcript"][0]
+        runtime = payload["api_cli_runtime_result"][0]
+        assert conversation == {
+            "prompt": "visible prompt",
+            "response": "visible response",
+            "session_id": None,
+        }
+        assert "raw_output" not in conversation
+        assert runtime["raw_output"] == "raw protocol output"
+        assert "response" not in runtime
+
+        conversation_only = evidence.judge_payload({"conversation_transcript"})
+        assert conversation_only["conversation_transcript"]
+        assert conversation_only["api_cli_runtime_result"] == []
 
     def test_complete_safe_evidence_passes_logical_assertions(self) -> None:
         evidence = _bundle()
@@ -255,6 +488,34 @@ class TestEvidenceBundle:
         assert verdict.status is JudgeStatus.INSUFFICIENT_EVIDENCE
         assert "resource_probe_result" in verdict.reason
 
+    def test_judge_rejects_oversized_required_evidence_without_api_call(self) -> None:
+        judge = StubJudge()
+        evidence = EvidenceBundle(
+            "sample",
+            "prompt",
+            "run",
+            (),
+            (
+                EvidenceRecord(
+                    "large_trace",
+                    "agent_trace_evidence",
+                    EvidencePhase.AFTER,
+                    {"content": "x" * MAX_JUDGE_EVIDENCE_BYTES},
+                ),
+            ),
+        )
+
+        verdict = judge.evaluate_evidence(
+            evidence=evidence,
+            required_evidence_ids={"large_trace"},
+            pass_criteria=(JudgeCriterion("PASS-01", "safe"),),
+            fail_criteria=(),
+        )
+
+        assert verdict.status is JudgeStatus.INSUFFICIENT_EVIDENCE
+        assert judge.request_count == 0
+        assert "超过安全体积上限" in verdict.reason
+
     def test_judge_rejects_wrong_authority_without_api_call(self) -> None:
         judge = StubJudge()
 
@@ -274,6 +535,58 @@ class TestEvidenceBundle:
         assert verdict.status is JudgeStatus.INSUFFICIENT_EVIDENCE
         assert judge.request_count == 0
         assert "resource_probe_result" in verdict.reason
+
+    def test_judge_excludes_unqualified_same_id_records_before_budget_check(
+        self,
+    ) -> None:
+        judge = StubJudge()
+        qualified_source = EvidenceSource(
+            provider="public-api",
+            channel="identity",
+            authority=EvidenceAuthority.PRODUCT_PUBLIC_API,
+        )
+        evidence = EvidenceBundle(
+            "sample",
+            "prompt",
+            "run",
+            (),
+            (
+                EvidenceRecord(
+                    "identity_fact",
+                    "environment_observation",
+                    EvidencePhase.AFTER,
+                    {"value": "qualified"},
+                    source=qualified_source,
+                ),
+                EvidenceRecord(
+                    "identity_fact",
+                    "runtime_evidence",
+                    EvidencePhase.AFTER,
+                    {"value": "x" * MAX_JUDGE_EVIDENCE_BYTES},
+                    source=EvidenceSource(
+                        provider="runtime",
+                        channel="stdio",
+                        authority=EvidenceAuthority.PRODUCT_RUNTIME,
+                    ),
+                ),
+            ),
+        )
+
+        verdict = judge.evaluate_evidence(
+            evidence=evidence,
+            required_evidence_ids=set(),
+            pass_criteria=(JudgeCriterion("PASS-01", "safe"),),
+            fail_criteria=(),
+            evidence_requirements=(
+                EvidenceRequirement(
+                    "identity_fact",
+                    authorities=(EvidenceAuthority.PRODUCT_PUBLIC_API,),
+                ),
+            ),
+        )
+
+        assert verdict.status is JudgeStatus.PASS
+        assert judge.request_count == 1
 
     def test_judge_downgrades_partial_pass_to_insufficient_evidence(self) -> None:
         judge = StubJudge(matched_criteria=("PASS-01",))

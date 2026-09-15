@@ -58,6 +58,7 @@ agent_models/
     ├── model.py            # CodeBuddy AgentModel 的组件组装
     ├── driver.py           # CodeBuddy 测试驱动：进程、认证、会话和输出解析
     ├── interactive.py      # CodeBuddy 公开 stream-json 长驻会话适配
+    ├── trace_adapter.py    # 网络、运行流和 Mock MCP 证据的 Trace 重建
     ├── evidence.py         # 产品公开界面的黑盒观察证据适配
     ├── mock_tool.py        # CodeBuddy Mock Tool 会话组装与证据采集
     ├── mock_mcp_server.py  # 确定性 stdio MCP 测试服务
@@ -68,11 +69,19 @@ assertions/
 ├── __init__.py
 ├── logical.py              # 基于逻辑判断的传统断言
 ├── environment.py          # 工具调用、模拟副作用及观察窗口断言
+├── trace.py                # 回合隔离的模型上下文和工具生命周期断言
 ├── outcome.py              # 通过、不通过、不适用、无法判定四态结果
 └── judge/
     ├── __init__.py
     ├── model.py            # Judge 模型统一接口及实现
     └── result.py           # JudgeVerdict 等结构化判定结果
+
+evidence_collectors/
+├── base.py                 # 产品无关的采集生命周期、窗口、状态和健康度
+├── manager.py              # 多采集器编排、失败聚合和逆序清理
+├── trace.py                # 产品无关的 Agent Trace 中间表示
+└── network/
+    └── https_mitm.py       # 运行级 HTTPS 代理、脱敏和有限流量采集
 
 test_cases/
 ├── base.py                 # 公共测试用例基类 AgentTestCase
@@ -147,6 +156,10 @@ README.md
 - 用例需要限定证据质量时使用 `EvidenceRequirement` 明确阶段、来源权威边界、RUN/会话关联和采集时间；在调用 Judge 前确定性校验，不满足时不得请求 Judge 给出通过结论。
 - Judge 的事实输入只能包含 `available` 证据；其他状态只提供不含原始 `data` 的采集诊断，不得作为事实或旁证。
 - 产品公开 CLI 运行时流只对该进程发出的会话、工具、权限、任务和终态事件具有权威性，不得据此推断云端账号身份、服务端授权状态、安全审计事件或所有未观察通道均无副作用。
+- CodeBuddy 网络证据通过运行级回环代理采集，默认只解密明确允许的模型服务主机；其他 CONNECT 流量透明转发。代理必须保留已有企业代理、CA 和不与抓包目标冲突的 `NO_PROXY` 语义，不得安装系统证书。
+- Trace 重建必须按 RUN、会话和回合隔离。多回合断言必须选择唯一回合；后台模型调用、历史回放、截断正文、坏 SSE 和工具关联歧义不得作为完整当前回合证据。
+- 网络正文和 Trace 在进入 `EvidenceRecord` 或 Judge 前完成脱敏；大体积正文使用有界分块工件和哈希引用，禁止用单个无限增长工件归档整次网络运行。
+- Judge 只接收用例明确要求的证据并设置输入体积上限；超限必须返回证据不足，不得静默截断后继续给出通过结论。
 - 权威身份断言必须使用独立的产品公开查询接口证据；Agent 自述、初始化响应中的账号对象、本地认证缓存和测试侧状态不能替代。
 - 测试用例通过统一 RequestContext、Mock Tool 和 LocalStateController 能力表达产品公开操作；具体 CLI 参数、MCP 和本地配置差异只能由产品 AgentModel 封装。
 - 持久化记忆用例通过 AgentModel 的统一记忆状态接口保存基线、观察测试标记和恢复；产品文件路径、格式和存储兼容规则不得泄漏到测试用例。
