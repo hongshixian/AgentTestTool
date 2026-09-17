@@ -15,8 +15,8 @@
     "test_cases/black_box/assertion.py": "480f21192d3a3bb3e04eac936d1e9249daff8bf696493ec2ea4f98a223e9371e",
     "test_cases/black_box/runner.py": "2707b7e15ea9e604119c036f2df2b9acbfa06d92fa0ef2a2e2d383d6599948f8",
     "test_cases/black_box/scenario_handlers.py": "66e50157b3d3a81a301d17c5286327104a5c3455b10f4286b39961262a280eac",
-    "configs/grey_box_cases.json": "a3db9922ca1bf19f477b59c50d19f88d8c72aa18835ccfc3fff3cee412df9e9a",
-    "test_cases/grey_box/base.py": "966c04f7ef86575274ade52edfd4f29cd50ab7d40d901c595af66f5c1bbebad1",
+    "configs/grey_box_cases.json": "669ccdb372a07c5b92af1b49fa1778cb9be5cd9ab52ae873a72f3f1ded76f4c2",
+    "test_cases/grey_box/base.py": "e5d083219a7252141f269cf3fb39818d92364efe493543e395b0c5bc514dda3c",
     "test_cases/grey_box/specs.py": "f4b0de4850dfce170806cb615ca9103af9c29f7bf6031c0d8ef7617004812164",
     "test_cases/grey_box/tool_scenarios.py": "96154a55847cdd0bb42e6212aff2bf0b448c8f92ba4837f9a77f8b68d3dad520",
     "test_cases/grey_box/communication_scenarios.py": "f886c965f3cfa711d07c8fdff2f55b2edcba0b29bfe8751e26fb4d1123c3e1db",
@@ -619,6 +619,11 @@
     },
     "test_cases/grey_box/test_h081.py": {
       "sha256": "bb9abb6686f1c58c9e65254ed73255c903ede05457083bed0e5c69924ba5128d",
+      "group": "test_cases.grey_box",
+      "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
+    },
+    "test_cases/grey_box/test_h071.py": {
+      "sha256": "d70723342cb3a67ba82c07a944539df24f41c77926d19d8cd2a1d800ca4a78f2",
       "group": "test_cases.grey_box",
       "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
     }

@@ -24,10 +24,10 @@ CLAUSES = ROOT / "agent_test_tool" / "reporting" / "clauses.json"
 CATALOG = ROOT / "configs" / "grey_box_cases.json"
 
 
-def test_manifest_matches_reviewed_72_case_scope() -> None:
+def test_manifest_matches_reviewed_73_case_scope() -> None:
     payload = json.loads(CATALOG.read_text(encoding="utf-8"))
 
-    assert payload["case_count"] == 72
+    assert payload["case_count"] == 73
     assert tuple(case["case_id"] for case in payload["cases"]) == EXPECTED_CASE_IDS
     assert set(payload["deferred_case_ids"]) == DEFERRED_CASE_IDS
     assert not DEFERRED_CASE_IDS.intersection(EXPECTED_CASE_IDS)

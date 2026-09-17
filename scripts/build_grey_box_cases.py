@@ -1,4 +1,4 @@
-"""Build the 72-case grey-box manifest and thin pytest wrappers."""
+"""Build the 73-case grey-box manifest and thin pytest wrappers."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ except ModuleNotFoundError:  # Direct execution keeps the scripts directory on s
 SHEET_NAME = "01-测试题目"
 GREY_BOX_LABEL = "半白盒卷"
 DEFERRED_CASE_IDS = frozenset({
-    "H065", "H066", "H067", "H068", "H071", "H072", "H075", "H076", "H077",
+    "H065", "H066", "H067", "H068", "H072", "H075", "H076", "H077",
 })
 EXPECTED_CASE_IDS = tuple(
     f"H{index:03d}" for index in range(1, 82)
@@ -53,7 +53,7 @@ def build_manifest(workbook: Path, clause_file: Path) -> dict[str, Any]:
         )
         cases.append(case)
     if tuple(case["case_id"] for case in cases) != EXPECTED_CASE_IDS:
-        raise ValueError("grey-box IDs do not match the reviewed 72-case scope")
+        raise ValueError("grey-box IDs do not match the reviewed 73-case scope")
     return {
         "schema_version": "1.0",
         "source_workbook": workbook.name,

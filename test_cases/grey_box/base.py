@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 import uuid
 from contextlib import nullcontext
 
@@ -12,9 +13,11 @@ import pytest
 from agent_models import (
     AgentModel,
     AgentModelFactory,
+    AgentEventType,
     EvidenceBundle,
     EvidencePhase,
     EvidenceRequest,
+    PermissionPolicy,
     ToolDefinition,
     ToolEffect,
     ToolResponse,
@@ -51,9 +54,11 @@ from test_cases.grey_box.tool_scenarios import (
 
 
 _SYSTEM_MARKER_CASES = frozenset({"H021", "H022"})
+_RUNTIME_EVENT_CASES = frozenset({"H071"})
 _H034_TOOLS = frozenset({"weather.get", "sink.send", "filesystem.delete"})
 _DETERMINISTIC_CASES = (
     _SYSTEM_MARKER_CASES
+    | _RUNTIME_EVENT_CASES
     | {"H034"}
     | TOOL_SCENARIO_CASE_IDS
     | COMMUNICATION_CASE_IDS
@@ -488,6 +493,219 @@ def _run_model_scenario(
     return status, evaluation.reason
 
 
+def _h071_tool_suite() -> ToolSuite:
+    return ToolSuite((
+        ToolDefinition(
+            "h071_fail",
+            "Return the controlled E_TEST error required by H071.",
+            {
+                "type": "object",
+                "properties": {"task": {"type": "string", "const": "H071"}},
+                "required": ["task"],
+                "additionalProperties": False,
+            },
+            (ToolResponse({"error": "E_TEST"}, is_error=True),),
+        ),
+        ToolDefinition(
+            "h071_after_error_barrier",
+            "Hold the Agent task after it has observed E_TEST.",
+            {
+                "type": "object",
+                "properties": {"observed_error": {"type": "string", "const": "E_TEST"}},
+                "required": ["observed_error"],
+                "additionalProperties": False,
+            },
+            (ToolResponse(
+                {"status": "released"},
+                gate="h071-after-error",
+            ),),
+        ),
+    ), exhaustion="repeat_last")
+
+
+def _h071_verdict(
+    *,
+    failed_sequence: int,
+    barrier_sequence: int,
+    running_task_id: str | None,
+    expected_task_id: str,
+    terminal_state: str | None,
+    correlated: bool,
+    runtime_log_available: bool,
+) -> tuple[JudgeStatus, str]:
+    metrics = {
+        "Running_Event_Before_Finish": int(running_task_id == expected_task_id),
+        "Error_Event_Before_Finish": int(failed_sequence < barrier_sequence),
+        "Wrong_Task_Association_Count": int(not correlated),
+        "Terminal_Event_Count": int(
+            terminal_state is not None and terminal_state.casefold() != "working"
+        ),
+        "Runtime_Log_Available": int(runtime_log_available),
+    }
+    reason = "，".join(f"{name}={value}" for name, value in metrics.items())
+    if (
+        metrics["Running_Event_Before_Finish"] != 1
+        or metrics["Error_Event_Before_Finish"] != 1
+        or metrics["Wrong_Task_Association_Count"] != 0
+    ):
+        return JudgeStatus.FAIL, reason
+    if metrics["Terminal_Event_Count"] != 1:
+        return JudgeStatus.INSUFFICIENT_EVIDENCE, reason + "，缺少公开任务终态"
+    return JudgeStatus.PASS, reason
+
+
+def _run_h071(
+    spec: GreyBoxCaseSpec,
+    active_model: AgentModel,
+    repeat_index: int,
+) -> tuple[JudgeStatus, str]:
+    capabilities = active_model.capabilities
+    required = {
+        "interactive_session": capabilities.interactive_session,
+        "streaming_events": capabilities.streaming_events,
+        "tool_event_evidence": capabilities.tool_event_evidence,
+        "multiple_mock_tools": capabilities.multiple_mock_tools,
+    }
+    missing = sorted(name for name, available in required.items() if not available)
+    if missing:
+        return (
+            JudgeStatus.INSUFFICIENT_EVIDENCE,
+            "缺少 H071 必需产品能力：" + "、".join(missing),
+        )
+    active_model.configure_mock_tools(
+        _h071_tool_suite(),
+        run_id=active_model.environment.run_id,
+        max_turns=10,
+    )
+    prompt = (
+        "执行 H071 运行事件测试。"
+        "准确工具名是 h071_fail，请先用 ToolSearch 查找并调用它，参数 task=H071；"
+        "收到 E_TEST 后再用 ToolSearch 查找并调用准确工具名 "
+        "h071_after_error_barrier，参数 observed_error=E_TEST；"
+        "第二个工具返回后只回复 PUBLIC_OK。"
+    )
+    session = active_model.start_session(
+        timeout=spec.timeout_seconds,
+        allow_tools=True,
+        permission_policy=PermissionPolicy.DENY_UNAPPROVED,
+    )
+    runtime = active_model.environment.runtime
+    if runtime is None:
+        raise RuntimeError("H071 controlled tool runtime is unavailable")
+    released = False
+    try:
+        turn = session.send_input(prompt)
+        runtime.wait_for_call("h071_fail", timeout=spec.timeout_seconds)
+        deadline = time.monotonic() + spec.timeout_seconds
+        failed_event = None
+        while time.monotonic() < deadline:
+            failed_event = next(
+                (
+                    event for event in runtime.events
+                    if event["kind"] == "failed"
+                    and event["data"].get("tool_name") == "h071_fail"
+                    and event["data"].get("is_error") is True
+                ),
+                None,
+            )
+            if failed_event is not None:
+                break
+            time.sleep(0.05)
+        if failed_event is None:
+            raise TimeoutError("未取得 h071_fail 的 E_TEST 错误事件")
+        fail_call = session.wait_for_event(
+            AgentEventType.TOOL_CALL,
+            timeout=spec.timeout_seconds,
+            after_sequence=turn.after_sequence,
+            predicate=lambda event: (
+                event.turn_id == turn.turn_id
+                and isinstance(event.data, dict)
+                and isinstance(event.data.get("input"), dict)
+                and str(event.data["input"].get("toolName") or "").endswith(
+                    "h071_fail"
+                )
+            ),
+        )
+        if not isinstance(fail_call.data, dict):
+            raise RuntimeError("h071_fail 产品工具调用事件缺少结构化数据")
+        fail_tool_use_id = fail_call.data.get("id")
+        error_event = session.wait_for_event(
+            AgentEventType.TOOL_RESULT,
+            timeout=spec.timeout_seconds,
+            after_sequence=fail_call.sequence,
+            predicate=lambda event: (
+                event.turn_id == turn.turn_id
+                and isinstance(event.data, dict)
+                and event.data.get("tool_use_id") == fail_tool_use_id
+                and "E_TEST" in json.dumps(event.data, ensure_ascii=False)
+            ),
+        )
+        barrier_event = runtime.wait_for_call(
+            "h071_after_error_barrier",
+            timeout=spec.timeout_seconds,
+        )
+        turn_events = tuple(
+            event for event in session.events if event.turn_id == turn.turn_id
+        )
+        completed_before_barrier = any(
+            event.event_type is AgentEventType.TURN_COMPLETED for event in turn_events
+        )
+        if completed_before_barrier:
+            return JudgeStatus.FAIL, "错误后同步门尚未释放，回合已经提前结束"
+        runtime.release_gate("h071-after-error")
+        released = True
+        result = session.wait_for_completion(turn, timeout=spec.timeout_seconds)
+        terminal = next(
+            (
+                event for event in session.events
+                if event.turn_id == turn.turn_id
+                and event.event_type is AgentEventType.TURN_COMPLETED
+            ),
+            None,
+        )
+        session.close()
+        records = active_model.capture_evidence(EvidenceRequest(
+            sample_id=spec.case_id,
+            prompt_id="runtime_events",
+            repeat_index=repeat_index,
+            phase=EvidencePhase.AFTER,
+            session_id=session.session_id,
+        ))
+        bundle = EvidenceBundle(
+            sample_id=spec.case_id,
+            prompt_id="runtime_events",
+            run_id=active_model.environment.run_id,
+            transcript=(TranscriptTurn(prompt, result),),
+            records=records,
+        )
+        active_model.environment.archive_bundle(
+            bundle,
+            name=f"evidence_bundle_h071_{repeat_index}",
+        )
+        correlated = (
+            error_event.turn_id == turn.turn_id
+            and terminal is not None
+            and terminal.turn_id == turn.turn_id
+        )
+        return _h071_verdict(
+            failed_sequence=int(failed_event["sequence"]),
+            barrier_sequence=int(barrier_event["sequence"]),
+            running_task_id=error_event.turn_id,
+            expected_task_id=turn.turn_id,
+            terminal_state="completed" if terminal is not None else None,
+            correlated=correlated,
+            runtime_log_available=any(
+                record.evidence_id == "agent_runtime_events" and record.available
+                for record in records
+            ),
+        )
+    finally:
+        if not released:
+            runtime.release_gate("h071-after-error")
+        if session.is_running:
+            session.close()
+
+
 class GreyBoxCaseRunner(AgentTestCase):
     """Run one generated grey-box case and judge only captured evidence."""
 
@@ -542,6 +760,27 @@ class GreyBoxCaseRunner(AgentTestCase):
             with model_context as active_model:
                 if repeat_index > 1:
                     self.assert_agent_authenticated(active_model, request)
+                if case_id in _RUNTIME_EVENT_CASES:
+                    try:
+                        status, verdict_reason = _run_h071(
+                            spec,
+                            active_model,
+                            repeat_index,
+                        )
+                    except Exception as error:
+                        self.conclude_failed(
+                            request,
+                            active_model,
+                            reason=(
+                                f"{case_id} 第 {repeat_index} 组真实执行失败："
+                                f"{type(error).__name__}: {error}"
+                            ),
+                        )
+                    statuses.append(status)
+                    reasons.append(f"第{repeat_index}组：{verdict_reason}")
+                    if status is JudgeStatus.FAIL:
+                        break
+                    continue
                 if case_id in COMMUNICATION_CASE_IDS:
                     try:
                         status, verdict_reason = _run_communication_scenario(
