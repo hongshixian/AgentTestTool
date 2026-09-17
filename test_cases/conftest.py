@@ -207,7 +207,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption(
         "--case-suite",
         action="store",
-        choices=("smoke", "black_box", "grey_box"),
+        choices=("smoke", "black_box", "grey_box", "white_box"),
         default="black_box",
         help="Collect the requested public assessment suite (default: black_box)",
     )
@@ -233,6 +233,10 @@ def pytest_configure(config: pytest.Config) -> None:
     )
     config.addinivalue_line(
         "markers",
+        "white_box: records source-code and harness based assessment requirements",
+    )
+    config.addinivalue_line(
+        "markers",
         "security: requires trusted security-test environment evidence",
     )
 
@@ -252,7 +256,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
 def _item_case_level(item: pytest.Item) -> str:
     module = getattr(item, "module", None)
     explicit = str(getattr(module, "TEST_CASE_LEVEL", "") or "").strip().lower()
-    if explicit in {"mother", "child", "smoke", "black_box", "grey_box"}:
+    if explicit in {"mother", "child", "smoke", "black_box", "grey_box", "white_box"}:
         return explicit
     if "smoke" in getattr(item, "keywords", {}):
         return "smoke"
@@ -260,11 +264,15 @@ def _item_case_level(item: pytest.Item) -> str:
         return "black_box"
     if "grey_box" in getattr(item, "keywords", {}):
         return "grey_box"
+    if "white_box" in getattr(item, "keywords", {}):
+        return "white_box"
     case_id = str(getattr(module, "TEST_CASE_ID", "") or "").strip()
     if case_id.startswith("B") and case_id[1:].isdigit():
         return "black_box"
     if case_id.startswith("H") and case_id[1:].isdigit():
         return "grey_box"
+    if case_id.startswith("W") and case_id[1:].isdigit():
+        return "white_box"
     if case_id.startswith("ATS-"):
         return "child"
     if case_id.startswith("TC-"):
@@ -275,7 +283,7 @@ def _item_case_level(item: pytest.Item) -> str:
 def _item_requires_network_capture(item: pytest.Item) -> bool:
     """Start the proxy only for cases that may execute black-box Agent actions."""
 
-    if _item_case_level(item) == "black_box":
+    if _item_case_level(item) in {"black_box", "white_box"}:
         return False
     module = getattr(item, "module", None)
     if bool(getattr(module, "OPERATOR_EVIDENCE_REQUIRED", False)):
@@ -303,7 +311,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         level = _item_case_level(item)
         is_e2e = "e2e" in item.keywords
         is_smoke = "smoke" in item.keywords
-        if is_e2e and not is_smoke and level in {"black_box", "grey_box"}:
+        if is_e2e and not is_smoke and level in {"black_box", "grey_box", "white_box"}:
             add_marker = getattr(item, "add_marker", None)
             if callable(add_marker):
                 add_marker(level)

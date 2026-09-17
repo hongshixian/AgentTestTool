@@ -23,10 +23,12 @@ TEST_CASES_ROOT = PACKAGE_ROOT / "test_cases"
 SMOKE_CASES_ROOT = TEST_CASES_ROOT / "smoke"
 BLACK_BOX_CASES_ROOT = TEST_CASES_ROOT / "black_box"
 GREY_BOX_CASES_ROOT = TEST_CASES_ROOT / "grey_box"
-CASE_SUITES = frozenset({"black_box", "grey_box"})
+WHITE_BOX_CASES_ROOT = TEST_CASES_ROOT / "white_box"
+CASE_SUITES = frozenset({"all", "black_box", "grey_box", "white_box"})
 CASE_SUITE_ROOTS = {
     "black_box": BLACK_BOX_CASES_ROOT,
     "grey_box": GREY_BOX_CASES_ROOT,
+    "white_box": WHITE_BOX_CASES_ROOT,
 }
 TEST_OBJECT_NAMES = {
     "codebuddy": "CodeBuddy Code CLI",
@@ -72,6 +74,7 @@ class WorkflowExecution:
     report_pdf: Path | None
     smoke: PhaseExecution
     business: PhaseExecution | None
+    business_suites: Mapping[str, PhaseExecution]
     smoke_passed: bool
     exit_code: int
 
@@ -321,6 +324,57 @@ def _default_pdf_builder(payload: Mapping[str, Any], output_path: Path) -> None:
     generate_pdf(report, output_path)
 
 
+def _aggregate_business_phases(
+    phases: Mapping[str, PhaseExecution],
+    run_directory: Path,
+    run_id: str,
+) -> PhaseExecution | None:
+    if not phases:
+        return None
+    cases: list[Any] = []
+    internal_errors: list[str] = []
+    collection_errors: list[str] = []
+    command: list[str] = []
+    for suite, execution in phases.items():
+        phase_cases = execution.result.get("cases")
+        if isinstance(phase_cases, list):
+            cases.extend(phase_cases)
+        session = execution.result.get("session")
+        if isinstance(session, Mapping):
+            for target, field in (
+                (internal_errors, "internal_errors"),
+                (collection_errors, "collection_errors"),
+            ):
+                values = session.get(field)
+                if isinstance(values, list):
+                    target.extend(f"{suite}: {value}" for value in values)
+        command.extend(execution.command)
+    returncode = 1 if any(item.returncode != 0 for item in phases.values()) else 0
+    result = {
+        "schema_version": REPORT_SCHEMA_VERSION,
+        "run_id": run_id,
+        "phase": "business",
+        "case_suite": "all" if len(phases) > 1 else next(iter(phases)),
+        "session": {
+            "exitstatus": returncode,
+            "collected": len(cases),
+            "reported_cases": len(cases),
+            "internal_errors": internal_errors,
+            "collection_errors": collection_errors,
+        },
+        "cases": cases,
+    }
+    return PhaseExecution(
+        name="business",
+        command=tuple(command),
+        returncode=returncode,
+        result=result,
+        stdout_path=run_directory / "business.stdout.log",
+        stderr_path=run_directory / "business.stderr.log",
+        timed_out=any(item.timed_out for item in phases.values()),
+    )
+
+
 def run_workflow(
     config: WorkflowConfig,
     *,
@@ -356,24 +410,29 @@ def run_workflow(
         process_runner=process_runner,
     )
     smoke_passed = smoke_gate_passed(smoke)
-    business: PhaseExecution | None = None
-    if smoke_passed and config.business_workers > 1:
+    business_suites: dict[str, PhaseExecution] = {}
+    selected_suites = tuple(CASE_SUITE_ROOTS) if config.suite == "all" else (config.suite,)
+    if smoke_passed and config.business_workers > 1 and config.suite != "all":
         from agent_test_tool.parallel_runner import run_parallel_business
 
-        business = run_parallel_business(config, run_id, run_directory, process_runner)
-    elif smoke_passed:
-        business = _run_pytest_phase(
-            phase="business",
-            selection=f"e2e and {config.suite}",
-            test_paths=config.business_paths or (CASE_SUITE_ROOTS[config.suite],),
-            run_id=run_id,
-            run_directory=run_directory,
-            agent=config.agent,
-            repeat=config.repeat,
-            case_suite=config.suite,
-            timeout_seconds=config.business_timeout_seconds,
-            process_runner=process_runner,
+        business_suites[config.suite] = run_parallel_business(
+            config, run_id, run_directory, process_runner
         )
+    elif smoke_passed:
+        for suite in selected_suites:
+            business_suites[suite] = _run_pytest_phase(
+                phase=(f"business-{suite}" if config.suite == "all" else "business"),
+                selection=f"e2e and {suite}",
+                test_paths=config.business_paths or (CASE_SUITE_ROOTS[suite],),
+                run_id=run_id,
+                run_directory=run_directory,
+                agent=config.agent,
+                repeat=config.repeat,
+                case_suite=suite,
+                timeout_seconds=config.business_timeout_seconds,
+                process_runner=process_runner,
+            )
+    business = _aggregate_business_phases(business_suites, run_directory, run_id)
 
     finished_at = datetime.now(timezone.utc)
     report_payload: dict[str, Any] = {
@@ -388,6 +447,10 @@ def run_workflow(
         "smoke": dict(smoke.result),
         "business_executed": business is not None,
         "business": dict(business.result) if business is not None else None,
+        "business_suites": {
+            suite: dict(execution.result)
+            for suite, execution in business_suites.items()
+        },
         "business_not_executed_reason": (
             None if business is not None else "冒烟测试未全部通过，未执行业务测试"
         ),
@@ -401,6 +464,10 @@ def run_workflow(
         "commands": {
             "smoke": list(smoke.command),
             "business": list(business.command) if business is not None else None,
+            "business_suites": {
+                suite: list(execution.command)
+                for suite, execution in business_suites.items()
+            },
         },
     }
     report_json = run_directory / "report.json"
@@ -434,6 +501,7 @@ def run_workflow(
         report_pdf=report_pdf,
         smoke=smoke,
         business=business,
+        business_suites=business_suites,
         smoke_passed=smoke_passed,
         exit_code=exit_code,
     )

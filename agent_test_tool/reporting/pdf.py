@@ -34,7 +34,6 @@ from reportlab.platypus import (
 
 from .clauses import (
     ClauseDefinition,
-    ClauseResultGroup,
     group_results_by_clause,
     load_clause_definitions,
 )
@@ -48,6 +47,10 @@ _STATUS_COLORS = {
     AssessmentStatus.NOT_APPLICABLE: colors.HexColor("#8C8C8C"),
     AssessmentStatus.INCONCLUSIVE: colors.HexColor("#D46B08"),
 }
+
+
+def _chinese_number(value: int) -> str:
+    return {1: "一", 2: "二", 3: "三", 4: "四"}[value]
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,16 +105,20 @@ class PDFReportGenerator:
         return output_path
 
     def build_story(self, report: ReportData) -> list[Flowable]:
-        """Build the smoke-gated three-chapter Platypus story."""
+        """Build the smoke-gated four-chapter Platypus story."""
         story: list[Flowable] = []
         story.extend(self._cover(report))
         story.append(PageBreak())
         story.extend(self._smoke_section(report))
         if report.smoke_passed:
-            story.append(PageBreak())
-            story.extend(self._overall_section(report))
-            story.append(PageBreak())
-            story.extend(self._clause_details_section(report))
+            suites = (
+                (2, "黑盒测试", "black_box"),
+                (3, "灰盒测试", "grey_box"),
+                (4, "白盒测试", "white_box"),
+            )
+            for chapter, title, suite in suites:
+                story.append(PageBreak())
+                story.extend(self._suite_section(report, chapter, title, suite))
         return story
 
     def _cover(self, report: ReportData) -> list[Flowable]:
@@ -169,10 +176,18 @@ class PDFReportGenerator:
             )
         return contents
 
-    def _overall_section(self, report: ReportData) -> list[Flowable]:
-        statistics = calculate_statistics(report.business_results)
+    def _suite_section(
+        self,
+        report: ReportData,
+        chapter: int,
+        title: str,
+        suite: str,
+    ) -> list[Flowable]:
+        results = report.suite_results(suite)
+        statistics = calculate_statistics(results)
         contents: list[Flowable] = [
-            Paragraph("二、整体测试结果", self.styles["section"]),
+            Paragraph(f"{_chinese_number(chapter)}、{title}", self.styles["section"]),
+            Paragraph(f"{chapter}.1 总体结果", self.styles["subsection"]),
         ]
         if report.business_errors:
             details = "；".join(report.business_errors[:5])
@@ -187,22 +202,25 @@ class PDFReportGenerator:
                 self.styles["notice"],
             ))
         contents.extend([
-            KeepTogether([self._pie_chart(statistics), Spacer(1, 3 * mm)]),
+            KeepTogether([
+                self._pie_chart(statistics, empty_message=f"本次没有{title}结果"),
+                Spacer(1, 3 * mm),
+            ]),
             self._statistics_table(statistics),
+            Spacer(1, 8 * mm),
+            Paragraph(f"{chapter}.2 用例详情", self.styles["subsection"]),
         ])
-        return contents
-
-    def _clause_details_section(self, report: ReportData) -> list[Flowable]:
-        contents: list[Flowable] = [
-            Paragraph("三、各部分用例明细", self.styles["section"]),
-        ]
-        include_representative_path = bool(report.mother_results)
-        for index, group in enumerate(self._clause_groups(report), start=1):
+        groups = group_results_by_clause(results, self.clauses)
+        populated_groups = tuple(group for group in groups if group.results)
+        if not populated_groups:
+            contents.append(self._case_table((), compact=True, empty_message=f"本次没有{title}结果"))
+            return contents
+        for index, group in enumerate(populated_groups, start=1):
             contents.extend(
                 [
                     Paragraph(
                         _mixed_safe(
-                            f"3.{index} {group.section_title}",
+                            f"{chapter}.2.{index} {group.section_title}",
                             self.fonts.latin_bold,
                         ),
                         self.styles["subsection"],
@@ -210,16 +228,12 @@ class PDFReportGenerator:
                     self._case_table(
                         group.results,
                         compact=True,
-                        include_representative_path=include_representative_path,
                         empty_message="该条款没有测试结果",
                     ),
                     Spacer(1, 7 * mm),
                 ]
             )
         return contents
-
-    def _clause_groups(self, report: ReportData) -> tuple[ClauseResultGroup, ...]:
-        return group_results_by_clause(report.business_results, self.clauses)
 
     def _pie_chart(
         self,

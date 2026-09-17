@@ -181,7 +181,7 @@ class TestPDFReporting:
         assert "三、各部分用例明细" not in text
         assert "业务测试未执行" in text
 
-    def test_passing_smoke_uses_the_three_chapter_structure(
+    def test_passing_smoke_uses_the_four_chapter_structure(
         self,
         tmp_path: Path,
     ) -> None:
@@ -190,21 +190,25 @@ class TestPDFReporting:
                 "ATS-5.1a-D1-01-S01-01",
                 AssessmentStatus.PASS,
                 CaseCategory.BUSINESS,
+                case_level="black_box",
             ),
             _case(
                 "ATS-5.1a-D1-01-S01-02",
                 AssessmentStatus.FAIL,
                 CaseCategory.BUSINESS,
+                case_level="black_box",
             ),
             _case(
                 "ATS-6.1b-D1-01-S01-01",
                 AssessmentStatus.NOT_APPLICABLE,
                 CaseCategory.BUSINESS,
+                case_level="grey_box",
             ),
             _case(
                 "ATS-6.1b-D1-01-S01-02",
                 AssessmentStatus.INCONCLUSIVE,
                 CaseCategory.BUSINESS,
+                case_level="white_box",
             ),
         )
         generator = _generator()
@@ -214,23 +218,23 @@ class TestPDFReporting:
         )
         text = _paragraph_text(story)
 
-        assert "二、整体测试结果" in text
-        assert "三、条款级测试结果" not in text
-        assert "四、各部分用例明细" not in text
-        assert "三、各部分用例明细" in text
-        assert "3.1 基础安全-5.1 a)" in text
-        assert "3.2 交互安全-6.1 b)" in text
-        assert "4.1 基础安全-5.1 a)" not in text
-        assert "4.2 交互安全-6.1 b)" not in text
-        assert "2.1 四态结果分布" not in text
-        assert "2.2 用例明细" not in text
+        assert "二、黑盒测试" in text
+        assert "三、灰盒测试" in text
+        assert "四、白盒测试" in text
+        assert "2.1 总体结果" in text
+        assert "2.2 用例详情" in text
+        assert "3.1 总体结果" in text
+        assert "3.2 用例详情" in text
+        assert "4.1 总体结果" in text
+        assert "4.2 用例详情" in text
         long_tables = [
             item for item in _walk_flowables(story) if isinstance(item, LongTable)
         ]
-        assert len(long_tables) == 3
+        assert len(long_tables) == 4
         assert long_tables[-1].repeatRows == 1
         assert len(long_tables[1]._cellvalues) == 3
-        assert len(long_tables[2]._cellvalues) == 3
+        assert len(long_tables[2]._cellvalues) == 2
+        assert len(long_tables[3]._cellvalues) == 2
         assert "代表路径" not in _table_text(long_tables[-1])[0]
         output = generator.generate(
             _report(smoke_status=AssessmentStatus.PASS, business_results=business),
@@ -265,34 +269,23 @@ class TestPDFReporting:
         )
         text = _paragraph_text(story)
 
-        assert "二、整体测试结果" in text
-        assert "三、各部分用例明细" in text
+        assert "二、黑盒测试" in text
+        assert "三、灰盒测试" in text
+        assert "四、白盒测试" in text
         assert "母用例代表路径" not in text
         assert "子用例展开路径" not in text
         detail_tables = [
             item for item in _walk_flowables(story) if isinstance(item, LongTable)
         ]
-        assert len(detail_tables) == 2
-        details = _table_text(detail_tables[1])
-        assert details[0] == [
-            "用例 ID",
-            "用例名称",
-            "代表路径",
-            "结果",
-            "简短说明",
-        ]
-        assert details[1][2] == "ATS-6.1b-D5-01-S01-01"
-        assert details[2][2] == "—"
+        assert len(detail_tables) == 4
+        assert all(len(table._cellvalues) == 2 for table in detail_tables[1:])
 
         statistic_tables = [
             item
             for item in _walk_flowables(story)
             if type(item) is Table and _table_text(item)[0][0] == "测评结果"
         ]
-        assert len(statistic_tables) == 1
-        overall_statistics = _table_text(statistic_tables[0])
-        assert overall_statistics[1][1] == "1"
-        assert overall_statistics[2][1] == "1"
+        assert len(statistic_tables) == 3
         output = PDFReportGenerator(clauses=(TEST_CLAUSES[1],)).generate(
             _report(
                 smoke_status=AssessmentStatus.PASS,
@@ -323,21 +316,13 @@ class TestPDFReporting:
         )
         text = _paragraph_text(story)
 
-        assert "二、整体测试结果" in text
+        assert "二、黑盒测试" in text
         assert "母用例代表路径" not in text
         detail_tables = [
             item for item in _walk_flowables(story) if isinstance(item, LongTable)
         ]
-        assert len(detail_tables) == 2
-        mother_table = _table_text(detail_tables[-1])
-        assert mother_table[0] == [
-            "用例 ID",
-            "用例名称",
-            "代表路径",
-            "结果",
-            "简短说明",
-        ]
-        assert mother_table[1][2] == "ATS-6.1b-D5-01-S01-01"
+        assert len(detail_tables) == 4
+        assert all(len(table._cellvalues) == 2 for table in detail_tables[1:])
 
     def test_clause_metadata_matches_the_frozen_workbook_overview(self) -> None:
         clauses = load_clause_definitions()
@@ -418,7 +403,9 @@ class TestPDFReporting:
         detail_tables = [
             item for item in _walk_flowables(story) if isinstance(item, LongTable)
         ]
-        assert _table_text(detail_tables[1])[1][1] == "该条款没有测试结果"
+        assert _table_text(detail_tables[1])[1][1] == "本次没有黑盒测试结果"
+        assert _table_text(detail_tables[2])[1][1] == "本次没有灰盒测试结果"
+        assert _table_text(detail_tables[3])[1][1] == "本次没有白盒测试结果"
 
         output = generator.generate(report, tmp_path / "empty-business.pdf")
 

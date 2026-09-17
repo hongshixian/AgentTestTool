@@ -46,6 +46,7 @@ markers = [
     "smoke: belongs to the minimal E2E verification subset",
     "black_box: uses only public input, output, and externally visible side effects",
     "grey_box: uses Hook, reconstructed Trace, and communication evidence",
+    "white_box: records source-code and harness based assessment requirements",
     "security: requires trusted security-test environment evidence",
 ]
 

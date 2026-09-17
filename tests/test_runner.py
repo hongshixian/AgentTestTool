@@ -121,6 +121,41 @@ class TestWorkflowRunner:
 
         assert all("--repeat" not in command for command in fake_pytest.commands)
 
+    def test_all_suite_runs_three_separate_business_phases(self, tmp_path: Path) -> None:
+        fake_pytest = _FakePytest(
+            [
+                _phase_payload(["通过"]),
+                _phase_payload(["通过"]),
+                _phase_payload(["不适用"]),
+                _phase_payload(["不适用"]),
+            ],
+            [0, 0, 0, 0],
+        )
+
+        result = run_workflow(
+            WorkflowConfig(
+                agent="codebuddy",
+                output_parent=tmp_path,
+                run_id="run-all-suites",
+                suite="all",
+            ),
+            process_runner=fake_pytest,
+            pdf_builder=_fake_pdf,
+        )
+
+        assert tuple(result.business_suites) == ("black_box", "grey_box", "white_box")
+        assert len(result.business.result["cases"]) == 3  # type: ignore[union-attr]
+        selections = [
+            command[len(command) - 1 - tuple(reversed(command)).index("-m") + 1]
+            for command in fake_pytest.commands
+        ]
+        assert selections == [
+            "e2e and smoke",
+            "e2e and black_box",
+            "e2e and grey_box",
+            "e2e and white_box",
+        ]
+
     def test_manifest_paths_are_used_only_for_business_phase(self, tmp_path: Path) -> None:
         fake_pytest = _FakePytest(
             [_phase_payload(["通过"]), _phase_payload(["通过"])],

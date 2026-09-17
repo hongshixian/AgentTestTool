@@ -47,9 +47,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--suite",
-        choices=("black_box", "grey_box"),
+        choices=("all", "black_box", "grey_box", "white_box"),
         default="black_box",
-        help="业务测试卷别（black_box 或 grey_box，默认：black_box）",
+        help="业务测试卷别；all 依次执行三卷（默认：black_box）",
     )
     parser.add_argument(
         "--agent",
@@ -114,6 +114,8 @@ def _manifest_paths(manifest_path: Path, suite: str = "black_box") -> tuple[Path
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.business_manifest and args.suite == "all":
+        raise SystemExit("业务清单读取失败：--business-manifest 必须配合单个卷别使用")
     try:
         business_paths = (
             _manifest_paths(args.business_manifest, args.suite)

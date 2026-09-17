@@ -158,10 +158,14 @@ class TestSuiteCLIContract:
 
         assert args.suite == "grey_box"
 
-    @pytest.mark.parametrize("suite", ("mother", "child", "all"))
+    @pytest.mark.parametrize("suite", ("mother", "child"))
     def test_parser_rejects_removed_suites(self, suite: str) -> None:
         with pytest.raises(SystemExit):
             cli.build_parser().parse_args(["--suite", suite])
+
+    @pytest.mark.parametrize("suite", ("all", "white_box"))
+    def test_parser_accepts_new_suite_choices(self, suite: str) -> None:
+        assert cli.build_parser().parse_args(["--suite", suite]).suite == suite
 
 
 class TestSuiteRunnerContract:
