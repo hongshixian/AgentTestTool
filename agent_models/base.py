@@ -31,7 +31,8 @@ class AgentModel(ABC):
         raise NotImplementedError("This product has no controlled environment adapter")
 
     def configure_mock_tools(self, suite: ToolSuite, *, run_id: str,
-                             initial_state: dict[str, JsonValue] | None = None) -> None:
+                             initial_state: dict[str, JsonValue] | None = None,
+                             visible_tool_names: frozenset[str] | None = None) -> None:
         """Connect multiple controlled tools through the product's public tool entry."""
         raise NotImplementedError("This product has no multiple-tool adapter")
 

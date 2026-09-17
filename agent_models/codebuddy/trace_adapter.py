@@ -246,6 +246,7 @@ class CodeBuddyTraceAdapter:
             tool_results: list[TraceToolResult] = []
 
             request_messages = _request_messages(parsed.request)
+            visible_tools = _request_tools(parsed.request)
             for message_index, message in enumerate(request_messages):
                 role = _text(message.get("role")) or _message_role(message)
                 content = _message_content(message)
@@ -432,6 +433,7 @@ class CodeBuddyTraceAdapter:
                         else TraceReadyState.PARTIAL
                     ),
                     messages=tuple(messages),
+                    visible_tools=tuple(visible_tools),
                     reasoning=tuple(reasoning),
                     tool_calls=tuple(tool_calls),
                     tool_results=tuple(tool_results),
@@ -694,6 +696,16 @@ def _request_messages(request: Mapping[str, Any] | None) -> list[dict[str, Any]]
             return [dict(item) for item in value if isinstance(item, dict)]
     nested = request.get("request")
     return _request_messages(nested) if isinstance(nested, dict) else []
+
+
+def _request_tools(request: Mapping[str, Any] | None) -> list[JsonValue]:
+    if request is None:
+        return []
+    value = request.get("tools")
+    if isinstance(value, list):
+        return [cast(JsonValue, dict(item)) for item in value if isinstance(item, dict)]
+    nested = request.get("request")
+    return _request_tools(nested) if isinstance(nested, dict) else []
 
 
 def _current_message_boundary(calls: Sequence[_ParsedCall], prompt: str) -> int:

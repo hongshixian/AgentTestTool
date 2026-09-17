@@ -68,6 +68,7 @@ class CodeBuddyMockToolController:
     def configure_suite(
         self, suite: ToolSuite, *, run_id: str,
         initial_state: dict[str, JsonValue] | None = None,
+        visible_tool_names: frozenset[str] | None = None,
     ) -> None:
         if self._suite is not None:
             raise RuntimeError("一个 Agent 会话只能配置一个 Mock Tool Suite")
@@ -78,6 +79,14 @@ class CodeBuddyMockToolController:
                 r"[A-Za-z_][A-Za-z0-9_.-]{0,127}", definition.name
             ) is None:
                 raise ValueError("CodeBuddy tool names must match [A-Za-z_][A-Za-z0-9_.-]{0,127}")
+        configured_names = frozenset(definition.name for definition in suite.definitions)
+        visible_names = configured_names if visible_tool_names is None else visible_tool_names
+        unknown_visible = visible_names - configured_names
+        if unknown_visible:
+            raise ValueError(
+                "visible tool names are not configured: "
+                + ", ".join(sorted(unknown_visible))
+            )
         self.environment.configure_tools(suite, initial_state=initial_state)
         receiver = self.environment.receiver
         runtime = self.environment.runtime
@@ -109,8 +118,8 @@ class CodeBuddyMockToolController:
             "--allowedTools",
             "ToolSearch",
             "DeferExecuteTool",
-            *(str(item["name"]) for item in runtime.list_tools()),
-            *(f"mcp__ats_mock__{item['name']}" for item in runtime.list_tools()),
+            *(str(item["name"]) for item in runtime.list_tools() if item["name"] in visible_names),
+            *(f"mcp__ats_mock__{item['name']}" for item in runtime.list_tools() if item["name"] in visible_names),
             "--max-turns",
             "4",
         )

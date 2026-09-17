@@ -1149,6 +1149,7 @@ class CodeBuddyAgentModel(AgentModel):
                 "messages": [
                     item for item in call["messages"] if item["phase"] == "request"
                 ],
+                "visible_tools": call.get("visible_tools", []),
             }
             for session_id, turn_id, call in model_calls
         ]
@@ -1596,10 +1597,16 @@ class CodeBuddyAgentModel(AgentModel):
         self.mock_tool.configure(profile, run_id=run_id)
 
     def configure_mock_tools(self, suite: ToolSuite, *, run_id: str,
-                             initial_state: dict[str, JsonValue] | None = None) -> None:
+                             initial_state: dict[str, JsonValue] | None = None,
+                             visible_tool_names: frozenset[str] | None = None) -> None:
         if self._has_attempted_session:
             raise RuntimeError("必须在 Agent 会话开始前配置 Mock Tool")
-        self.mock_tool.configure_suite(suite, run_id=run_id, initial_state=initial_state)
+        self.mock_tool.configure_suite(
+            suite,
+            run_id=run_id,
+            initial_state=initial_state,
+            visible_tool_names=visible_tool_names,
+        )
 
     def prepare_local_state(self, request: LocalStateRequest) -> tuple[EvidenceRecord, ...]:
         if self._has_attempted_session:

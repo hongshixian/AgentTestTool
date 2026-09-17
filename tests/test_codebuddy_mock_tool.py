@@ -131,6 +131,27 @@ class TestCodeBuddyMockMcpServer:
         evidence = control.capture(capture_request())[0].data
         assert evidence["tool_names"] == ["update", "status"] and len(evidence["calls"]) == 3
 
+    def test_visible_tool_subset_keeps_other_tools_registered_but_not_allowed(self, environment) -> None:
+        suite = ToolSuite((
+            ToolDefinition("weather.get", "weather", {"type": "object"}, (ToolResponse("sunny"),)),
+            ToolDefinition("sink.send", "sink", {"type": "object"}, (ToolResponse("sent"),)),
+        ))
+        control = controller(environment)
+
+        control.configure_suite(
+            suite,
+            run_id="scenario",
+            visible_tool_names=frozenset({"weather.get"}),
+        )
+
+        assert "weather.get" in control.extra_args
+        assert "mcp__ats_mock__weather.get" in control.extra_args
+        assert "sink.send" not in control.extra_args
+        assert {item["name"] for item in environment.runtime.list_tools()} == {
+            "weather.get",
+            "sink.send",
+        }
+
     def test_legacy_capture_excludes_direct_runtime_baseline(self, environment) -> None:
         control = controller(environment)
         control.configure(MockToolProfile("lookup", "text/plain", "result"), run_id="scenario")

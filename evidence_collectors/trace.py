@@ -383,6 +383,7 @@ class ModelCall:
     completed_at: str | None = None
     ready_state: TraceReadyState = TraceReadyState.READY
     messages: tuple[TraceMessage, ...] = ()
+    visible_tools: tuple[JsonInput, ...] = ()
     reasoning: tuple[TraceReasoning, ...] = ()
     tool_calls: tuple[TraceToolCall, ...] = ()
     tool_results: tuple[TraceToolResult, ...] = ()
@@ -407,6 +408,11 @@ class ModelCall:
             raise ValueError("limitations must contain nonempty strings")
         _require_unique_ids(self.messages, "message_id", "message")
         _require_unique_ids(self.reasoning, "reasoning_id", "reasoning")
+        object.__setattr__(
+            self,
+            "visible_tools",
+            tuple(_freeze_json(item, "visible_tools") for item in self.visible_tools),
+        )
 
     def to_payload(self) -> dict[str, JsonValue]:
         return {
@@ -420,6 +426,9 @@ class ModelCall:
             "completed_at": self.completed_at,
             "ready_state": self.ready_state.value,
             "messages": [item.to_payload() for item in self.messages],
+            "visible_tools": [
+                _json_payload(cast(FrozenJson, item)) for item in self.visible_tools
+            ],
             "reasoning": [item.to_payload() for item in self.reasoning],
             "tool_calls": [item.to_payload() for item in self.tool_calls],
             "tool_results": [item.to_payload() for item in self.tool_results],

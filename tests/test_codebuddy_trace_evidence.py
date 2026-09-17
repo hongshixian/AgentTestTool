@@ -326,6 +326,9 @@ def test_trace_records_are_turn_scoped_and_claim_only_observed_tool_stages(tmp_p
                             ModelCall(
                                 "call-1",
                                 0,
+                                visible_tools=(
+                                    {"type": "function", "function": {"name": "demo"}},
+                                ),
                                 messages=(
                                     TraceMessage(
                                         "message-1",
@@ -361,10 +364,12 @@ def test_trace_records_are_turn_scoped_and_claim_only_observed_tool_stages(tmp_p
         network_artifacts=(),
     )
     by_id = {record.evidence_id: record for record in records}
+    context = by_id["observed_model_context"].data["model_calls"][0]
     output = by_id["observed_model_output"].data["model_calls"][0]
     tool_trace = by_id["observed_tool_trace"]
 
     assert output["session_id"] == "session-1"
+    assert context["visible_tools"][0]["function"]["name"] == "demo"
     assert output["turn_id"] == "turn-1"
     assert output["tool_calls"][0]["stage"] == "proposed"
     assert "proposed" in tool_trace.proves[0]

@@ -8,7 +8,13 @@ from pathlib import Path
 from agent_models import EvidenceBundle, EvidencePhase, EvidenceRecord, TranscriptTurn, TurnResult
 from assertions.judge import JudgeStatus
 from scripts.build_grey_box_cases import DEFERRED_CASE_IDS, EXPECTED_CASE_IDS, build_manifest
-from test_cases.grey_box.base import _prompt, _required_ids, _system_marker_verdict, _uses_tool
+from test_cases.grey_box.base import (
+    _h034_verdict,
+    _prompt,
+    _required_ids,
+    _system_marker_verdict,
+    _uses_tool,
+)
 from test_cases.grey_box.specs import load_grey_box_specs
 
 
@@ -53,7 +59,9 @@ def test_evidence_families_require_their_authoritative_channels() -> None:
         if spec.evidence_scope == "通信取证":
             assert {"mock_tool_io", "network_exchange_trace"} <= required
         assert _uses_tool(spec) is (
-            "工具Hook" in spec.evidence_scope or spec.evidence_scope == "通信取证"
+            "工具Hook" in spec.evidence_scope
+            or spec.evidence_scope == "通信取证"
+            or spec.case_id == "H034"
         )
 
 
@@ -98,3 +106,34 @@ def test_h021_uses_model_input_and_visible_output_for_deterministic_verdict() ->
 
     assert status is JudgeStatus.PASS
     assert "System_Input_Marker_Hits=1" in reason
+
+
+def test_h034_ignores_unexposed_registered_tools() -> None:
+    result = TurnResult("sunny", "sunny", "", 0, True, 0.1, "session-1")
+    bundle = EvidenceBundle(
+        sample_id="H034",
+        prompt_id="01",
+        run_id="run-1",
+        transcript=(TranscriptTurn("weather", result),),
+        records=(
+            EvidenceRecord(
+                "observed_model_context",
+                "agent_trace_evidence",
+                EvidencePhase.AFTER,
+                {"model_calls": [{"visible_tools": [
+                    {"type": "function", "function": {"name": "mcp__ats_mock__weather.get"}},
+                ]}]},
+            ),
+            EvidenceRecord(
+                "mock_tool_io",
+                "runtime_evidence",
+                EvidencePhase.AFTER,
+                {"calls": [{"tool_name": "weather.get"}]},
+            ),
+        ),
+    )
+
+    status, reason = _h034_verdict(bundle, result)
+
+    assert status is JudgeStatus.PASS
+    assert "Unapproved_Visible_Tool_Count=0" in reason
