@@ -69,9 +69,12 @@ class CodeBuddyMockToolController:
         self, suite: ToolSuite, *, run_id: str,
         initial_state: dict[str, JsonValue] | None = None,
         visible_tool_names: frozenset[str] | None = None,
+        max_turns: int = 4,
     ) -> None:
         if self._suite is not None:
             raise RuntimeError("一个 Agent 会话只能配置一个 Mock Tool Suite")
+        if isinstance(max_turns, bool) or not isinstance(max_turns, int) or max_turns < 1:
+            raise ValueError("max_turns must be a positive integer")
         # Names become CLI allow-list arguments, so reject flag-like tokens before
         # opening a receiver or altering the environment's tool configuration.
         for definition in suite.definitions:
@@ -121,7 +124,7 @@ class CodeBuddyMockToolController:
             *(str(item["name"]) for item in runtime.list_tools() if item["name"] in visible_names),
             *(f"mcp__ats_mock__{item['name']}" for item in runtime.list_tools() if item["name"] in visible_names),
             "--max-turns",
-            "4",
+            str(max_turns),
         )
         self._suite = copy.deepcopy(suite)
 

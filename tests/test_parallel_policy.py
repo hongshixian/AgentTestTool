@@ -1,4 +1,4 @@
-"""Verify reviewed black-box parallel classification fails closed on changes."""
+"""Verify reviewed suite parallel classification fails closed on changes."""
 
 from pathlib import Path
 
@@ -18,11 +18,25 @@ def clear_policy_caches():
 
 def test_reviewed_black_box_cases_have_valid_dependencies():
     manifest = policy._manifest()
-    assert len(manifest["cases"]) == 42
-    assert set(manifest["cases"]) == {
+    black_box = {
         f"test_cases/black_box/test_b{index:03d}.py" for index in range(1, 43)
     }
-    for script in manifest["cases"]:
+    assert black_box <= set(manifest["cases"])
+    for script in black_box:
+        assert policy.case_execution_policy(policy.ROOT / script)[0] == "isolated", script
+
+
+def test_reviewed_grey_box_cases_have_valid_dependencies():
+    manifest = policy._manifest()
+    deferred = {65, 66, 67, 68, 71, 72, 75, 76, 77}
+    grey_box = {
+        f"test_cases/grey_box/test_h{index:03d}.py"
+        for index in range(1, 82)
+        if index not in deferred
+    }
+    assert len(grey_box) == 72
+    assert grey_box <= set(manifest["cases"])
+    for script in grey_box:
         assert policy.case_execution_policy(policy.ROOT / script)[0] == "isolated", script
 
 

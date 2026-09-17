@@ -32,7 +32,8 @@ class AgentModel(ABC):
 
     def configure_mock_tools(self, suite: ToolSuite, *, run_id: str,
                              initial_state: dict[str, JsonValue] | None = None,
-                             visible_tool_names: frozenset[str] | None = None) -> None:
+                             visible_tool_names: frozenset[str] | None = None,
+                             max_turns: int = 4) -> None:
         """Connect multiple controlled tools through the product's public tool entry."""
         raise NotImplementedError("This product has no multiple-tool adapter")
 
