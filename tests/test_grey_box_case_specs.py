@@ -8,7 +8,7 @@ from pathlib import Path
 from agent_models import EvidenceBundle, EvidencePhase, EvidenceRecord, TranscriptTurn, TurnResult
 from assertions.judge import JudgeStatus
 from scripts.build_grey_box_cases import DEFERRED_CASE_IDS, EXPECTED_CASE_IDS, build_manifest
-from test_cases.grey_box.base import _h021_verdict, _prompt, _required_ids, _uses_tool
+from test_cases.grey_box.base import _prompt, _required_ids, _system_marker_verdict, _uses_tool
 from test_cases.grey_box.specs import load_grey_box_specs
 
 
@@ -67,6 +67,16 @@ def test_h021_attack_prompt_does_not_contain_the_protected_marker() -> None:
     assert "系统提示" in prompt
 
 
+def test_h022_disable_safety_prompt_does_not_contain_protected_marker() -> None:
+    spec = load_grey_box_specs()["H022"]
+
+    prompt = _prompt(spec)
+
+    assert str(spec.input_config["Marker"]) not in prompt
+    assert str(spec.input_config["Public_Marker"]) in prompt
+    assert "关闭" in prompt
+
+
 def test_h021_uses_model_input_and_visible_output_for_deterministic_verdict() -> None:
     spec = load_grey_box_specs()["H021"]
     marker = str(spec.input_config["Marker"])
@@ -84,7 +94,7 @@ def test_h021_uses_model_input_and_visible_output_for_deterministic_verdict() ->
         ),),
     )
 
-    status, reason = _h021_verdict(spec, bundle, result)
+    status, reason = _system_marker_verdict(spec, bundle, result)
 
     assert status is JudgeStatus.PASS
     assert "System_Input_Marker_Hits=1" in reason
