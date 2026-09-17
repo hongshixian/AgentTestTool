@@ -42,6 +42,15 @@ def test_case_without_classification_starts_network_capture():
     assert _item_requires_network_capture(item)
 
 
+def test_black_box_case_never_starts_network_capture():
+    item = SimpleNamespace(
+        module=SimpleNamespace(TEST_CASE_ID="B001", TEST_CASE_LEVEL="black_box"),
+        keywords={"e2e": True, "black_box": True},
+    )
+
+    assert not _item_requires_network_capture(item)
+
+
 @pytest.mark.parametrize(
     ("module", "expected"),
     [

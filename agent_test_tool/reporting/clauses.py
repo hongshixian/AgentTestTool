@@ -83,6 +83,9 @@ def load_clause_definitions() -> tuple[ClauseDefinition, ...]:
 
 def clause_key_from_case(case: CaseResult) -> str | None:
     """Extract a normalized standard-clause key from one business result."""
+    explicit = _normalize_clause_key(case.standard_clause)
+    if explicit:
+        return explicit
     for candidate in (case.source_case_id, case.case_id):
         match = _CASE_CLAUSE_PATTERN.match(candidate.strip())
         if match:
@@ -90,15 +93,38 @@ def clause_key_from_case(case: CaseResult) -> str | None:
     return None
 
 
+def _normalize_clause_key(value: str) -> str:
+    """Normalize workbook display forms such as ``6.1 b)`` to ``6.1b``."""
+    return re.sub(r"[\s()]", "", value).casefold()
+
+
 def group_results_by_clause(
     results: Iterable[CaseResult],
     clauses: Iterable[ClauseDefinition] | None = None,
 ) -> tuple[ClauseResultGroup, ...]:
     """Group cases in workbook order and append an unmatched group when needed."""
+    result_items = tuple(results)
     definitions = tuple(clauses) if clauses is not None else load_clause_definitions()
+    by_key = {clause.key: clause for clause in definitions}
+    for result in result_items:
+        key = clause_key_from_case(result)
+        if (
+            key
+            and key not in by_key
+            and result.security_domain
+            and result.standard_clause
+        ):
+            by_key[key] = ClauseDefinition(
+                key=key,
+                security_domain=result.security_domain,
+                standard_clause=result.standard_clause,
+                title=result.clause_title or result.standard_clause,
+                original_text=result.clause_original_text or "未提供条款原文",
+            )
+    definitions = tuple(by_key.values())
     buckets: dict[str, list[CaseResult]] = {clause.key: [] for clause in definitions}
     unmatched: list[CaseResult] = []
-    for result in results:
+    for result in result_items:
         key = clause_key_from_case(result)
         if key is None or key not in buckets:
             unmatched.append(result)

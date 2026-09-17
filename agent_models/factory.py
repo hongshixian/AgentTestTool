@@ -39,6 +39,8 @@ class AgentModelFactory:
                assets_root: Path | None = None, run_id: str | None = None,
                secrets: Sequence[str] = (), test_case_id: str | None = None,
                enable_network_capture: bool = True) -> AgentModel:
+        if os.environ.get("AGENT_TEST_EVIDENCE_PROFILE", "").strip() == "black_box":
+            enable_network_capture = False
         normalized = product.strip().lower()
         if normalized == "codebuddy":
             from agent_models.codebuddy.driver import CodeBuddyDriver

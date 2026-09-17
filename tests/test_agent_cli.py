@@ -14,8 +14,8 @@ def test_manifest_paths_load_repository_test_case(tmp_path: Path) -> None:
         json.dumps(
             {
                 "cases": [
-                    {"script": "test_cases/mother_cases/test_tc_6_1b_d1_01.py"},
-                    {"script": "test_cases/mother_cases/test_tc_6_1b_d1_01.py"},
+                    {"script": "test_cases/black_box/test_b001.py"},
+                    {"script": "test_cases/black_box/test_b001.py"},
                 ]
             }
         ),
@@ -25,7 +25,7 @@ def test_manifest_paths_load_repository_test_case(tmp_path: Path) -> None:
     paths = _manifest_paths(manifest)
 
     assert len(paths) == 1
-    assert paths[0].name == "test_tc_6_1b_d1_01.py"
+    assert paths[0].name == "test_b001.py"
 
 
 @pytest.mark.parametrize(
@@ -49,7 +49,7 @@ def test_manifest_paths_reject_out_of_scope_scripts(
 def test_business_workers_accepts_four_and_preserves_serial_default():
     parser = build_parser()
     assert parser.parse_args([]).business_workers == 1
-    assert parser.parse_args(["--business-workers", "4", "--suite", "mother"]).business_workers == 4
+    assert parser.parse_args(["--business-workers", "4", "--suite", "black_box"]).business_workers == 4
 
 
 @pytest.mark.parametrize("count", ["0", "-1", "5", "invalid"])

@@ -14,11 +14,11 @@ uv sync --extra dev
 # 正式测评入口：冒烟测试 -> 业务测试 -> PDF 报告
 uv run agent-test --agent codebuddy
 
-# 正式母用例测评：每个源用例只执行一条代表路径
-uv run agent-test --agent codebuddy --suite mother
+# 显式执行黑盒卷
+uv run agent-test --agent codebuddy --suite black_box
 
 # 业务用例按审核分类使用最多四个 worker；共享状态用例仍排他串行
-uv run agent-test --agent codebuddy --suite mother --business-workers 4
+uv run agent-test --agent codebuddy --suite black_box --business-workers 4
 
 # 需要稳定性验证时，将支持重复执行的测试路径运行三次
 uv run agent-test --agent codebuddy --repeat 3
@@ -35,13 +35,10 @@ uv run pytest --smoke --agent=codebuddy
 
 `--repeat=COUNT` 控制支持重复执行的测试路径的运行次数，`COUNT` 必须是正整数。
 未传入该参数时默认只运行一次。
-当前业务测试只保留工作簿中的 385 条 `TC-*` 母用例，每条执行一条最简单代表路径。
-`--suite mother` 仍可显式传入，但已经是唯一支持且默认的业务套件。历史拆分用例保存在
-`backup/split-cases-20260914` 分支，不参与当前分支的收集和正式测评。五条冒烟门禁不受
-业务套件过滤。
-其中 63 条母用例的完整判定依赖运营方材料、访谈或服务端证据。这些用例不启动本地 CLI，
-直接返回“不适用”，并在原因中列出需要运营方提供的证据；完整口径和清单见
-[`docs/operator_evidence_mother_cases.md`](docs/operator_evidence_mother_cases.md)。
+当前业务测试实现工作簿“三套卷”中的 42 条黑盒题 `B001-B042`，默认且唯一支持的业务
+套件为 `black_box`。黑盒断言只使用用户可见输入输出、工作区文件副作用、受控模拟服务
+公开状态和运行控制结果；不启动网络抓包，不消费重建 Trace、ATIF、工具调用明细或产品
+私有协议数据。迁移前用例状态保存在 `archive/pre-three-volume-20260917` 分支。
 正式入口先执行 CLI 安装、基础交互、多轮交互、文件创建和文件编辑五条冒烟测试。
 五条用例必须全部返回“通过”才会继续执行业务测试；否则立即停止业务测试并生成只含
 冒烟章节的报告。冒烟用例采用确定性逻辑断言，不依赖 Judge。
@@ -49,7 +46,7 @@ uv run pytest --smoke --agent=codebuddy
 ### 业务测试并行
 
 `--business-workers=1|2|3|4` 控制业务 worker 数，默认 `1` 保持串行行为。
-母用例、业务清单和重复执行均可与该参数组合。冒烟阶段始终保持原样。
+黑盒卷、业务清单和重复执行均可与该参数组合。冒烟阶段始终保持原样。
 并行模式先做 pytest 收集，将已审核的独立用例分配给最多四个子进程；全部子进程结束后，
 再用单进程逐条执行共享状态及尚未审核的用例。用例内部并发、记忆修改和恢复、后台任务
 等路径默认排他执行，不把它们放入普通并行队列。
@@ -61,7 +58,7 @@ uv run pytest --smoke --agent=codebuddy
 统一的 `business-results.json` 和原有章节结构的报告。缺失结果按执行失败保留用例身份，
 不会悄悄缩小统计分母。业务超时覆盖收集、并行和排他阶段，不自动重试有副作用的用例。
 
-分类依据是当前母用例代码的实际执行路径。真正操作产品记忆基线的用例仍然排他。
+分类依据是当前黑盒用例代码的实际执行路径；清单外或依赖摘要变化的用例自动回退排他执行。
 并行分类不改变用例的四态判决条件或报告中的能力覆盖说明。
 
 CodeBuddy 并行需要显式配置已认证的专用 `CODEBUDDY_CONFIG_DIR`。框架在临时目录中为
@@ -328,7 +325,8 @@ agent_test_tool/ 正式工作流入口、四态结果采集及 ReportLab PDF 报
 agent_models/   Agent Model 抽象与各 CLI 产品实现
 assertions/      传统逻辑断言及 Judge 智能断言
 test_cases/     pytest 公共测试用例
-test_cases/mother_cases/ 工作簿 TC-* 母用例及代表路径公共执行逻辑
+test_cases/smoke/     五条正式冒烟门禁
+test_cases/black_box/ 工作簿 B001-B042 黑盒卷及公共执行逻辑
 assets/         测试用例共用静态资源
 configs/        产品配置示例
 tests/          框架离线回归与本地协议集成验证

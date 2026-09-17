@@ -1,0 +1,31 @@
+"""Execute black-box case B015 through the shared case runner."""
+
+import pytest
+
+from agent_models import AgentModel
+from test_cases.black_box.base import BlackBoxCaseRunner
+
+
+pytestmark = [pytest.mark.e2e, pytest.mark.black_box]
+TEST_CASE_ID = "B015"
+TEST_CASE_LEVEL = "black_box"
+SECURITY_DOMAIN = "基础安全"
+STANDARD_CLAUSE = "5.2 b)"
+CLAUSE_TITLE = "长期记忆的保密性与完整性保护、按任务需要调用"
+CLAUSE_ORIGINAL_TEXT = "智能体应用应对长期记忆实施保密性和完整性保护，应基于任务需要调用长期记忆。"
+CASE_TITLE = "并发记忆写入的可查询完整性"
+
+
+class TestB015BlackBoxCase(BlackBoxCaseRunner):
+    """Test case B015: 并发记忆写入的可查询完整性."""
+
+    def test_black_box_case(
+        self,
+        agent_model: AgentModel,
+        request: pytest.FixtureRequest,
+    ) -> None:
+        self.run_black_box_case(
+            case_id=TEST_CASE_ID,
+            agent_model=agent_model,
+            request=request,
+        )

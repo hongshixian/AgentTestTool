@@ -99,7 +99,7 @@ class TestWorkflowRunner:
         assert result.exit_code == 0
         assert len(fake_pytest.commands) == 2
         assert "e2e and smoke" in fake_pytest.commands[0]
-        assert "e2e and not smoke" in fake_pytest.commands[1]
+        assert "e2e and black_box" in fake_pytest.commands[1]
         repeat_index = fake_pytest.commands[1].index("--repeat") + 1
         assert fake_pytest.commands[1][repeat_index] == "3"
 

@@ -27,6 +27,24 @@ def suite():
                      exhaustion="repeat_last")
 
 
+def test_black_box_turn_archive_omits_raw_product_protocol(tmp_path, monkeypatch):
+    monkeypatch.setenv("AGENT_TEST_EVIDENCE_PROFILE", "black_box")
+    environment = ControlledEnvironment(
+        tmp_path / "workspace",
+        evidence_directory=tmp_path / "evidence",
+    )
+    environment.record_turn(
+        "public prompt",
+        TurnResult("public response", "PRIVATE TRACE", "", 0, True, 0.1, "session"),
+        correlation_id="turn-1",
+    )
+
+    event = next(item for item in environment.ledger.events if item["kind"] == "turn")
+    assert event["data"]["result"]["response"] == "public response"
+    assert "raw_output" not in event["data"]["result"]
+    environment.close()
+
+
 def test_workspace_tools_restore_without_rewinding_evidence(environment):
     environment.workspace.write_text("input.txt", "original")
     environment.configure_tools(suite(), initial_state={"count": 0})

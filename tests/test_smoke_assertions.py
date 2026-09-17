@@ -8,7 +8,7 @@ import pytest
 from agent_models.capabilities import AgentCapabilities
 from agent_models.result import AuthResult, AuthStatus, TurnResult
 from assertions import AssessmentOutcomeSignal, AssessmentStatus
-from test_cases.test_multi_turn import TestATS00XD200S01MultiTurn as MultiTurnCase
+from test_cases.smoke.test_multi_turn import TestATS00XD200S01MultiTurn as MultiTurnCase
 
 
 class _Ledger:

@@ -1,1260 +1,245 @@
 {
   "schema_version": 1,
   "dependencies": {
-    "test_cases/conftest.py": "07235e392c3c5148f230966102a18a2e562eafe1be109a6ec4350191531d0349",
-    "configs/mother_cases_v3.json": "570f6859faadb4e604474aac40953c1f583c500be9a20b702027beb77e611349"
+    "test_cases/conftest.py": "e7debe60e38ab82948953e9974cc7de92b7aba7103cc9b9a884eee1a10647545",
+    "configs/black_box_cases.json": "47331b99ed916496286361571c1372ec827ec4fd37d737f60c4dd66738c4b327"
   },
   "scenario_dependencies": {
     "test_cases/base.py": "daa1b5412cd80571db140f6d156e06253a644317cef676f423954f076239f7ad",
-    "test_cases/mother_cases/base.py": "abda32bd1256e050f61bdf238d3c52dcef8c5b71b00b7e61e757483819079ec0",
-    "test_cases/mother_cases/p2_proxy.py": "a35d94624e706f2c671ca7ba9d942498236d937b7091b16f06160ca6baf65773",
-    "test_cases/mother_cases/relaxed.py": "76a893fac8faaf80df1edcff08f63982894eee5a7ff0b8bc230eb678c43c09cf",
-    "test_cases/security.py": "2664ae84272f25b83eb25820e903eb00f2043c5c8f728f70587b89d2e29e1e62",
-    "test_cases/mother_cases/p2_identity.py": "2e27e5798f5a54132d67173d53578e9e441aef1d81631dadcff360e10a6b9aba",
-    "test_cases/mother_cases/p1_output.py": "9902f5db168e362a08d766f77503f5c8cee38566a7523551bc4fb78c3bfc2087",
-    "test_cases/mother_cases/operator_evidence.py": "bc652fed2e47af78a8f466bad86f00b11a3171abef8f8cb4b38d8fda09038a3f",
-    "configs/operator_evidence_cases.json": "22ba98addf4d14033c321ab5d761fe3e4ebeec38b62faa3d81cfa75d34c3c1d2"
+    "test_cases/black_box/base.py": "d45b668355d53049f1709e1e86f8b95d859743c276de4024224b9fab20be4f41",
+    "test_cases/black_box/models.py": "b6ed977899520b7442c46aee25e2bc4a63cecc0f4cdd108330edf97319fe5c85",
+    "test_cases/black_box/specs.py": "5d9794fb51642ddf270d1b93e6f774a50bcdd2e0fb925d0d4d3247e0df0be0c9",
+    "test_cases/black_box/environment.py": "83e48747fd229970e58114cf0cdd79a3a631e76dac650bb247f3c20b24e6e169",
+    "test_cases/black_box/execution.py": "00687f9572caff7ee8f9d18f4c66cae12baad25e0559bb37cb67249b5d67671e",
+    "test_cases/black_box/evidence.py": "ba648f76910436f7319ddaf668e412dced0f6df4adf0dfca4d9c728e52ab0f32",
+    "test_cases/black_box/assertion.py": "480f21192d3a3bb3e04eac936d1e9249daff8bf696493ec2ea4f98a223e9371e",
+    "test_cases/black_box/runner.py": "2707b7e15ea9e604119c036f2df2b9acbfa06d92fa0ef2a2e2d383d6599948f8",
+    "test_cases/black_box/scenario_handlers.py": "66e50157b3d3a81a301d17c5286327104a5c3455b10f4286b39961262a280eac"
   },
   "groups": {
-    "test_cases.mother_cases.p2_proxy": [
+    "test_cases.black_box": [
       "test_cases/base.py",
-      "test_cases/mother_cases/base.py",
-      "test_cases/mother_cases/p2_proxy.py",
-      "test_cases/mother_cases/relaxed.py",
-      "test_cases/security.py"
-    ],
-    "test_cases.mother_cases.p2_identity": [
-      "test_cases/base.py",
-      "test_cases/mother_cases/base.py",
-      "test_cases/mother_cases/p2_identity.py",
-      "test_cases/mother_cases/p2_proxy.py",
-      "test_cases/mother_cases/relaxed.py",
-      "test_cases/security.py"
-    ],
-    "test_cases.mother_cases.p1_output": [
-      "test_cases/base.py",
-      "test_cases/mother_cases/base.py",
-      "test_cases/mother_cases/p1_output.py",
-      "test_cases/mother_cases/relaxed.py",
-      "test_cases/security.py"
-    ],
-    "test_cases.mother_cases.operator_evidence": [
-      "test_cases/base.py",
-      "test_cases/mother_cases/base.py",
-      "test_cases/mother_cases/operator_evidence.py",
-      "configs/operator_evidence_cases.json"
+      "test_cases/black_box/base.py",
+      "test_cases/black_box/models.py",
+      "test_cases/black_box/specs.py",
+      "test_cases/black_box/environment.py",
+      "test_cases/black_box/execution.py",
+      "test_cases/black_box/evidence.py",
+      "test_cases/black_box/assertion.py",
+      "test_cases/black_box/runner.py",
+      "test_cases/black_box/scenario_handlers.py"
     ]
   },
   "cases": {
-    "test_cases/mother_cases/test_tc_5_1a_d1_01.py": {
-      "sha256": "4cba2bf015f0aebdb459d19eeb032cc4d13eefe0afd45bcf52ab0cf2243eb969",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_1a_d1_02.py": {
-      "sha256": "d6f56e7f66e0873578ecc2da23bbbf673bc03c68234f3b368eca05f9b14ad1bc",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1a_d2_01.py": {
-      "sha256": "06bc4baaf4657c2decad6d18dce81302663972849dbaaa82e83e34dc4f47dfdf",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1a_d2_02.py": {
-      "sha256": "072d67cbaa027798d629e01d79955f024cec200b7b81c21e1350c2e5668c59e2",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1a_d3_01.py": {
-      "sha256": "12515a39c0b084c442021bdb4726864c42e5e193691c1a76295fc467aa7eff31",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1b_d1_01.py": {
-      "sha256": "0afc1b0f65b5ac2a947d887caf45267925ea3ef65fdab4bb86eb5a8e486e7e2b",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_1b_d2_01.py": {
-      "sha256": "a904ef28d293c206087bae653924ef8dc540f659a03ec5e77f0cefa0576c5c91",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1b_d2_02.py": {
-      "sha256": "10943cd21d5d35a9a132e6ce873a5542073bf1ff98e173038207113d0535c48e",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1b_d4_01.py": {
-      "sha256": "b1da5a1770e0448d4469f36a3667b6e9c6683939875473ca603edb5acf3b2319",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1b_d5_01.py": {
-      "sha256": "7f4e018228d39adbf1db9a6e7064f8549c76a0f2a80b22bb474d1501e214ac64",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1b_d5_02.py": {
-      "sha256": "764be6d34c6f87d3d6449f7d7c388964132d1c3d27c1524e94b14837d0bb93fa",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1c_d1_01.py": {
-      "sha256": "33663be228f702dd1d6fc0f39d3cfd14653eb1d7d2cb29a98e14dc801606f284",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_1c_d2_01.py": {
-      "sha256": "b7223e7be384e9d8106bc5253ed14a14ecffcc7dfb32309950e5d3b1b926a8f9",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1c_d2_02.py": {
-      "sha256": "691fdd975dd8304e164fd09dc5a324012cd71250cb479c686f6b3fae25adbf95",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1c_d4_01.py": {
-      "sha256": "210052f5c69ddc058c425cf77441207a92286aa9dd857f24e0ca82b70962febb",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1c_d5_01.py": {
-      "sha256": "e3d9ee25243f931bdda3952ace06e59354fb5ce704d2f6945b4ef522835d1bd1",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_1c_d5_02.py": {
-      "sha256": "894b1310dc9b398c202d75e8f987de2648ee83594b45bd45d2ce8febfcec8c9b",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2a_d6_01.py": {
-      "sha256": "d515c30dfa9708fb93b044046905935c18379826c234657da03e5c02acbabb0d",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2c_d4_02.py": {
-      "sha256": "c2c12c3ffec7ee95d8e07c8885f4908c5e315acc0b0d0399a55e8e3810a4dcbb",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2d_d1_01.py": {
-      "sha256": "3de2e02ac872d96769fa4001d18d26a873bb31bc91d473215d02a24243e76084",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2d_d2_01.py": {
-      "sha256": "f920927f6da7259ad0fea282348b0df33018f55e2d9aa0dc9f43d4619c14bc46",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2d_d2_02.py": {
-      "sha256": "f0d019b3a813abec25eb24bf9c88cf7c6407473cefe601f1b11139776cab1517",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2d_d3_01.py": {
-      "sha256": "6f0f79616c895a10375cb013777c4f0c85fead81e052d3f0689b5fe9900c7cbc",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2d_d3_02.py": {
-      "sha256": "f914d07fd8cb3a81cf7b0c5fc90d79b8d10ecdf3dd96b7412e5779f7e1e02ac5",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2d_d3_03.py": {
-      "sha256": "6d6ef99d528a65da5948e5be1f4d22e852f4c1a53e3f936fe9d141c09b761fce",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2d_d6_01.py": {
-      "sha256": "641ba4a54ef663212615aec848ee7ab5233d5e3181b2a5fee6fd0f022b04405b",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2e_d1_01.py": {
-      "sha256": "bf0b5d7062472191a6f878481e3e77aae636391452688f122ae08d9fcbe885f2",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2e_d2_01.py": {
-      "sha256": "682e06a85bc1afd48d4bbea96abb6127acc254e32bcf35d5aba440d36b88d46d",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2e_d2_02.py": {
-      "sha256": "bbcbc4ddf4c892081c555bde0032cc7434151cec66f504f78a78d172a0a5fa79",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2e_d2_03.py": {
-      "sha256": "b3846e0eca71993126050a9b8ba83d332f6239c5826a1b8dea94b8153d96919d",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2e_d3_01.py": {
-      "sha256": "c34ea5a542d36d32dfab56f9f16c123cf7af82545176452c194aef2bbfb8e450",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2e_d3_02.py": {
-      "sha256": "78d8c336edf9f830ba059b1b9f328a03cd71d8fc5232dfea40c307322ee19962",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2e_d3_03.py": {
-      "sha256": "e9814fa3a5a479befe510ce99b43db8f6836b9104abea601e47b7b4a563b63ed",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2e_d6_01.py": {
-      "sha256": "24f55f52b4fe11d4ab6013f0b0e4031460b9446804d40736799477336fcfc7da",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3a_d1_01.py": {
-      "sha256": "5e85bdaaa19d0d6480312fc1654fab3525e77e782d91323854b7b93df41088c8",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_3a_d1_02.py": {
-      "sha256": "19729ea1746ac88be9b0c1e6cc88ba2c77c60afa5764db897c10717ec26a7030",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3a_d2_01.py": {
-      "sha256": "3e98f5ec5be4564baafbe59d9ba0ee346415ffcfc27299bca2885b06a71e7193",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3a_d2_02.py": {
-      "sha256": "049e4af42ca581be3169339edea059c5963adba60bac09ec9095ad3b0f9c2bba",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3a_d3_01.py": {
-      "sha256": "d2a5edac7c897748ac171d3ad1b973dce9484a4bed98998e3cfcc22724c242ca",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3a_d3_02.py": {
-      "sha256": "21bb39b8068137cf7eba947a851660ac213588bbc602dcf864e4f95cb2675583",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3a_d4_01.py": {
-      "sha256": "c2d020ffd7b3e459b2137bd8753aff3e41b3368628fbec8f3d925968e813466e",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3b_d1_01.py": {
-      "sha256": "510f1cee6bc14326985adbb090931f01a21e512d10ba78de48483b5ec4f87875",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_3b_d1_02.py": {
-      "sha256": "ca235e83d1c3c25d35148fa5b7c8d128c9762c10d387293fcee32fb15b8e6c09",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3b_d2_01.py": {
-      "sha256": "19b807fecee2e1307685a873b4d9844f81e837540ac29b89de53c01a15c51954",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3b_d2_02.py": {
-      "sha256": "a55e6228ca66f6af49c6fc09654585aea92abd3f01ce073e77e8942d4dd7055e",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3b_d4_01.py": {
-      "sha256": "78c934eead9d32685c273fe28e4e768abfbba0ad6810802ca2aa6be64a9013e2",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3b_d5_01.py": {
-      "sha256": "73b5307ad1f7e550b0c466642068bc9a618cd3c8dd83187f810bc48cbcf8f20b",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3b_d5_02.py": {
-      "sha256": "61b0416f08dd064041ff98c3921389fae240cba3cc599f65e75204a289d42d07",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3c_d1_01.py": {
-      "sha256": "a581626786098be9ac64d56b77c1a2505b8aee48bfb94a6375d99bf96c3be1b2",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_3c_d1_02.py": {
-      "sha256": "90939965b0559c179a7b263c936db90056fbb8abe3a55fdc16650364f7ec7132",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3c_d2_01.py": {
-      "sha256": "88dd80207820028fbc6f66b6c75ce43ea94f5e1f3ac4d862f055d30368e0d5c2",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3c_d2_02.py": {
-      "sha256": "df89ee429115c7f2b8a15a45868a01adb35dca544ced32e785e25b829b058f56",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3c_d3_01.py": {
-      "sha256": "4e686918d273536d4a79de1941435222cd54afbfa0125463287fa23dcdf2112d",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3c_d4_01.py": {
-      "sha256": "696d16ef0e47bbef031e09e9582c87055dddc488fa26a145b9eb632db350e881",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3c_d5_01.py": {
-      "sha256": "caadf32e1473ed4e75479855ec376efd3aad2a4f62344dcf1955e40d92b24aff",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_3c_d5_02.py": {
-      "sha256": "107a1eb78e25beee341b30e7f7754513285532120f40fc372b65f0889aa68801",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4a_d1_01.py": {
-      "sha256": "5fe4250f67a491df0bc4ffe7230ac2dc2813ecbcb5eced0fa55930b0e18a5eec",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_4a_d1_02.py": {
-      "sha256": "0cf342dcd2994f9dd4fc26dde1d2d50ed267408a32381abc35e1cdf0b8592967",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4a_d2_01.py": {
-      "sha256": "3e17a8ae5bc78c19ca797d7d05bc8b0c49f012f73787f17d726355ecc66ef3f0",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4a_d2_02.py": {
-      "sha256": "eb3fc97adbe0c424621b6c268e70ccfe8760d2861bf6eabc09a497873f818c68",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4a_d3_01.py": {
-      "sha256": "325cb9807bc3c75ea8e1641b2c221a3105621e0deb5f5267ffc976bc0407acf1",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4a_d5_01.py": {
-      "sha256": "b66c7dbb6c80da6f36320cbb01d1fc0185878877213a8c33c90dd837f9636a31",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4a_d5_02.py": {
-      "sha256": "47bfd61a8e2ea6e36b07620bf7487e72d359a6d09c01c0119b72d4f9640ad39d",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4c_d1_01.py": {
-      "sha256": "ff147baee740cb91709f0a149628052b73d05000d13f1e1c4cf2eef1bce11b34",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_4c_d1_02.py": {
-      "sha256": "31ca48bad6e80abc65ead0a1b1f5667ebcc8fa4149a6d78945b3b2ff39eee201",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4c_d2_01.py": {
-      "sha256": "8af1a6cef91d0a0ff16696c75481c634de9fe6bb3e0f7bdacc761237101c9236",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4c_d2_02.py": {
-      "sha256": "539de83cf7fa4edcae9d7c53e1d10b0125227b41aeaf0e5eb6bd27809fca7cd6",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4c_d3_02.py": {
-      "sha256": "c1a0905d5cb91930fe35fb59f42d888237367097e802137bc4227e9fa43e34e9",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4c_d4_01.py": {
-      "sha256": "ba2578ea28b321df68ad02a684e6ca3b1f558bb79f42c7ec924f8ed4ad3f7b06",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_4c_d5_01.py": {
-      "sha256": "96e33e22faa8ec82d68200f94204c00fb175ef66b7a2259f98001ab41f54956c",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_5e_d2_01.py": {
-      "sha256": "1ca24b53660fc6503ec30402a69f7ac042bfc70ce06a73d2c8377ac4e528cb1c",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1a_d1_01.py": {
-      "sha256": "b25032c6a6a38a51cd39b3bf79d6f89faad3d40b796d370fcfa610a58a55db9f",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_1a_d1_02.py": {
-      "sha256": "b6b74c5dc7a8af151084799d1f600c06f9dacb5b2781794040a3d5e708e9591c",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1a_d2_01.py": {
-      "sha256": "33b755f89fc44011fe895bc617191806073972090b23d79e6611d5d5ae5e7674",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1a_d2_02.py": {
-      "sha256": "f0dfb6d180cfebaa3618b30f9fcf6fcc735fd490a42ef5658ff652dc532dc80c",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1a_d3_01.py": {
-      "sha256": "72b32246d185de8ad126184448d13931a04cc30db29e9bb17140fe0e70f701f0",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1a_d3_02.py": {
-      "sha256": "95205b7c3422468695e9a9dd3870d5033776ab203bde9eb883549a3f0f35afc1",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1a_d4_01.py": {
-      "sha256": "755c11ca2717c93bacc1e6d614ea61b502cebc8022fa196b05ef5ff28822a5d0",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1a_d5_01.py": {
-      "sha256": "d7083fd0782958dee7a1b87526475e70561ced8f21101585c07a7ec00285b934",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1a_d5_02.py": {
-      "sha256": "744e73fab2edc29a4a05b2df85389d5632c4d58b8a454c3948fabd16a340c3ca",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1b_d4_01.py": {
-      "sha256": "19ca13975fc1dd4345bdc9379cdb0404b438f573df03520ccda2454c7392893f",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1b_d6_01.py": {
-      "sha256": "a9ec434db3d53b4c57fa26a8d669aa94653d65f4770173160930e58e53e80599",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1d_d2_01.py": {
-      "sha256": "f3f4ea8c273746f54c942ccbb692abb9ef10b7d2e96e17bc558f0e86b80676f8",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1d_d5_01.py": {
-      "sha256": "c8960ad5998f8100fe1a2fd317dc1f69fc7cf490bb62e4ae9305e4bdb981e6a6",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1d_d5_03.py": {
-      "sha256": "7854c2461b3f84cd0b25248c621e37e4eae609359ff17f306dc011d59cff9c73",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_1d_d6_01.py": {
-      "sha256": "8445849311adc2077355738b59382224ea55ddd37058388b2b30ad80b9531711",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2a_d1_01.py": {
-      "sha256": "5a4540e5a0a02bdc4ad8f344fad60cef1a068604a209c1bc9e92be81fbe16941",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_2a_d1_02.py": {
-      "sha256": "bb212c248dd376a3433a91543d43a65fdbb8a674a0139063d5ea136a39b1c0c5",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2a_d2_01.py": {
-      "sha256": "2bb46a2baf641ffc7944a8977c516609471a028d98b9704dc16915a59cfdb73e",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2a_d2_02.py": {
-      "sha256": "8be9431597f649e10a8c9656a56ba86d6562acfb23f398896b14342a919a41f4",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2a_d3_01.py": {
-      "sha256": "954822c92fada8c3a17e0227e5b0f1bc1ba17df13889d2508360bed930581f2f",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2a_d3_02.py": {
-      "sha256": "03780246c8da260e59ae8c4ac8c565b3eb82854366fd677c25c7d562b6f26b4e",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2a_d5_01.py": {
-      "sha256": "d957828a58e5d9beceeb9aee92694bcc0bb4452e10b15ce36d2a5fc23fd2680c",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2b_d1_01.py": {
-      "sha256": "1a7b0966046f24ff0690fa149a11ae13083fa7dbe2f20c87f300d277de898e54",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_2b_d1_02.py": {
-      "sha256": "5aa3ef6e5f98425aeb203d6ffcebeb16835f8afe36f583b1ee1b503501621efb",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2b_d2_01.py": {
-      "sha256": "c9eb28068d0e5f4f7e5508dff0ac6c20e0608664c1184e876a21b42e34dfbee7",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2b_d2_02.py": {
-      "sha256": "fe6abcc9a96df266e2019610ca1caa50312748f0e6d874676956cfd7418d6965",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2b_d4_01.py": {
-      "sha256": "e2801b52800b09d7f449d29fd91b334c06da7ef74b44c474e7a4c5a7de71ead6",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2b_d5_01.py": {
-      "sha256": "4ea1f24b5d795cb009710d263822d350f46aa5881d21ffd15afe23b93b8d964e",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2b_d5_02.py": {
-      "sha256": "bb40a99ccb81910804232694d137ceeb740b9f5f113b1adff8aa8066dfc6f209",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2c_d1_01.py": {
-      "sha256": "368b21a4ec772ae968623a061b25148f941bc656aa2d29677e2200d0546e1bca",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_2c_d1_02.py": {
-      "sha256": "a69a944ca2dfc599b3f6285996dea67c14c70e47227fa91f7d963c136e9c1f08",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2c_d2_01.py": {
-      "sha256": "7035cb962a2769fdec7237f0ee7468222c2db97a86b74cb8615e2708d0af327a",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2c_d2_02.py": {
-      "sha256": "3e962b68fd69f1bf969b468fb3b0daba1f5718ba0b5660dba37bef657dd2f057",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2c_d3_01.py": {
-      "sha256": "c996e1c29a4fc0fa5f2451d54cd709b44c7987296a8413c8e40306cea1be19c4",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2c_d3_02.py": {
-      "sha256": "e12696dd0940c3569a58355e9ec1aa585b3478bed695a5db87165de7cfaaaf4c",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2c_d5_01.py": {
-      "sha256": "9069a843bf5adabd8dc350b91629b9a48b231df119ba0ed2fca1f242c817568f",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2c_d5_02.py": {
-      "sha256": "3d06501b360d9c28fd9b920e31a677292fe2d1804b7f4b40cad3c73b63108623",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2d_d1_01.py": {
-      "sha256": "2f801890620f8f5b2a36023385de6ba23b3027a78586092faaafa8ec2127a50e",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_2d_d1_02.py": {
-      "sha256": "bfc109d0d7516931f67c70156d9d0b359006aeb85014f60246560e79f9916c95",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2d_d2_01.py": {
-      "sha256": "bb007f32f2951eac943b28e994272d0d2b751161f96ed0a58e04608189119dc4",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2d_d2_02.py": {
-      "sha256": "3abbcdb9394b4ac746646e643f82c9d6f7558b8becc97133d57c07f5ae90491c",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2d_d3_01.py": {
-      "sha256": "714a929cc40ee09222a684082a856e5c225a40ee644818de5e94acd401aa5d1e",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2d_d3_02.py": {
-      "sha256": "0f473b84de3e926dcb415f26ba768bf51310cbbb0c77b5f5cec63db9d44d8610",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2e_d1_01.py": {
-      "sha256": "7e753ea68538355c55e10c02f1e7ceb0c2b533ce5c0105d870c698a85978ca87",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_2e_d1_02.py": {
-      "sha256": "99a15e0983ff1b02720a635c08551191c463a6e11e3a0add2e037d6651c557a7",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2e_d2_01.py": {
-      "sha256": "3dfa2d3c8107e6f80a00ea49aef4e78a7637aa645272cfab964ecab4b64ba94a",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2e_d2_02.py": {
-      "sha256": "a3bc8dca7f018fa0aad46f40d3a39e1b5b037c25cc22627fa6928343922103a6",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2e_d3_01.py": {
-      "sha256": "180e8a25e5f0acc92663096c8d37223b906c42d451ea5f7745d4a26855dfc5c0",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2e_d5_01.py": {
-      "sha256": "a6c4d9e7f2c6ca41428b264b4d6895597599db9ef72acbed7f05bef2dbf86c5c",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2e_d5_02.py": {
-      "sha256": "06874becc03ba3e935c4b70eab448d590f8f3fb0fa57bc6f0544f0464b83b9a2",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2f_d1_01.py": {
-      "sha256": "278ca53a4e561ee7316d0021c838fa00bbe4b34ba820534c0cce18c36cf57d5c",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_2f_d1_02.py": {
-      "sha256": "13484b71b18218d8da9e0bd5cc59304243a3ab386b107d3bdef27c223f86b8f9",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2f_d2_01.py": {
-      "sha256": "2c307be535ad8f5ae0a27ceff3caa2d276de3f47aa2a1661ac7db9df936c70b1",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2f_d2_02.py": {
-      "sha256": "665a9f881709f7f9022c829005e9b855231f62354677428c736d978270e22d4d",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2f_d3_01.py": {
-      "sha256": "df57c81c19dd4445f9b423d1c9264091780ed8270c50e860bdb3276f0dfa8665",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2f_d5_01.py": {
-      "sha256": "23a691bffe0c80f35fed5ed2fc1c99a8a87de50172759b462ba7ab36951de196",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2f_d5_02.py": {
-      "sha256": "1c0dcdd04f09b3cf569c93168fe4c679b8213ac784039118723f91d3e8e44bd0",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2h_d1_01.py": {
-      "sha256": "e76327fabfc3dae2e535af1f57ae6e86c44fea5cdfe7cfee0a90955695fd161f",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_2h_d1_02.py": {
-      "sha256": "a2f9a05e73178d620293a0c1302adfe4e5b1de33898e7e884f1bc5add658406b",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2h_d2_01.py": {
-      "sha256": "b8821013b4c7bfd20b462bdfc97765a7960031c8be419326e12726bd16d979d0",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2h_d3_01.py": {
-      "sha256": "cf4f0121a55798110c9b36ac709b24dc89d54d03e7c694b158ac47c757ad8cb0",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2h_d5_01.py": {
-      "sha256": "5d15afaa2fb67d6df79289e229dd458ef01f901da8ee95e8544af0028f4394fc",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2h_d5_02.py": {
-      "sha256": "a3f69961aa09824ebba53666796aa7f19b2267820fcdfb8f0e45cc62268b3f79",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_2h_d5_03.py": {
-      "sha256": "74ba205cde6f9ea2dddc4ca4e33147786de7697e65555f4a81e191a9b1602c47",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4a_d1_01.py": {
-      "sha256": "ceb3a55819bde6cccd37b2b001676546c61b30a8b4bb22f6117c881a56f0f837",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_4a_d1_02.py": {
-      "sha256": "344824e16d20f12d19ae7a4ffd5fdf1dc8becdb2ca5e5baed1b455490b31ca97",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4a_d2_01.py": {
-      "sha256": "462aa8ad4c817ac00dfc6b7fbaaaaba61bb749c273180bbbca5d987f2f2778d8",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4a_d2_02.py": {
-      "sha256": "443ddffa959ab104a198c3de665725022f1e78a8c0afe352b1ecaf2f28450d30",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4a_d2_03.py": {
-      "sha256": "3520e020163d2ad1545fb5eec8af4466a782efd646b2dd56f66ff677f8eeaf08",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4a_d3_01.py": {
-      "sha256": "0f626e41a8d15f182b72b4fce04842e381cc758a7a121a6efb2504e737839252",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4a_d3_02.py": {
-      "sha256": "63ed62c41598d0469bd277f93f7263f83eed3394eaf3086b868b1e2b8a5557cb",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4a_d4_01.py": {
-      "sha256": "e1ad4fade333a794c989c88373b2a5271d1268d490da74e800d6b552de6e5d88",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4a_d6_01.py": {
-      "sha256": "1ac84be3f57e9e819c2862a34f2e0d4e116efb91d910970013bf714d916a9237",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4b_d1_01.py": {
-      "sha256": "858aa32aa4760d94bf867656c3eea51b9a916527e5a1ddb55e2758652c74d82d",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_4b_d1_02.py": {
-      "sha256": "ded1ddca11c051aa7e22f6830a0c1012b99e1648f94769d49d70c67343686636",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4b_d2_01.py": {
-      "sha256": "360ce7cfbc49c3344b44ee352ae7526de68bb55a56a6e6f3a118ea5e40d27ea1",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4b_d2_02.py": {
-      "sha256": "66ce70134ca97bc302d1c08bace98e0c89a4a8a305bc07f1d176e939786f3508",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4b_d3_01.py": {
-      "sha256": "b575d4983c75edd8708235a6de72146e4a01a3bc6657f876147815cd6dcdff06",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4b_d5_01.py": {
-      "sha256": "ecdd2c352b5f82a2d11c8692b16bddcb99a8608711fb885ac8319ebba188be88",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4b_d5_02.py": {
-      "sha256": "69fab798fc7d776223ab24e947dafd79cf185e0a251f135f615261757755769d",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4c_d1_01.py": {
-      "sha256": "7959261d9edbf76f27d1399cb1d62fbb1381c1a7fdb9fc373cdef83faae57f62",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_4c_d1_02.py": {
-      "sha256": "8def685e8dabbbd26ba7def736a11d82a445d3544e6fb970998fb50c817bd94f",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4c_d2_02.py": {
-      "sha256": "70258e48ee2c5eb4c8f4cd970557e2ebd464e93660687d7af9845c951ed52000",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4c_d3_02.py": {
-      "sha256": "3013556109586d4cb8ae0b865a09ed5ffc02ac54ca9b94a5a9a97de478e17d82",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4c_d5_01.py": {
-      "sha256": "280be35dc48fe9176bb834baaa0e6015b67776c7ec44dbb5d5b94e8c3951e611",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4d_d1_01.py": {
-      "sha256": "9006b3b16a62e93eb4f75e15bad095d4b086945652ecbdcdb0d21ee841721633",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_4d_d2_01.py": {
-      "sha256": "00a6aff91729dace1f8301c11ce61ecae3c1408f48716ac24b47fd13129055a1",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4d_d5_01.py": {
-      "sha256": "ea0247b6cefb63027b77c752a3487f8bdd2d078d6cde9790506de364a667aeb9",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4d_d5_02.py": {
-      "sha256": "fb9442cfcf8ccb623d24f27a70818f72ff75036d65677ccf18c245ee73b1b9e3",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4e_d1_01.py": {
-      "sha256": "7e00bad83b3aefe26f13010d26b05c15b5e36b373275b3a10f194e240a4c2862",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_4e_d1_02.py": {
-      "sha256": "ef25bdb39980a02aa334f67c15390d1e7475adebbb43c9f4d4ee74af43219c08",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4e_d2_01.py": {
-      "sha256": "929e0e282c01771053e63e4b7966dd0ddcfa39839923d487b6386064930833c8",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4e_d2_02.py": {
-      "sha256": "cbb3a1a9fe304fb3f688a88d9caa4eb1cba6175e01284b887229446afda776e0",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4e_d3_01.py": {
-      "sha256": "f1f9c0c2b3bf93585a54d8a905926875c65e82b8dd9e41e9849c03ab93ccab33",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4e_d5_01.py": {
-      "sha256": "958ea866b5e521312fb86ffbefd40c94bda3cc94fdde08c9d24acc54b42845c2",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4f_d1_01.py": {
-      "sha256": "d8ae55fe0d01a6f99086f9360e1ea8eb699e1150d1840d97ee68625fdc7e9763",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_4f_d1_02.py": {
-      "sha256": "4db219a268ebe0d5113bb1c57538018750cf2929415264cef8e68bd1d0465d4b",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4f_d2_01.py": {
-      "sha256": "6674fadd7cea6ff13fbc5575bd403e55f631994a4552a1e9b38cadb1523f03cf",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4f_d2_02.py": {
-      "sha256": "edde39407ed9be3d77f5816b049b6ab182f3094bc6e06947dd749dbd4416db4f",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4f_d3_01.py": {
-      "sha256": "83a5e1442b835a1fab591ca394833c2cf9475bec566cdb847517e8848a98df2a",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_6_4f_d3_02.py": {
-      "sha256": "ce758525e805efba34b467aaa840f390cc88886374cf167a500ef5aea074351b",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1a_d1_01.py": {
-      "sha256": "de1a5876df342fdacb0079693bc2a2b8cfed16041303eb240cf736f86885f4d2",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_7_1a_d1_02.py": {
-      "sha256": "b0eb4a20ead0b0360e63d9c2caad17e52322a061a8e0c619738dcd021d378337",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1a_d2_01.py": {
-      "sha256": "afe0f42cd534d17d1936c4b101a6ba134e28b1f58c7306e4024c2eb5f495f966",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1a_d2_02.py": {
-      "sha256": "6cd072b12d57757bdbe629742fecc3b781e336f98c113ba8edb2a12561bcb2be",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1a_d4_01.py": {
-      "sha256": "0a008b25b387b3df24344dd64c95ad5b197edb59fdfb575fbe06bdbcf39ddf7e",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1a_d5_01.py": {
-      "sha256": "ca21ec4844a27d72eb41bd051989725a3e56fd33c7f1cb6d587faf2391b839d6",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1b_d1_01.py": {
-      "sha256": "a352ddd8a1cdd887fc3c796e240f47492aaac7d8a09dd634110cace42cad10b4",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_7_1b_d1_02.py": {
-      "sha256": "258748bd8e27a81a75df1330aa7cb3e25328489c183f722bc2faf3e2c5fe54e7",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1b_d2_01.py": {
-      "sha256": "8ac160cacad432b2b1c2b135f9ca54e94681db0f86e4cceadd2dde3f805d58a9",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1b_d2_02.py": {
-      "sha256": "52b14c7e0295b2fcb9ad1b4120841e583005555430bbaefcc2f60662726a4623",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1b_d4_01.py": {
-      "sha256": "702b776e4996157e65bf94785cf1764450b24b850a108a78307ecf53af13b31d",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1b_d5_01.py": {
-      "sha256": "4b5d01fbb17b8cea84be18e8019fd7b2ea3cea1282e0c7712c1e16878e86fcf3",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1b_d5_02.py": {
-      "sha256": "98cc93039751c725dee06844992cdafa02ac80a33eaf330bfc6bbac3610dd70d",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1c_d1_02.py": {
-      "sha256": "b4fa435caddee41655178e81b4b6f11904ad2108c184555fb262a4a7c0c488d5",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1c_d2_02.py": {
-      "sha256": "1a253466c10580235127d44b801b2502f69ef8ae09dae05542044cc90e4e78a1",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1c_d5_02.py": {
-      "sha256": "057a44125aba451fa253a5f55eaab42e7e99e03f3296b0a00e40da77ec81e0f2",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_1c_d6_01.py": {
-      "sha256": "e55a1e330793e759bc4f50a874c53307cf3cab29f9816fbff855f495a5199177",
-      "group": "test_cases.mother_cases.p1_output",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2a_d1_01.py": {
-      "sha256": "e9ca6ce6eabb15731ec91faaf712abb41ab651c23771f6b03215302091a43656",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_7_2a_d1_02.py": {
-      "sha256": "99fa7fe83dc64d4cc2e46bc070e0c1fe635295e0347851b610f0634e140d73c5",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2a_d2_01.py": {
-      "sha256": "3c1d1bcbc131e9636a7bd4acd01751c2cc20a7d4418e6df7038f2593fd63cd37",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2a_d2_02.py": {
-      "sha256": "55696e66338c32dd8e3265bb099e86b2798622ff745ae51a9d75cead1b93767c",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2a_d3_01.py": {
-      "sha256": "09edc0eafea59f7a4995ff27028c6b5b66821a958537c30bad4ddfc5f2a1c354",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2a_d4_01.py": {
-      "sha256": "78912c35410d8ef8eec9a41f44ecbb60eb5191305b6f52d794e28a680d168280",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2a_d5_01.py": {
-      "sha256": "29a73ca4c6a7254c19811dd002f9168d0bfc342e60c5e960b9fed130c5241d90",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2a_d5_02.py": {
-      "sha256": "6e384837f145751bd7f763c5c8d48770f7975894e72420d0526f9129e3d40812",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2b_d1_01.py": {
-      "sha256": "c002c99796906a91cc99bc78a8419df9e493cc42a55f015af32b46f3a27bc2fd",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_7_2b_d1_02.py": {
-      "sha256": "6a1c65f63d992cf4c376c53b7eae691eb637f4e5f787d1f88df65afd26757f8d",
-      "group": "test_cases.mother_cases.p2_proxy",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2b_d2_01.py": {
-      "sha256": "fcfcc6d45b926b131d9555a2590dedefdf9009ec36f12a76b70377ce9b6f6c3f",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2b_d2_02.py": {
-      "sha256": "51c0084a8549faf75ff57f9ffd9eced9d94972e31c3c0b0027bba7197bb8cdb8",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2b_d4_01.py": {
-      "sha256": "858e9fb8d81c6ea75683611f62296837d453fb25ff9184d8cb521cb9ec0d056a",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2b_d5_01.py": {
-      "sha256": "dd1af2776760382a6012b79f55ecf495eaddafd5df97d2af50d0a5bde7e9a544",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2c_d4_02.py": {
-      "sha256": "2b87670ab79a5e29291978b8049c9c341c0c4f7fd9ed88c1e9f3e304a673a824",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_7_2c_d5_01.py": {
-      "sha256": "f52f8459d67501962eabe3ac328fc4ffdc7adc8ac37f90d8552dd127c93cf86e",
-      "group": "test_cases.mother_cases.p2_identity",
-      "reason": "Reviewed isolated conversation or per-case tool path"
-    },
-    "test_cases/mother_cases/test_tc_5_2f_d1_01.py": {
-      "sha256": "ce0985f1ed9791304be7aac18bc075c5255ef5cd4e6972c6a9613a456af68cc1",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_2f_d1_02.py": {
-      "sha256": "66943073cefa67c03c8d6259370e760da3396197fc07a95e050601c97545b25d",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_2f_d3_01.py": {
-      "sha256": "421a58fb3f643f9b8ea12b2f249c97a0cca3ee4316e39fbde56295d1a2feae6a",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_2f_d3_02.py": {
-      "sha256": "b04880dab1862a1720c41044d0bb7a85e1c370925ea8cf23e0436f50b3a467bc",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_2f_d3_03.py": {
-      "sha256": "32faa74d58616504dd465baea09109f7e6dc7fa0cecfd6c15eaf9ae75f2d1a93",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_2f_d6_01.py": {
-      "sha256": "b7421ff91220cb2fd9a308882f3a7f7c7f3a88be2c25c138b72ea4a49f3c8c64",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_2f_d6_02.py": {
-      "sha256": "ee666b99c8189ed12d10ae56c12ba9889c2a7d9a5c1323e2dd762c27ea5d23fe",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_4b_d1_01.py": {
-      "sha256": "2e002e27f49240ab7042c1ee52b77b26c35dfffed4e815c3fdde0d75ea607bd3",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_4b_d1_02.py": {
-      "sha256": "c4b5ebc2e47911bec80c01223e14e40e1af46ed04313537c0a65bae78969a086",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_4b_d2_01.py": {
-      "sha256": "836432fb6eb60a6f5f1615e0a6713016fd8de6e1135526f9ddd163ce94122987",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_4b_d3_01.py": {
-      "sha256": "15e3c6d0c8d8cfbb77219525890f10de3ca3b6f732a91aaa6bd52fc9676e5a36",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_4b_d3_02.py": {
-      "sha256": "dbe66abebb41f598d92165c737182773ff14d4f28b02253e4170883c2f73e6f1",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_4b_d6_01.py": {
-      "sha256": "b23d0849af73b27a375d9a2e5b8dd18fe73a85d3fe8848abf949a2189fee16ef",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_4b_d6_02.py": {
-      "sha256": "a0c254167dd8bf1857bbcfa3afca09a9fab2da5eb50c44049f063e6398efaea0",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_4c_d3_01.py": {
-      "sha256": "9372fb9ab0734bcfb7a74498061a36df5081a935b46ad2bd22724740af6f4b7f",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_5a_d1_01.py": {
-      "sha256": "544a1d2983b72388a49692440a521dfbbf64457898b01c94be431b5df952d577",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_5b_d1_01.py": {
-      "sha256": "183de276a7990b6ed57dfad24266fc92ac4d6695c033ee8f320c8441f5fddbaf",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_5b_d1_02.py": {
-      "sha256": "48b86249824c667bec9847411141ebcc39efb225e515b2b18217951e76d6884e",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_5b_d2_01.py": {
-      "sha256": "3c088f9d41f42ef75030e92fcf870235218cf12161b7e257278f580dd437cfb3",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_5b_d2_02.py": {
-      "sha256": "76145e30ab16d1b023b580b57ac9d034ed524f264726f98bb2be1e68da852a83",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_5b_d3_01.py": {
-      "sha256": "b61fc36e2fb140b93059cbe4e893c1ce52575330eca27c5e8c05405dbe6941af",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_5b_d4_01.py": {
-      "sha256": "0b18b2a10ddf279da2ae6e5fa59ade2e2768b1677ae6a665f5b5e7414a0eeff3",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_5c_d1_01.py": {
-      "sha256": "add3b1e86f9e94023df84947578609bd71338c8a5dad84df0abacbcc066220be",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_5d_d1_01.py": {
-      "sha256": "e13e66ade62952e4ab318cbd0a0413233f7cfa04ba18eb3652c776fc275ecefa",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_5_5e_d1_01.py": {
-      "sha256": "6ab3ef0b7cc681273975683b3e448c5ed9b63c13ffc496f8d46afb7212025cfb",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_1b_d1_01.py": {
-      "sha256": "a2a4ca5d6f93276ad1c9fc6b9da2396758a756b33734c1c40576c98349119fed",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_1c_d1_01.py": {
-      "sha256": "07b79bb03a970ae6c07b93893f1ba7daf98010a96f64c0a2e102a43141330406",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_1d_d1_01.py": {
-      "sha256": "e5bf86e8262939a624f56c829f2ce74847a34dee36a9642c6155884829cc87c2",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_2g_d1_01.py": {
-      "sha256": "b5d7ca47c1b26deb68e6b4589e33756a0c69a65b6f37f42bf4697971edc5ee90",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_3a_d1_01.py": {
-      "sha256": "3b719fea2fc1c344ba101897b64b2b59d1d2502222455275e98e15d3cd957700",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_3b_d1_01.py": {
-      "sha256": "546a77c38874d18a120d5762cf2b6ecc51706df973bbd95c23476fe35fd5ac5a",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_3c_d1_01.py": {
-      "sha256": "67c95fe92e582e0721297c22e994fe908bb3f68eceb28d4d47f1e9a9bf02a7ba",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_3d_d1_01.py": {
-      "sha256": "34632c52bd8d74b90a1d76cd14b95536c51adcacb9365959f9373b64e006ee79",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_6_4d_d1_02.py": {
-      "sha256": "0ba227b0fcbb1fa94b40d942d39995519006bd768629d0a22a8062c4fc3735b0",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_7_1c_d1_01.py": {
-      "sha256": "0b7c3e70628d9bd2f9219d65574cd9aad283dea30b49a80c821dade35a14d8a1",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_7_1d_d1_01.py": {
-      "sha256": "dffbb568f92a2af95fd7ad7e77bfd5632a482e9800988c330fce5b190ad91011",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
-    },
-    "test_cases/mother_cases/test_tc_7_2c_d1_01.py": {
-      "sha256": "54e0473dce93187f5b758d53e41d54d3df2e5afecd8beb07de293b6ae1c57829",
-      "group": "test_cases.mother_cases.operator_evidence",
-      "reason": "Operator-evidence case only records metadata and concludes not applicable"
+    "test_cases/black_box/test_b001.py": {
+      "sha256": "96e8a679481f32ee0df613f5a2b34c48fb3a995d285ed9937d679131363419a7",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b002.py": {
+      "sha256": "32dfda73939294fa25f2c8a33e45e66b41cf58e07a68bb0d1753897fc8edca6b",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b003.py": {
+      "sha256": "4e636d08b4ea0cc3b80404824a3048e7f7a1ba404f6c6d158069eda84a52cb13",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b004.py": {
+      "sha256": "1217e98242ff2e07184c5601b8bfaec12732331e627e27a4cbb2dcbb64b5e84d",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b005.py": {
+      "sha256": "80fd9e3e3c935668f8a380d4016b52bbc60e9137c06c10bdf7718e2897862923",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b006.py": {
+      "sha256": "8a779fa8fad5d20924938a86ea15d729b43b768be706a9c5cfa06feb6bafce2b",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b007.py": {
+      "sha256": "f8e8987159859a4582189e0d62eb40673b50fb764152930b9445e92a903bac6c",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b008.py": {
+      "sha256": "92f13df183c665f8d17872172663111ec0c87a7b395524229c72e32d119fcc4b",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b009.py": {
+      "sha256": "0617f05275bc417ad839850029c35c40037f2b66e6853afec61268ccbb16e9c8",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b010.py": {
+      "sha256": "fb07fd7e309a32ca2248bd02405b23dd91711e3819a937b1efffc440227fb71c",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b011.py": {
+      "sha256": "6a48c9a24a16247fd751ecc2de005a6cfebb12f0df22d2676b34df3aeac26317",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b012.py": {
+      "sha256": "54219e5bc86847b9bc76d11438d7ed175c0c3a6564c838a1b8bd5c5a63746466",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b013.py": {
+      "sha256": "9e2652eeeeb8cfb956f08f194873bca98e3de6583e5e03dc560fb8e7cc2cb1e6",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b014.py": {
+      "sha256": "f7bb72e87ec24dcaf8c4f6a7f990d4ce65e8e48129a164e4d9aa6af043a9e847",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b015.py": {
+      "sha256": "c629ad469c50f4c8f45d159c7164d14320dae4cd20f1fce6a0a3f52c0979db83",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b016.py": {
+      "sha256": "973911d3fc4dac4cb1984c99800ccf58f2421e4e44e2a4d898212e4a7e7e2410",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b017.py": {
+      "sha256": "dc97182ea962f79750604391196b455f96f912b156723af7f1a0f02746a2c7b8",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b018.py": {
+      "sha256": "d50ece08e598b13b0ba3e66bf9117976a083776d92d72fc0776691a9702f379c",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b019.py": {
+      "sha256": "e6a9d6bdfd5e8c8e0bb151d8a5b267b5d1def1e5a6419ae85342b5a5043a1ae3",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b020.py": {
+      "sha256": "a759fbfd6a50c349d29b3b13c6bc32a6b97d4e55c8edd044ffff23c2b0aaa02e",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b021.py": {
+      "sha256": "6f7fee3695a8973780e3c55a9d4a322ebca8d2579f3d8e0c27f694e62846face",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b022.py": {
+      "sha256": "46dbb3edf80996415d9f4d3b5dd5eaa056aa5e2f24487c62430c77b0a7711d3b",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b023.py": {
+      "sha256": "b872a95d9ac85cc08639476ce8431eb8e7fc8c91a0468aa9c81afceddae2c96d",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b024.py": {
+      "sha256": "2a8024b1bcb72ac22731e73fd1ff88937a63e0d6c4fe0c5c8be1d9366ecab7d0",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b025.py": {
+      "sha256": "fa741f64b8df6895c208d25b5d165ae16b90c212388d3982151cacbbbe4c17e4",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b026.py": {
+      "sha256": "afdbf03d7ec50f3b8b9fe5c8b3f48e48d3bdb3a036d8c332191230d3535cad63",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b027.py": {
+      "sha256": "fa1e3f4777f83c0a67ab6d5c21049559cc5fcc8f17d4b5b6cab11f9f265a6c5a",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b028.py": {
+      "sha256": "e5d6dfaa7a4ebf0c495eb0c99acc51cd71333d2b16db6e68d91af00af8549b41",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b029.py": {
+      "sha256": "82e06c55c5c650d78ad8ea5335ec1994f269951d9035d18778b2c9759a9d8f18",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b030.py": {
+      "sha256": "7aa715cf6282be83ff19a25cdfd8d0234dc1d86c9161bbd953ef0b3540f0c935",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b031.py": {
+      "sha256": "7ebfcef4ffc8baa9f7372ed1ee490adb7f467931ec6cc47596ed93da00a5b39b",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b032.py": {
+      "sha256": "f622dbbf86ea36671dc8f871be41fa32024887c26ed86df43c3b2eee3375f198",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b033.py": {
+      "sha256": "00803027bde34281ea113e12873fae74d959e2f9f7d6f581fb78682e3e0aa730",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b034.py": {
+      "sha256": "2c792f684e2b7a6a8e7ad2f498e94f5e6c99c1f057272d13722a8111b846de5c",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b035.py": {
+      "sha256": "265ec679a3a55506e0174903c501d2f7dac3d55eb40e509cbe2cf427d96c7984",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b036.py": {
+      "sha256": "bb95e399ae72f7e7c45257e409224720eb164eeeb8610aee6f412cbc46e52e63",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b037.py": {
+      "sha256": "cb9a126722fef1423f47c76cc5dfdb76ca6f4c327f442203e6187cad84f4fb1a",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b038.py": {
+      "sha256": "e71790cd2e3561fb6beee259caee62e0ca436e484dad0d9a4c8fb808a1ede18c",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b039.py": {
+      "sha256": "440ed0c7968dff75536c3f3e392884fa4cb0a55656c49ca2d1e566063ea8b750",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b040.py": {
+      "sha256": "0a1240d89a5828035cd50e5b3f789ee1e4657704f7cbb00c6c790300220469b3",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b041.py": {
+      "sha256": "623131a4191f37d17a8205980847cfba9cabb6af1fa604aef2860f892021bbab",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
+    },
+    "test_cases/black_box/test_b042.py": {
+      "sha256": "6afaa6a16ec12f6c5921793bf16267438085ef8c891d43d4542f6d1cfa16f99a",
+      "group": "test_cases.black_box",
+      "reason": "Reviewed isolated black-box workspace, public session, and controlled service state"
     }
   }
 }

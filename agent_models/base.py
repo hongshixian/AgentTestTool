@@ -35,6 +35,10 @@ class AgentModel(ABC):
         """Connect multiple controlled tools through the product's public tool entry."""
         raise NotImplementedError("This product has no multiple-tool adapter")
 
+    def begin_independent_session(self) -> None:
+        """Start the next one-shot turn in a fresh public product conversation."""
+        raise NotImplementedError("This product cannot start independent one-shot sessions")
+
     @property
     @abstractmethod
     def product(self) -> str:

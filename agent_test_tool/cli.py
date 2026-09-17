@@ -41,15 +41,15 @@ def build_parser() -> argparse.ArgumentParser:
         "--business-manifest",
         type=Path,
         help=(
-            "仅执行 JSON 清单 cases[].script 指定的母用例文件；"
+            "仅执行 JSON 清单 cases[].script 指定的黑盒用例文件；"
             "冒烟测试仍执行完整 smoke 集"
         ),
     )
     parser.add_argument(
         "--suite",
-        choices=("mother",),
-        default="mother",
-        help="业务测试粒度（当前仅保留母用例，默认：mother）",
+        choices=("black_box",),
+        default="black_box",
+        help="业务测试卷别（当前实现黑盒卷，默认：black_box）",
     )
     parser.add_argument(
         "--agent",
@@ -94,7 +94,7 @@ def _manifest_paths(manifest_path: Path) -> tuple[Path, ...]:
         raise ValueError("业务清单必须包含非空 cases 数组")
     project_root = Path(__file__).resolve().parent.parent
     test_root = (project_root / "test_cases").resolve()
-    mother_root = (test_root / "mother_cases").resolve()
+    black_box_root = (test_root / "black_box").resolve()
     paths: list[Path] = []
     seen: set[Path] = set()
     for index, case in enumerate(cases, start=1):
@@ -102,8 +102,8 @@ def _manifest_paths(manifest_path: Path) -> tuple[Path, ...]:
         if not isinstance(script, str) or not script.strip():
             raise ValueError(f"业务清单第 {index} 项缺少 script")
         path = (project_root / script).resolve()
-        if not path.is_relative_to(mother_root) or path.parent != mother_root:
-            raise ValueError(f"业务清单脚本不在 test_cases/mother_cases：{script}")
+        if not path.is_relative_to(black_box_root) or path.parent != black_box_root:
+            raise ValueError(f"业务清单脚本不在 test_cases/black_box：{script}")
         if not path.is_file() or not path.name.startswith("test_") or path.suffix != ".py":
             raise ValueError(f"业务清单脚本无效：{script}")
         if path not in seen:

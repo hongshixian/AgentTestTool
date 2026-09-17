@@ -69,8 +69,10 @@ def test_four_real_workers_overlap_and_exclusive_waits(pytester, monkeypatch):
 def pytest_addoption(parser):
     for name in ("--agent", "--evidence-dir", "--case-suite"):
         parser.addoption(name)
+
 def pytest_configure(config):
     config.addinivalue_line("markers", "e2e: offline fake business test")
+    config.addinivalue_line("markers", "black_box: offline fake black-box test")
     config.addinivalue_line("markers", "smoke: smoke")
     from agent_test_tool import parallel_policy
     parallel_policy.case_execution_policy = lambda path: ("isolated", "offline fixture")
@@ -81,7 +83,7 @@ import json
 import os
 import pytest
 
-pytestmark = pytest.mark.e2e
+pytestmark = [pytest.mark.e2e, pytest.mark.black_box]
 
 def check(name, request):
     conn = http.client.HTTPConnection("127.0.0.1", int(os.environ["WORKER_TEST_PORT"]), timeout=20)

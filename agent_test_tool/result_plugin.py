@@ -104,6 +104,10 @@ class _CaseState:
     case_level: str = ""
     source_case_id: str = ""
     representative_child_id: str = ""
+    security_domain: str = ""
+    standard_clause: str = ""
+    clause_title: str = ""
+    clause_original_text: str = ""
     phases: dict[str, dict[str, object]] = field(default_factory=dict)
 
     def record(self, report: pytest.TestReport) -> None:
@@ -178,6 +182,10 @@ class _CaseState:
             "case_level": self.case_level,
             "source_case_id": self.source_case_id,
             "representative_child_id": self.representative_child_id,
+            "security_domain": self.security_domain,
+            "standard_clause": self.standard_clause,
+            "clause_title": self.clause_title,
+            "clause_original_text": self.clause_original_text,
             "status": status,
             "reason": reason,
             "missing_evidence": missing_evidence,
@@ -213,13 +221,17 @@ class ResultCollector:
         name_match = _TEST_NAME_PATTERN.search(class_doc)
         name = name_match.group(1).strip() if name_match else getattr(item, "name", item.nodeid)
         case_level = str(getattr(module, "TEST_CASE_LEVEL", "") or "").strip().lower()
-        if case_level not in {"mother", "child", "smoke"}:
+        if case_level not in {"mother", "child", "black_box", "smoke"}:
             if test_case_id.startswith("TC-"):
                 case_level = "mother"
             elif test_case_id.startswith("ATS-0.0x-"):
                 case_level = "smoke"
-            else:
+            elif re.fullmatch(r"B\d{3}", test_case_id, re.IGNORECASE):
+                case_level = "black_box"
+            elif test_case_id.startswith("ATS-"):
                 case_level = "child"
+            else:
+                case_level = "unknown"
         source_case_id = str(getattr(module, "SOURCE_CASE_ID", "") or "").strip()
         if not source_case_id and test_case_id.startswith("ATS-"):
             match = re.match(r"ATS-(.+?)-S\d+(?:-|$)", test_case_id)
@@ -240,6 +252,12 @@ class ResultCollector:
                 case_level=case_level,
                 source_case_id=source_case_id,
                 representative_child_id=representative_child_id,
+                security_domain=str(getattr(module, "SECURITY_DOMAIN", "") or "").strip(),
+                standard_clause=str(getattr(module, "STANDARD_CLAUSE", "") or "").strip(),
+                clause_title=str(getattr(module, "CLAUSE_TITLE", "") or "").strip(),
+                clause_original_text=str(
+                    getattr(module, "CLAUSE_ORIGINAL_TEXT", "") or ""
+                ).strip(),
             ),
         )
 

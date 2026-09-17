@@ -45,6 +45,10 @@ def _case(
     case_level: str = "",
     source_case_id: str = "",
     representative_child_id: str = "",
+    security_domain: str = "",
+    standard_clause: str = "",
+    clause_title: str = "",
+    clause_original_text: str = "",
 ) -> CaseResult:
     return CaseResult(
         case_id=case_id,
@@ -56,6 +60,10 @@ def _case(
         case_level=case_level,
         source_case_id=source_case_id,
         representative_child_id=representative_child_id,
+        security_domain=security_domain,
+        standard_clause=standard_clause,
+        clause_title=clause_title,
+        clause_original_text=clause_original_text,
     )
 
 
@@ -112,6 +120,25 @@ def _generator() -> PDFReportGenerator:
 
 
 class TestPDFReporting:
+    def test_black_box_case_uses_explicit_workbook_clause_metadata(self) -> None:
+        result = _case(
+            "B001",
+            AssessmentStatus.PASS,
+            CaseCategory.BUSINESS,
+            case_level="black_box",
+            security_domain="基础安全",
+            standard_clause="5.1 a)",
+            clause_title="实例身份绑定",
+            clause_original_text="智能体应用实例应具备唯一身份标识。",
+        )
+
+        groups = group_results_by_clause((result,), TEST_CLAUSES)
+
+        matched = [group for group in groups if group.results]
+        assert len(matched) == 1
+        assert matched[0].section_title == "基础安全-5.1 a)"
+        assert matched[0].results == (result,)
+
     def test_business_framework_failure_is_visible_without_changing_case_counts(self, tmp_path: Path) -> None:
         report = ReportData.from_pytest_payloads(
             {"cases": [{"test_case_id": "SMOKE", "status": "通过"}]},

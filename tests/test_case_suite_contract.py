@@ -1,4 +1,4 @@
-"""Verify the public contract for the retained mother-case suite."""
+"""Verify the public contract for the black-box assessment suite."""
 
 from __future__ import annotations
 
@@ -143,24 +143,24 @@ class _OptionParser:
 
 
 class TestSuiteCLIContract:
-    def test_mother_is_the_default(self) -> None:
+    def test_black_box_is_the_default(self) -> None:
         args = cli.build_parser().parse_args([])
 
-        assert args.suite == "mother"
+        assert args.suite == "black_box"
 
-    def test_parser_accepts_mother_suite(self) -> None:
-        args = cli.build_parser().parse_args(["--suite", "mother"])
+    def test_parser_accepts_black_box_suite(self) -> None:
+        args = cli.build_parser().parse_args(["--suite", "black_box"])
 
-        assert args.suite == "mother"
+        assert args.suite == "black_box"
 
-    @pytest.mark.parametrize("suite", ("child", "all"))
+    @pytest.mark.parametrize("suite", ("mother", "child", "all"))
     def test_parser_rejects_removed_suites(self, suite: str) -> None:
         with pytest.raises(SystemExit):
             cli.build_parser().parse_args(["--suite", suite])
 
 
 class TestSuiteRunnerContract:
-    def test_mother_filter_is_applied_only_to_the_business_phase(
+    def test_black_box_filter_is_applied_only_to_the_business_phase(
         self,
         tmp_path: Path,
     ) -> None:
@@ -170,8 +170,8 @@ class TestSuiteRunnerContract:
             WorkflowConfig(
                 agent="codebuddy",
                 output_parent=tmp_path,
-                run_id="run-mother",
-                suite="mother",
+                run_id="run-black-box",
+                suite="black_box",
             ),
             process_runner=fake_pytest,
             pdf_builder=_fake_pdf,
@@ -180,13 +180,13 @@ class TestSuiteRunnerContract:
         assert result.smoke_passed is True
         assert len(fake_pytest.commands) == 2
         smoke_option_index = fake_pytest.commands[0].index("--case-suite") + 1
-        assert fake_pytest.commands[0][smoke_option_index] == "mother"
+        assert fake_pytest.commands[0][smoke_option_index] == "smoke"
         option_index = fake_pytest.commands[1].index("--case-suite") + 1
-        assert fake_pytest.commands[1][option_index] == "mother"
+        assert fake_pytest.commands[1][option_index] == "black_box"
         report = json.loads(result.report_json.read_text(encoding="utf-8"))
-        assert report["business_selection"]["suite"] == "mother"
+        assert report["business_selection"]["suite"] == "black_box"
 
-    def test_runner_accepts_selected_mother_paths(
+    def test_runner_accepts_selected_black_box_paths(
         self,
         tmp_path: Path,
     ) -> None:
@@ -194,10 +194,10 @@ class TestSuiteRunnerContract:
             WorkflowConfig(
                 agent="codebuddy",
                 output_parent=tmp_path,
-                run_id="run-manifest-mother",
-                suite="mother",
+                run_id="run-manifest-black-box",
+                suite="black_box",
                 business_paths=(
-                    Path("test_cases/mother_cases/test_tc_6_1b_d5_01.py"),
+                    Path("test_cases/black_box/test_b001.py"),
                 ),
             ),
             process_runner=_FakePytest(),
@@ -208,35 +208,35 @@ class TestSuiteRunnerContract:
 
 
 class TestSuiteCollectionContract:
-    def test_direct_pytest_defaults_to_mother_suite(self) -> None:
+    def test_direct_pytest_defaults_to_black_box_suite(self) -> None:
         parser = _OptionParser()
 
         add_test_case_options(parser)  # type: ignore[arg-type]
 
-        assert parser.options["--case-suite"]["default"] == "mother"
+        assert parser.options["--case-suite"]["default"] == "black_box"
 
-    def test_collection_keeps_mother_and_offline_cases(self) -> None:
-        mother = _CollectionItem("TC-6.1b-D5-01")
+    def test_collection_keeps_black_box_and_offline_cases(self) -> None:
+        black_box = _CollectionItem("B001")
         child = _CollectionItem("ATS-6.1b-D5-01-S01-01")
         offline = _CollectionItem("FRAMEWORK-OFFLINE", e2e=False)
-        items = [mother, child, offline]
-        config = _CollectionConfig("mother")
+        items = [black_box, child, offline]
+        config = _CollectionConfig("black_box")
 
         pytest_collection_modifyitems(config, items)  # type: ignore[arg-type]
 
         assert [item.module.TEST_CASE_ID for item in items] == [
-            "TC-6.1b-D5-01",
+            "B001",
             "FRAMEWORK-OFFLINE",
         ]
-        assert mother.markers == ["mother_case"]
-        assert child.markers == ["child_case"]
+        assert black_box.markers == ["black_box"]
+        assert child.markers == []
         assert offline.markers == []
 
     def test_business_suite_never_deselects_smoke_cases(self) -> None:
         smoke = _CollectionItem("ATS-0.0x-D0-01-S01-01")
         smoke.keywords["smoke"] = True
         items = [smoke]
-        config = _CollectionConfig("mother")
+        config = _CollectionConfig("black_box")
 
         pytest_collection_modifyitems(config, items)  # type: ignore[arg-type]
 
@@ -246,6 +246,31 @@ class TestSuiteCollectionContract:
 
 
 class TestSuiteResultMetadataContract:
+    def test_black_box_case_retains_explicit_clause_metadata(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        collector = ResultCollector(tmp_path / "result.json", run_id="run-black-box")
+        item = _item(
+            case_id="B001",
+            constants={
+                "TEST_CASE_LEVEL": "black_box",
+                "SECURITY_DOMAIN": "基础安全",
+                "STANDARD_CLAUSE": "5.1 a)",
+                "CLAUSE_TITLE": "实例身份绑定",
+                "CLAUSE_ORIGINAL_TEXT": "智能体应用实例应具备唯一身份标识。",
+            },
+        )
+
+        collector.record_report(item, _report())
+        case = collector.build_payload(exit_status=0)["cases"][0]
+
+        assert case["case_level"] == "black_box"
+        assert case["security_domain"] == "基础安全"
+        assert case["standard_clause"] == "5.1 a)"
+        assert case["clause_title"] == "实例身份绑定"
+        assert case["clause_original_text"].startswith("智能体应用实例")
+
     def test_mother_case_preserves_explicit_representative_path(
         self,
         tmp_path: Path,

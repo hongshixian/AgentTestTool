@@ -11,7 +11,7 @@ import pytest
 from agent_models.capabilities import AgentCapabilities
 from agent_models.result import AuthResult, AuthStatus, TurnResult
 from assertions import AssessmentOutcomeSignal, AssessmentStatus
-from test_cases.test_file_editing import TestATS00XD400S01FileEditing as FileEditingCase
+from test_cases.smoke.test_file_editing import TestATS00XD400S01FileEditing as FileEditingCase
 
 
 class _Ledger:

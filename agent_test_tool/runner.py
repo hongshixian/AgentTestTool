@@ -20,7 +20,9 @@ FAIL_STATUS = "不通过"
 REPORT_SCHEMA_VERSION = 1
 PACKAGE_ROOT = Path(__file__).resolve().parent.parent
 TEST_CASES_ROOT = PACKAGE_ROOT / "test_cases"
-CASE_SUITES = frozenset({"mother"})
+SMOKE_CASES_ROOT = TEST_CASES_ROOT / "smoke"
+BLACK_BOX_CASES_ROOT = TEST_CASES_ROOT / "black_box"
+CASE_SUITES = frozenset({"black_box"})
 TEST_OBJECT_NAMES = {
     "codebuddy": "CodeBuddy Code CLI",
 }
@@ -35,7 +37,7 @@ class WorkflowConfig:
     repeat: int = 1
     smoke_timeout_seconds: float = 900.0
     business_timeout_seconds: float = 86_400.0
-    suite: str = "mother"
+    suite: str = "black_box"
     business_paths: tuple[Path, ...] = ()
     business_selection_source: str | None = None
     run_id: str | None = None
@@ -183,6 +185,9 @@ def _run_pytest_phase(
     environment["AGENT_TEST_RUN_ID"] = run_id
     environment["AGENT_TEST_PHASE"] = phase
     environment["AGENT_TEST_CASE_SUITE"] = case_suite
+    environment["AGENT_TEST_EVIDENCE_PROFILE"] = (
+        "black_box" if case_suite == "black_box" else "default"
+    )
     environment.update(environment_overrides or {})
 
     timed_out = False
@@ -336,12 +341,12 @@ def run_workflow(
     smoke = _run_pytest_phase(
         phase="smoke",
         selection="e2e and smoke",
-        test_paths=(TEST_CASES_ROOT,),
+        test_paths=(SMOKE_CASES_ROOT,),
         run_id=run_id,
         run_directory=run_directory,
         agent=config.agent,
         repeat=1,
-        case_suite="mother",
+        case_suite="smoke",
         timeout_seconds=config.smoke_timeout_seconds,
         process_runner=process_runner,
     )
@@ -354,8 +359,8 @@ def run_workflow(
     elif smoke_passed:
         business = _run_pytest_phase(
             phase="business",
-            selection="e2e and not smoke",
-            test_paths=config.business_paths or (TEST_CASES_ROOT,),
+            selection="e2e and black_box",
+            test_paths=config.business_paths or (BLACK_BOX_CASES_ROOT,),
             run_id=run_id,
             run_directory=run_directory,
             agent=config.agent,

@@ -313,6 +313,17 @@ class CodeBuddyAgentModel(AgentModel):
                 self._has_started_session = True
             return turn
 
+    def begin_independent_session(self) -> None:
+        if self._execution_path == "interactive":
+            raise RuntimeError("长驻交互模式不能切换单轮会话")
+        self._session_id = f"ats-{uuid.uuid4().hex}"
+        self._has_started_session = False
+        self.environment.ledger.record(
+            "agent_model",
+            "independent_session_started",
+            {"session_id": self._session_id},
+        )
+
     def start_session(
         self,
         *,

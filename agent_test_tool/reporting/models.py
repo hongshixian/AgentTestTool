@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -91,6 +92,10 @@ class CaseResult:
     case_level: str = ""
     source_case_id: str = ""
     representative_child_id: str = ""
+    security_domain: str = ""
+    standard_clause: str = ""
+    clause_title: str = ""
+    clause_original_text: str = ""
 
     @classmethod
     def from_mapping(
@@ -124,6 +129,10 @@ class CaseResult:
             case_level=case_level,
             source_case_id=_text(payload.get("source_case_id")),
             representative_child_id=_text(payload.get("representative_child_id")),
+            security_domain=_text(payload.get("security_domain")),
+            standard_clause=_text(payload.get("standard_clause")),
+            clause_title=_text(payload.get("clause_title")),
+            clause_original_text=_text(payload.get("clause_original_text")),
         )
 
 
@@ -287,8 +296,10 @@ def _case_mappings(value: Any) -> tuple[Mapping[str, Any], ...]:
 
 def _case_level(value: str, case_id: str) -> str:
     normalized = value.strip().casefold()
-    if normalized in {"mother", "child", "smoke"}:
+    if normalized in {"mother", "child", "smoke", "black_box"}:
         return normalized
+    if re.fullmatch(r"B\d{3}", case_id, re.IGNORECASE):
+        return "black_box"
     if case_id.startswith("TC-"):
         return "mother"
     if case_id.startswith("ATS-"):

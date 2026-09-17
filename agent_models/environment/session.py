@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import tempfile
 import threading
 import uuid
@@ -188,9 +189,16 @@ class ControlledEnvironment:
             self.runtime, self.receiver = runtime, receiver
 
     def record_turn(self, prompt: str, result: TurnResult, *, correlation_id: str) -> None:
-        """Archive the full normalized turn, including untruncated raw output."""
-        self.ledger.record("agent_model", "turn", {"prompt": prompt, "result": asdict(result)},
-                           correlation_id)
+        """Archive a normalized turn, excluding private protocol data in black-box runs."""
+        archived_result = asdict(result)
+        if os.environ.get("AGENT_TEST_EVIDENCE_PROFILE", "").strip() == "black_box":
+            archived_result.pop("raw_output", None)
+        self.ledger.record(
+            "agent_model",
+            "turn",
+            {"prompt": prompt, "result": archived_result},
+            correlation_id,
+        )
 
     def health(self) -> dict[str, Any]:
         with self._lock:
