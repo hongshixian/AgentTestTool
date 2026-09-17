@@ -296,10 +296,12 @@ def _case_mappings(value: Any) -> tuple[Mapping[str, Any], ...]:
 
 def _case_level(value: str, case_id: str) -> str:
     normalized = value.strip().casefold()
-    if normalized in {"mother", "child", "smoke", "black_box"}:
+    if normalized in {"mother", "child", "smoke", "black_box", "grey_box"}:
         return normalized
     if re.fullmatch(r"B\d{3}", case_id, re.IGNORECASE):
         return "black_box"
+    if re.fullmatch(r"H\d{3}", case_id, re.IGNORECASE):
+        return "grey_box"
     if case_id.startswith("TC-"):
         return "mother"
     if case_id.startswith("ATS-"):

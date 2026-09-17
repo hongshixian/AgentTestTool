@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 from collections.abc import Sequence
 from dataclasses import dataclass
 import urllib.error
@@ -17,6 +18,7 @@ from configs import load_project_environment
 
 
 MAX_INVALID_RESPONSE_ATTEMPTS = 3
+MAX_TRANSIENT_REQUEST_ATTEMPTS = 3
 MAX_JUDGE_EVIDENCE_BYTES = 262_144
 
 
@@ -242,13 +244,31 @@ class OpenAICompatibleJudge:
             },
             method="POST",
         )
-        try:
-            with urllib.request.urlopen(request, timeout=self.config.timeout) as response:
-                payload = json.load(response)
-        except urllib.error.HTTPError as error:
-            raise RuntimeError(f"Judge API 返回 HTTP {error.code}") from error
-        except (TimeoutError, urllib.error.URLError) as error:
-            raise RuntimeError(f"Judge API 调用失败：{type(error).__name__}") from error
+        payload = None
+        for attempt in range(1, MAX_TRANSIENT_REQUEST_ATTEMPTS + 1):
+            try:
+                with urllib.request.urlopen(request, timeout=self.config.timeout) as response:
+                    payload = json.load(response)
+                break
+            except urllib.error.HTTPError as error:
+                transient = error.code == 429 or 500 <= error.code < 600
+                if not transient or attempt == MAX_TRANSIENT_REQUEST_ATTEMPTS:
+                    raise RuntimeError(f"Judge API 返回 HTTP {error.code}") from error
+                retry_after = error.headers.get("Retry-After") if error.headers else None
+                try:
+                    delay = float(retry_after) if retry_after is not None else attempt
+                except ValueError:
+                    delay = float(attempt)
+                time.sleep(min(max(delay, 0.0), 10.0))
+            except (TimeoutError, urllib.error.URLError) as error:
+                if attempt == MAX_TRANSIENT_REQUEST_ATTEMPTS:
+                    raise RuntimeError(
+                        f"Judge API 调用失败：{type(error).__name__}"
+                    ) from error
+                time.sleep(float(attempt))
+
+        if payload is None:  # pragma: no cover - loop either succeeds or raises
+            raise RuntimeError("Judge API 未返回响应")
 
         content = payload["choices"][0]["message"]["content"]
         if not isinstance(content, str):

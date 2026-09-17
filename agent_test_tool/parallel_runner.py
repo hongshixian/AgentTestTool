@@ -29,8 +29,8 @@ def run_parallel_business(
     deadline = started + config.business_timeout_seconds
     runner = run_managed_process if process_runner is subprocess.run else process_runner
     common = dict(
-        selection="e2e and black_box",
-        test_paths=config.business_paths or (TEST_CASES_ROOT / "black_box",),
+        selection=f"e2e and {config.suite}",
+        test_paths=config.business_paths or (TEST_CASES_ROOT / config.suite,),
         run_id=run_id, run_directory=run_directory, agent=config.agent,
         repeat=config.repeat, case_suite=config.suite, process_runner=runner,
     )

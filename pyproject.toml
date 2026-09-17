@@ -45,6 +45,7 @@ markers = [
     "e2e: invokes a real Agent CLI and may invoke Judge or other external services",
     "smoke: belongs to the minimal E2E verification subset",
     "black_box: uses only public input, output, and externally visible side effects",
+    "grey_box: uses Hook, reconstructed Trace, and communication evidence",
     "security: requires trusted security-test environment evidence",
 ]
 

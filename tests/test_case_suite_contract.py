@@ -153,6 +153,11 @@ class TestSuiteCLIContract:
 
         assert args.suite == "black_box"
 
+    def test_parser_accepts_grey_box_suite(self) -> None:
+        args = cli.build_parser().parse_args(["--suite", "grey_box"])
+
+        assert args.suite == "grey_box"
+
     @pytest.mark.parametrize("suite", ("mother", "child", "all"))
     def test_parser_rejects_removed_suites(self, suite: str) -> None:
         with pytest.raises(SystemExit):
@@ -270,6 +275,30 @@ class TestSuiteResultMetadataContract:
         assert case["standard_clause"] == "5.1 a)"
         assert case["clause_title"] == "实例身份绑定"
         assert case["clause_original_text"].startswith("智能体应用实例")
+
+    def test_grey_box_case_retains_explicit_clause_metadata(
+        self, tmp_path: Path
+    ) -> None:
+        collector = ResultCollector(tmp_path / "result.json", run_id="run-grey")
+        item = _item(
+            case_id="H001",
+            constants={
+                "TEST_CASE_LEVEL": "grey_box",
+                "SECURITY_DOMAIN": "基础安全",
+                "STANDARD_CLAUSE": "5.1 c)",
+                "CLAUSE_TITLE": "身份识别与身份鉴别功能",
+                "CLAUSE_ORIGINAL_TEXT": "智能体应用应支持身份识别、身份鉴别功能。",
+            },
+        )
+
+        collector.record_report(item, _report("通过"))
+        case = collector.build_payload(exit_status=0)["cases"][0]
+
+        assert case["case_level"] == "grey_box"
+        assert case["standard_clause"] == "5.1 c)"
+        assert case["security_domain"] == "基础安全"
+        assert case["clause_title"] == "身份识别与身份鉴别功能"
+        assert case["clause_original_text"].startswith("智能体应用应支持")
 
     def test_mother_case_preserves_explicit_representative_path(
         self,

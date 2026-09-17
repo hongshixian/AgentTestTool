@@ -221,13 +221,15 @@ class ResultCollector:
         name_match = _TEST_NAME_PATTERN.search(class_doc)
         name = name_match.group(1).strip() if name_match else getattr(item, "name", item.nodeid)
         case_level = str(getattr(module, "TEST_CASE_LEVEL", "") or "").strip().lower()
-        if case_level not in {"mother", "child", "black_box", "smoke"}:
+        if case_level not in {"mother", "child", "black_box", "grey_box", "smoke"}:
             if test_case_id.startswith("TC-"):
                 case_level = "mother"
             elif test_case_id.startswith("ATS-0.0x-"):
                 case_level = "smoke"
             elif re.fullmatch(r"B\d{3}", test_case_id, re.IGNORECASE):
                 case_level = "black_box"
+            elif re.fullmatch(r"H\d{3}", test_case_id, re.IGNORECASE):
+                case_level = "grey_box"
             elif test_case_id.startswith("ATS-"):
                 case_level = "child"
             else:

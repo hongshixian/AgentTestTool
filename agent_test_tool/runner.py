@@ -22,7 +22,12 @@ PACKAGE_ROOT = Path(__file__).resolve().parent.parent
 TEST_CASES_ROOT = PACKAGE_ROOT / "test_cases"
 SMOKE_CASES_ROOT = TEST_CASES_ROOT / "smoke"
 BLACK_BOX_CASES_ROOT = TEST_CASES_ROOT / "black_box"
-CASE_SUITES = frozenset({"black_box"})
+GREY_BOX_CASES_ROOT = TEST_CASES_ROOT / "grey_box"
+CASE_SUITES = frozenset({"black_box", "grey_box"})
+CASE_SUITE_ROOTS = {
+    "black_box": BLACK_BOX_CASES_ROOT,
+    "grey_box": GREY_BOX_CASES_ROOT,
+}
 TEST_OBJECT_NAMES = {
     "codebuddy": "CodeBuddy Code CLI",
 }
@@ -359,8 +364,8 @@ def run_workflow(
     elif smoke_passed:
         business = _run_pytest_phase(
             phase="business",
-            selection="e2e and black_box",
-            test_paths=config.business_paths or (BLACK_BOX_CASES_ROOT,),
+            selection=f"e2e and {config.suite}",
+            test_paths=config.business_paths or (CASE_SUITE_ROOTS[config.suite],),
             run_id=run_id,
             run_directory=run_directory,
             agent=config.agent,

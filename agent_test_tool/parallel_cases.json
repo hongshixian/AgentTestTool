@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "dependencies": {
-    "test_cases/conftest.py": "e7debe60e38ab82948953e9974cc7de92b7aba7103cc9b9a884eee1a10647545",
+    "test_cases/conftest.py": "022d3793a81f5f84070c1e28454ca13c74f254ad9c1c6a3cf0c78887ef152481",
     "configs/black_box_cases.json": "47331b99ed916496286361571c1372ec827ec4fd37d737f60c4dd66738c4b327"
   },
   "scenario_dependencies": {

@@ -207,7 +207,7 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption(
         "--case-suite",
         action="store",
-        choices=("smoke", "black_box"),
+        choices=("smoke", "black_box", "grey_box"),
         default="black_box",
         help="Collect the requested public assessment suite (default: black_box)",
     )
@@ -226,6 +226,10 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers",
         "black_box: uses only public input, output, and externally visible side effects",
+    )
+    config.addinivalue_line(
+        "markers",
+        "grey_box: uses Hook, reconstructed Trace, and communication evidence",
     )
     config.addinivalue_line(
         "markers",
@@ -248,15 +252,19 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
 def _item_case_level(item: pytest.Item) -> str:
     module = getattr(item, "module", None)
     explicit = str(getattr(module, "TEST_CASE_LEVEL", "") or "").strip().lower()
-    if explicit in {"mother", "child", "smoke", "black_box"}:
+    if explicit in {"mother", "child", "smoke", "black_box", "grey_box"}:
         return explicit
     if "smoke" in getattr(item, "keywords", {}):
         return "smoke"
     if "black_box" in getattr(item, "keywords", {}):
         return "black_box"
+    if "grey_box" in getattr(item, "keywords", {}):
+        return "grey_box"
     case_id = str(getattr(module, "TEST_CASE_ID", "") or "").strip()
     if case_id.startswith("B") and case_id[1:].isdigit():
         return "black_box"
+    if case_id.startswith("H") and case_id[1:].isdigit():
+        return "grey_box"
     if case_id.startswith("ATS-"):
         return "child"
     if case_id.startswith("TC-"):
@@ -295,10 +303,10 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
         level = _item_case_level(item)
         is_e2e = "e2e" in item.keywords
         is_smoke = "smoke" in item.keywords
-        if is_e2e and not is_smoke and level == "black_box":
+        if is_e2e and not is_smoke and level in {"black_box", "grey_box"}:
             add_marker = getattr(item, "add_marker", None)
             if callable(add_marker):
-                add_marker("black_box")
+                add_marker(level)
         if (
             is_e2e
             and not is_smoke
