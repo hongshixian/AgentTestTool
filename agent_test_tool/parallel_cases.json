@@ -15,7 +15,7 @@
     "test_cases/black_box/assertion.py": "480f21192d3a3bb3e04eac936d1e9249daff8bf696493ec2ea4f98a223e9371e",
     "test_cases/black_box/runner.py": "2707b7e15ea9e604119c036f2df2b9acbfa06d92fa0ef2a2e2d383d6599948f8",
     "test_cases/black_box/scenario_handlers.py": "66e50157b3d3a81a301d17c5286327104a5c3455b10f4286b39961262a280eac",
-    "configs/grey_box_cases.json": "669ccdb372a07c5b92af1b49fa1778cb9be5cd9ab52ae873a72f3f1ded76f4c2",
+    "configs/grey_box_cases.json": "31a9b01351afee641431a98ee6f64842bb2e7700a020144ce47868f73a0eab19",
     "test_cases/grey_box/base.py": "e5d083219a7252141f269cf3fb39818d92364efe493543e395b0c5bc514dda3c",
     "test_cases/grey_box/specs.py": "f4b0de4850dfce170806cb615ca9103af9c29f7bf6031c0d8ef7617004812164",
     "test_cases/grey_box/tool_scenarios.py": "96154a55847cdd0bb42e6212aff2bf0b448c8f92ba4837f9a77f8b68d3dad520",
@@ -624,6 +624,46 @@
     },
     "test_cases/grey_box/test_h071.py": {
       "sha256": "d70723342cb3a67ba82c07a944539df24f41c77926d19d8cd2a1d800ca4a78f2",
+      "group": "test_cases.grey_box",
+      "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
+    },
+    "test_cases/grey_box/test_h065.py": {
+      "sha256": "682036dade9e035523bddbcb35246d3d9dbe33ac00a918ae8906616d29fe473c",
+      "group": "test_cases.grey_box",
+      "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
+    },
+    "test_cases/grey_box/test_h066.py": {
+      "sha256": "030b217b6ffce6a44cadfad48db1c9bb9454b0f8813e5ab159024cfd718a595a",
+      "group": "test_cases.grey_box",
+      "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
+    },
+    "test_cases/grey_box/test_h067.py": {
+      "sha256": "e3be4d50506f0e5701e9f6d082cd0dfa4e24b0397699918f527acba74c313bb8",
+      "group": "test_cases.grey_box",
+      "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
+    },
+    "test_cases/grey_box/test_h068.py": {
+      "sha256": "5a8623206649660b75fc4c75429876e40e14f0992942d0badab237eee1ca04d7",
+      "group": "test_cases.grey_box",
+      "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
+    },
+    "test_cases/grey_box/test_h072.py": {
+      "sha256": "65617755cd204bb4b1b613ed03fc46c107a1373403ecb4f15be34ac554795803",
+      "group": "test_cases.grey_box",
+      "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
+    },
+    "test_cases/grey_box/test_h075.py": {
+      "sha256": "2c3b5cc5395873c0a8137ed0891527c19cffe3b1b914676f297140683b57d4d3",
+      "group": "test_cases.grey_box",
+      "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
+    },
+    "test_cases/grey_box/test_h076.py": {
+      "sha256": "f595ea4a7e9cacd5ed1e1cc1b6b7c1183ca18894cf18a79a1d2d27149bc9670c",
+      "group": "test_cases.grey_box",
+      "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
+    },
+    "test_cases/grey_box/test_h077.py": {
+      "sha256": "3c522e30039814e2f1ab65d05c632a6bab3e2597ec1bce0b2d340872d7cb86b5",
       "group": "test_cases.grey_box",
       "reason": "Reviewed isolated grey-box workspace, product profile, collector, and controlled tool state"
     }

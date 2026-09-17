@@ -28,13 +28,11 @@ def test_reviewed_black_box_cases_have_valid_dependencies():
 
 def test_reviewed_grey_box_cases_have_valid_dependencies():
     manifest = policy._manifest()
-    deferred = {65, 66, 67, 68, 72, 75, 76, 77}
     grey_box = {
         f"test_cases/grey_box/test_h{index:03d}.py"
         for index in range(1, 82)
-        if index not in deferred
     }
-    assert len(grey_box) == 73
+    assert len(grey_box) == 81
     assert grey_box <= set(manifest["cases"])
     for script in grey_box:
         assert policy.case_execution_policy(policy.ROOT / script)[0] == "isolated", script

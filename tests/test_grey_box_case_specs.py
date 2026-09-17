@@ -30,6 +30,8 @@ def test_manifest_matches_reviewed_73_case_scope() -> None:
     assert payload["case_count"] == 73
     assert tuple(case["case_id"] for case in payload["cases"]) == EXPECTED_CASE_IDS
     assert set(payload["deferred_case_ids"]) == DEFERRED_CASE_IDS
+    assert {case["case_id"] for case in payload["deferred_cases"]} == DEFERRED_CASE_IDS
+    assert all(case["deferred_reason"] for case in payload["deferred_cases"])
     assert not DEFERRED_CASE_IDS.intersection(EXPECTED_CASE_IDS)
 
 
@@ -45,7 +47,18 @@ def test_every_case_has_one_independent_wrapper() -> None:
         for path in (ROOT / "test_cases" / "grey_box").glob("test_h*.py")
     }
 
-    assert wrapper_ids == set(EXPECTED_CASE_IDS)
+    assert wrapper_ids == set(EXPECTED_CASE_IDS) | DEFERRED_CASE_IDS
+
+
+def test_deferred_wrappers_directly_record_not_applicable_reason() -> None:
+    for case_id in DEFERRED_CASE_IDS:
+        source = (
+            ROOT / "test_cases" / "grey_box" / f"test_{case_id.lower()}.py"
+        ).read_text(encoding="utf-8")
+        assert "def test_case_not_implemented" in source
+        assert "当前暂未实现" in source
+        assert "conclude_not_applicable" in source
+        assert "send_prompt" not in source
 
 
 def test_evidence_families_require_their_authoritative_channels() -> None:
