@@ -23,6 +23,7 @@
     "test_cases/grey_box/communication_scenarios.py": "f886c965f3cfa711d07c8fdff2f55b2edcba0b29bfe8751e26fb4d1123c3e1db",
     "test_cases/grey_box/model_scenarios.py": "8df0f9224823d2b98cb18fa4b7a1c3e2a94e8e46e1fd347d70357086e1f23ba8",
     "agent_models/base.py": "dc51607003a589b87644d8d9cbb6445757ca82e2870150e31eb67d5c27876e88",
+    "agent_models/codebuddy/driver.py": "38a6167d1f1375d9e20bb36066e52de332f1966c9297c2857be50665e4c08ad3",
     "agent_models/codebuddy/model.py": "d1d46794c9bc9314f4f0884d002efd2315db163432b50ca4fe44e47a1c7c185b",
     "agent_models/codebuddy/mock_tool.py": "306f687c9274959d34f713660ba1af006db9497e563ae650f5468071da73abe2"
   },
@@ -38,7 +39,8 @@
       "test_cases/black_box/evidence.py",
       "test_cases/black_box/assertion.py",
       "test_cases/black_box/runner.py",
-      "test_cases/black_box/scenario_handlers.py"
+      "test_cases/black_box/scenario_handlers.py",
+      "agent_models/codebuddy/driver.py"
     ],
     "test_cases.grey_box": [
       "configs/grey_box_cases.json",
@@ -50,6 +52,7 @@
       "test_cases/grey_box/communication_scenarios.py",
       "test_cases/grey_box/model_scenarios.py",
       "agent_models/base.py",
+      "agent_models/codebuddy/driver.py",
       "agent_models/codebuddy/model.py",
       "agent_models/codebuddy/mock_tool.py"
     ]

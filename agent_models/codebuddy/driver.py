@@ -36,6 +36,7 @@ class CodeBuddyDriver:
         workspace: Path,
         executable: str = "codebuddy",
         default_timeout: float = 90.0,
+        default_model: str = "hy3",
         config_dir: Path | None = None,
         process_environment_overrides: Mapping[str, str] | None = None,
     ) -> None:
@@ -43,6 +44,9 @@ class CodeBuddyDriver:
         self.workspace = workspace
         self.executable = executable
         self.default_timeout = default_timeout
+        if not isinstance(default_model, str) or not default_model.strip():
+            raise ValueError("default_model must be nonempty text")
+        self.default_model = default_model.strip()
         self.is_dedicated_test_account = config_dir is not None or bool(configured_dir)
         self.config_dir = config_dir or (
             Path(configured_dir).expanduser()
@@ -62,6 +66,20 @@ class CodeBuddyDriver:
         self._interactive_lock = threading.RLock()
         self._background_task_ids: set[str] = set()
         self._background_lock = threading.RLock()
+
+    def _append_model_args(
+        self,
+        command: list[str],
+        extra_args: Sequence[str],
+    ) -> None:
+        """Pin the test model unless a caller explicitly overrides it."""
+        has_override = any(
+            argument == "--model" or argument.startswith("--model=")
+            for argument in extra_args
+        )
+        if not has_override:
+            command.extend(("--model", self.default_model))
+        command.extend(extra_args)
 
     def is_available(self) -> bool:
         """Return whether the CodeBuddy executable can be resolved."""
@@ -137,7 +155,7 @@ class CodeBuddyDriver:
             command.extend(["--resume" if resume else "--session-id", session_id])
         else:
             command.append("--no-session-persistence")
-        command.extend(extra_args)
+        self._append_model_args(command, extra_args)
 
         process_environment = self._process_environment()
         if allow_tools:
@@ -201,7 +219,7 @@ class CodeBuddyDriver:
         except KeyError as error:
             raise ValueError("unsupported permission policy") from error
         command.extend(("--permission-mode", permission_mode))
-        command.extend(extra_args)
+        self._append_model_args(command, extra_args)
 
         process_environment = self._process_environment()
 
@@ -264,7 +282,7 @@ class CodeBuddyDriver:
         ]
         if not allow_tools:
             command.extend(("--tools", ""))
-        command.extend(extra_args)
+        self._append_model_args(command, extra_args)
         command.append(prompt)
         process_environment = self._process_environment()
         if allow_tools:

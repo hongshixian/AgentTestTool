@@ -135,8 +135,10 @@ class TestCodeBuddyDriver:
 
     def test_passes_selected_profile_to_real_cli(self, monkeypatch, tmp_path) -> None:
         observed_environment: dict[str, str] = {}
+        observed_command: list[str] = []
 
         def fake_run(command, **kwargs):
+            observed_command.extend(command)
             observed_environment.update(kwargs["env"])
             return subprocess.CompletedProcess(command, 0, "", "")
 
@@ -146,13 +148,34 @@ class TestCodeBuddyDriver:
         driver.send_prompt("test")
 
         assert observed_environment["CODEBUDDY_CONFIG_DIR"] == str(tmp_path)
+        model_index = observed_command.index("--model") + 1
+        assert observed_command[model_index] == "hy3"
+
+    def test_explicit_model_argument_overrides_the_default(
+        self, monkeypatch, tmp_path
+    ) -> None:
+        observed_command: list[str] = []
+
+        def fake_run(command, **_kwargs):
+            observed_command.extend(command)
+            return subprocess.CompletedProcess(command, 0, "", "")
+
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        driver = CodeBuddyDriver(workspace=tmp_path)
+
+        driver.send_prompt("test", extra_args=("--model", "hy3-x"))
+
+        assert observed_command.count("--model") == 1
+        assert observed_command[observed_command.index("--model") + 1] == "hy3-x"
 
     def test_applies_collector_environment_to_every_managed_cli_launch(
         self, monkeypatch, tmp_path
     ) -> None:
         environments: list[dict[str, str]] = []
+        commands: list[list[str]] = []
 
         def fake_run(command, **kwargs):
+            commands.append(list(command))
             environments.append(dict(kwargs["env"]))
             if "--bg" in command:
                 return subprocess.CompletedProcess(
@@ -182,15 +205,22 @@ class TestCodeBuddyDriver:
             and environment["CODEBUDDY_CONFIG_DIR"] == str(tmp_path)
             for environment in environments
         )
+        model_commands = [command for command in commands if "--print" in command or "--bg" in command]
+        assert len(model_commands) == 2
+        assert all(
+            command[command.index("--model") + 1] == "hy3"
+            for command in model_commands
+        )
 
     def test_applies_collector_environment_to_interactive_session(
         self, monkeypatch, tmp_path
     ) -> None:
-        observed: dict[str, str] = {}
+        observed: dict[str, object] = {}
 
         class FakeSession:
             def __init__(self, **kwargs):
-                observed.update(kwargs["environment"])
+                observed["environment"] = kwargs["environment"]
+                observed["command"] = kwargs["command"]
 
         monkeypatch.setattr(
             "agent_models.codebuddy.driver.CodeBuddyInteractiveSession",
@@ -207,9 +237,14 @@ class TestCodeBuddyDriver:
 
         driver.start_session(session_id="session-1")
 
-        assert observed["HTTPS_PROXY"] == "http://127.0.0.1:43123"
-        assert observed["NODE_EXTRA_CA_CERTS"] == str(tmp_path / "ca.pem")
-        assert observed["CODEBUDDY_CONFIG_DIR"] == str(tmp_path)
+        environment = observed["environment"]
+        assert isinstance(environment, dict)
+        assert environment["HTTPS_PROXY"] == "http://127.0.0.1:43123"
+        assert environment["NODE_EXTRA_CA_CERTS"] == str(tmp_path / "ca.pem")
+        assert environment["CODEBUDDY_CONFIG_DIR"] == str(tmp_path)
+        command = observed["command"]
+        assert isinstance(command, list)
+        assert command[command.index("--model") + 1] == "hy3"
 
     def test_model_does_not_advertise_or_fake_private_identity_context(
         self, monkeypatch, tmp_path
