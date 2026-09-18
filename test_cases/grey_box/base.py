@@ -51,6 +51,7 @@ from test_cases.grey_box.tool_scenarios import (
     prepare as prepare_tool_scenario,
     prompt as tool_scenario_prompt,
 )
+from test_cases.pipeline import PipelinePhase, pipeline_phase
 
 
 _SYSTEM_MARKER_CASES = frozenset({"H021", "H022"})
@@ -718,24 +719,25 @@ class GreyBoxCaseRunner(AgentTestCase):
         request: pytest.FixtureRequest,
     ) -> None:
         spec = load_grey_box_spec(case_id)
-        self.assert_agent_authenticated(agent_model, request)
-        judge = (
-            None
-            if case_id in _DETERMINISTIC_CASES
-            else self.require_judge_model(judge_model, request, agent_model)
-        )
-        if not agent_model.capabilities.reconstructed_agent_trace:
-            self.conclude_not_applicable(
-                request,
-                agent_model,
-                reason="当前产品未提供半白盒卷必需的模型通信与 Trace 重建能力",
+        with pipeline_phase(request, agent_model, PipelinePhase.CAPABILITY_CHECK):
+            self.assert_agent_authenticated(agent_model, request)
+            judge = (
+                None
+                if case_id in _DETERMINISTIC_CASES
+                else self.require_judge_model(judge_model, request, agent_model)
             )
-        if _uses_tool(spec) and not agent_model.capabilities.multiple_mock_tools:
-            self.conclude_not_applicable(
-                request,
-                agent_model,
-                reason="当前产品未提供半白盒卷必需的受控工具/Webhook 接入能力",
-            )
+            if not agent_model.capabilities.reconstructed_agent_trace:
+                self.conclude_not_applicable(
+                    request,
+                    agent_model,
+                    reason="当前产品未提供半白盒卷必需的模型通信与 Trace 重建能力",
+                )
+            if _uses_tool(spec) and not agent_model.capabilities.multiple_mock_tools:
+                self.conclude_not_applicable(
+                    request,
+                    agent_model,
+                    reason="当前产品未提供半白盒卷必需的受控工具/Webhook 接入能力",
+                )
 
         pass_criteria, fail_criteria = _criteria(spec)
         statuses: list[JudgeStatus] = []
@@ -762,11 +764,15 @@ class GreyBoxCaseRunner(AgentTestCase):
                     self.assert_agent_authenticated(active_model, request)
                 if case_id in _RUNTIME_EVENT_CASES:
                     try:
-                        status, verdict_reason = _run_h071(
-                            spec,
-                            active_model,
-                            repeat_index,
-                        )
+                        with pipeline_phase(
+                            request, active_model, PipelinePhase.EXERCISE,
+                            repeat_index=repeat_index,
+                        ):
+                            status, verdict_reason = _run_h071(
+                                spec,
+                                active_model,
+                                repeat_index,
+                            )
                     except Exception as error:
                         self.conclude_failed(
                             request,
@@ -783,11 +789,15 @@ class GreyBoxCaseRunner(AgentTestCase):
                     continue
                 if case_id in COMMUNICATION_CASE_IDS:
                     try:
-                        status, verdict_reason = _run_communication_scenario(
-                            spec,
-                            active_model,
-                            repeat_index,
-                        )
+                        with pipeline_phase(
+                            request, active_model, PipelinePhase.EXERCISE,
+                            repeat_index=repeat_index,
+                        ):
+                            status, verdict_reason = _run_communication_scenario(
+                                spec,
+                                active_model,
+                                repeat_index,
+                            )
                     except Exception as error:
                         self.conclude_failed(
                             request,
@@ -816,11 +826,15 @@ class GreyBoxCaseRunner(AgentTestCase):
                             ),
                         )
                     try:
-                        status, verdict_reason = _run_model_scenario(
-                            case_id,
-                            active_model,
-                            repeat_index,
-                        )
+                        with pipeline_phase(
+                            request, active_model, PipelinePhase.EXERCISE,
+                            repeat_index=repeat_index,
+                        ):
+                            status, verdict_reason = _run_model_scenario(
+                                case_id,
+                                active_model,
+                                repeat_index,
+                            )
                     except Exception as error:
                         self.conclude_failed(
                             request,
@@ -862,11 +876,15 @@ class GreyBoxCaseRunner(AgentTestCase):
                     else _prompt(spec)
                 )
                 try:
-                    result = active_model.send_prompt(
-                        prompt,
-                        timeout=spec.timeout_seconds,
-                        allow_tools=_uses_tool(spec),
-                    )
+                    with pipeline_phase(
+                        request, active_model, PipelinePhase.EXERCISE,
+                        repeat_index=repeat_index,
+                    ):
+                        result = active_model.send_prompt(
+                            prompt,
+                            timeout=spec.timeout_seconds,
+                            allow_tools=_uses_tool(spec),
+                        )
                 except Exception as error:
                     self.conclude_failed(
                         request,
@@ -877,50 +895,58 @@ class GreyBoxCaseRunner(AgentTestCase):
                         ),
                     )
                 self.assert_turn_completed(result, request, active_model)
-                records = active_model.capture_evidence(EvidenceRequest(
-                    sample_id=case_id,
-                    prompt_id="01",
+                with pipeline_phase(
+                    request, active_model, PipelinePhase.EVIDENCE_PROJECTION,
                     repeat_index=repeat_index,
-                    phase=EvidencePhase.AFTER,
-                    session_id=result.session_id,
-                ))
-                bundle = EvidenceBundle(
-                    sample_id=case_id,
-                    prompt_id="01",
-                    run_id=active_model.environment.run_id,
-                    transcript=(TranscriptTurn(prompt, result),),
-                    records=records,
-                )
-                active_model.environment.archive_bundle(
-                    bundle,
-                    name=f"evidence_bundle_{case_id.lower()}_{repeat_index}",
-                )
-                if case_id in _SYSTEM_MARKER_CASES:
-                    status, verdict_reason = _system_marker_verdict(spec, bundle, result)
-                elif case_id == "H034":
-                    status, verdict_reason = _h034_verdict(bundle, result)
-                elif case_id in TOOL_SCENARIO_CASE_IDS:
-                    evaluation = evaluate_tool_scenario(tool_plan, bundle, result)
-                    status, verdict_reason = evaluation.status, evaluation.reason
-                else:
-                    assert judge is not None
-                    try:
-                        verdict = judge.evaluate_evidence(
-                            evidence=bundle,
-                            required_evidence_ids=_required_ids(spec),
-                            pass_criteria=pass_criteria,
-                            fail_criteria=fail_criteria,
-                        )
-                    except Exception as error:
-                        self.conclude_failed(
-                            request,
-                            active_model,
-                            reason=(
-                                f"{case_id} 第 {repeat_index} 组 Judge 执行失败："
-                                f"{type(error).__name__}: {error}"
-                            ),
-                        )
-                    status, verdict_reason = verdict.status, verdict.reason
+                ):
+                    records = active_model.capture_evidence(EvidenceRequest(
+                        sample_id=case_id,
+                        prompt_id="01",
+                        repeat_index=repeat_index,
+                        phase=EvidencePhase.AFTER,
+                        session_id=result.session_id,
+                    ))
+                    bundle = EvidenceBundle(
+                        sample_id=case_id,
+                        prompt_id="01",
+                        run_id=active_model.environment.run_id,
+                        transcript=(TranscriptTurn(prompt, result),),
+                        records=records,
+                    )
+                    active_model.environment.archive_bundle(
+                        bundle,
+                        name=f"evidence_bundle_{case_id.lower()}_{repeat_index}",
+                    )
+                with pipeline_phase(
+                    request, active_model, PipelinePhase.ASSERTION,
+                    repeat_index=repeat_index,
+                ):
+                    if case_id in _SYSTEM_MARKER_CASES:
+                        status, verdict_reason = _system_marker_verdict(spec, bundle, result)
+                    elif case_id == "H034":
+                        status, verdict_reason = _h034_verdict(bundle, result)
+                    elif case_id in TOOL_SCENARIO_CASE_IDS:
+                        evaluation = evaluate_tool_scenario(tool_plan, bundle, result)
+                        status, verdict_reason = evaluation.status, evaluation.reason
+                    else:
+                        assert judge is not None
+                        try:
+                            verdict = judge.evaluate_evidence(
+                                evidence=bundle,
+                                required_evidence_ids=_required_ids(spec),
+                                pass_criteria=pass_criteria,
+                                fail_criteria=fail_criteria,
+                            )
+                        except Exception as error:
+                            self.conclude_failed(
+                                request,
+                                active_model,
+                                reason=(
+                                    f"{case_id} 第 {repeat_index} 组 Judge 执行失败："
+                                    f"{type(error).__name__}: {error}"
+                                ),
+                            )
+                        status, verdict_reason = verdict.status, verdict.reason
             statuses.append(status)
             reasons.append(f"第{repeat_index}组：{verdict_reason}")
             if status is JudgeStatus.FAIL:

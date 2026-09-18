@@ -3,46 +3,59 @@
 import pytest
 
 from agent_models import AgentModel
-from assertions.outcome import AssessmentOutcomeSignal, AssessmentStatus, AssessmentVerdict
+from assertions.outcome import AssessmentStatus, AssessmentVerdict
+from test_cases.base import AgentTestCase
 from test_cases.black_box.assertion import BlackBoxAssertion
 from test_cases.black_box.environment import BlackBoxEnvironmentBuilder
 from test_cases.black_box.evidence import BlackBoxEvidenceProjector
 from test_cases.black_box.execution import BlackBoxCaseExecutor
 from test_cases.black_box.specs import load_black_box_spec
+from test_cases.pipeline import PipelinePhase, pipeline_phase
 
 
-class BlackBoxCaseRunner:
-    def run(self, case_id: str, agent_model: AgentModel) -> AssessmentVerdict:
+class BlackBoxCaseRunner(AgentTestCase):
+    def run(
+        self,
+        case_id: str,
+        agent_model: AgentModel,
+        request: pytest.FixtureRequest,
+    ) -> AssessmentVerdict:
         builder = BlackBoxEnvironmentBuilder()
         executor = BlackBoxCaseExecutor()
         projector = BlackBoxEvidenceProjector()
         assertion = BlackBoxAssertion()
         spec = load_black_box_spec(case_id)
-        prepared = builder.build(spec, agent_model, repeat_index=1)
+        with pipeline_phase(request, agent_model, PipelinePhase.CAPABILITY_CHECK):
+            pass
+        with pipeline_phase(request, agent_model, PipelinePhase.ENVIRONMENT_SETUP):
+            prepared = builder.build(spec, agent_model, repeat_index=1)
         verdicts: list[AssessmentVerdict] = []
         try:
             for repeat_index in range(1, spec.repeat_count + 1):
                 if repeat_index > 1:
                     agent_model.begin_independent_session()
                     prepared = builder.reset_for_repeat(prepared, agent_model, repeat_index=repeat_index)
-                ledger = agent_model.environment.ledger
-                ledger.record("black_box", "phase_started",
-                              {"case_id": case_id, "repeat_index": repeat_index, "phase": "exercise"})
-                execution = executor.execute(prepared, agent_model)
-                ledger.record("black_box", "phase_completed",
-                              {"case_id": case_id, "repeat_index": repeat_index, "phase": "exercise"})
-                evidence = projector.observe(prepared, execution, agent_model)
-                ledger.record("black_box", "phase_started",
-                              {"case_id": case_id, "repeat_index": repeat_index, "phase": "assertion"})
-                verdict = assertion.evaluate(spec, evidence)
+                with pipeline_phase(
+                    request, agent_model, PipelinePhase.EXERCISE,
+                    repeat_index=repeat_index,
+                ):
+                    execution = executor.execute(prepared, agent_model)
+                with pipeline_phase(
+                    request, agent_model, PipelinePhase.EVIDENCE_PROJECTION,
+                    repeat_index=repeat_index,
+                ):
+                    evidence = projector.observe(prepared, execution, agent_model)
+                with pipeline_phase(
+                    request, agent_model, PipelinePhase.ASSERTION,
+                    repeat_index=repeat_index,
+                ):
+                    verdict = assertion.evaluate(spec, evidence)
                 verdicts.append(verdict)
-                ledger.record("black_box", "phase_completed",
-                              {"case_id": case_id, "repeat_index": repeat_index, "phase": "assertion",
-                               "status": verdict.status.value})
                 if verdict.status is AssessmentStatus.FAIL:
                     break
         finally:
-            builder.cleanup(prepared, agent_model)
+            with pipeline_phase(request, agent_model, PipelinePhase.CLEANUP):
+                builder.cleanup(prepared, agent_model)
         failed = next((item for item in verdicts if item.status is AssessmentStatus.FAIL), None)
         inconclusive = next((item for item in verdicts if item.status is AssessmentStatus.INCONCLUSIVE), None)
         return failed or inconclusive or AssessmentVerdict(
@@ -55,22 +68,23 @@ class BlackBoxCaseRunner:
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
     ) -> None:
-        _conclude(self.run(case_id, agent_model), agent_model, request)
+        verdict = self.run(case_id, agent_model, request)
+        if verdict.status is AssessmentStatus.FAIL:
+            self.conclude_failed(request, agent_model, reason=verdict.reason)
+        if verdict.status is AssessmentStatus.INCONCLUSIVE:
+            self.conclude_inconclusive(
+                request,
+                agent_model,
+                reason=verdict.reason,
+                missing_evidence=verdict.missing_evidence,
+                execution_completed=True,
+            )
+        self.conclude_passed(request, agent_model, reason=verdict.reason)
 
 
 def run_black_box_case(case_id: str, agent_model: AgentModel, request: pytest.FixtureRequest) -> None:
-    _conclude(BlackBoxCaseRunner().run(case_id, agent_model), agent_model, request)
-
-
-def _conclude(
-    verdict: AssessmentVerdict,
-    agent_model: AgentModel,
-    request: pytest.FixtureRequest,
-) -> None:
-    request.node.user_properties.extend((("assessment_status", verdict.status.value),
-                                         ("assessment_reason", verdict.reason),
-                                         ("assessment_missing_evidence", "；".join(verdict.missing_evidence))))
-    agent_model.environment.ledger.record("assertion", "assessment_concluded",
-                                          {"status": verdict.status.value, "reason": verdict.reason,
-                                           "missing_evidence": list(verdict.missing_evidence)})
-    raise AssessmentOutcomeSignal(verdict)
+    BlackBoxCaseRunner().run_black_box_case(
+        case_id=case_id,
+        agent_model=agent_model,
+        request=request,
+    )

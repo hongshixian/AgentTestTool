@@ -342,10 +342,16 @@ def agent_model(request: pytest.FixtureRequest, tmp_path) -> Iterator[AgentModel
                                   enable_network_capture=_item_requires_network_capture(
                                       request.node
                                   )) as model:
+        from test_cases.pipeline import PipelinePhase, pipeline_phase, record_case_event
+
         request.node.user_properties.append(("evidence_directory", str(model.environment.evidence_directory)))
         model.environment.ledger.record("pytest", "case_started", {"node_id": request.node.nodeid})
+        record_case_event(request, model, "case_started")
         try:
-            yield model
+            with pipeline_phase(request, model, PipelinePhase.INITIALIZE):
+                pass
+            with pipeline_phase(request, model, PipelinePhase.EVIDENCE_COLLECTION):
+                yield model
         finally:
             model.environment.ledger.save_artifact("pytest_outcome", {
                 "node_id": request.node.nodeid,

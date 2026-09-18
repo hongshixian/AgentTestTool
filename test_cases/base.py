@@ -30,6 +30,7 @@ from assertions.logical import (
 )
 from assertions.judge import JudgeStatus, JudgeVerdict, OpenAICompatibleJudge
 from test_cases.security import SecurityIdentitySettings, SecurityTargetSettings
+from test_cases.pipeline import pipeline_phase_active, record_conclusion
 
 
 class AgentTestCase:
@@ -185,6 +186,8 @@ class AgentTestCase:
                 "missing_evidence": list(verdict.missing_evidence),
             },
         )
+        if not pipeline_phase_active(request):
+            record_conclusion(request, agent_model, verdict)
         raise AssessmentOutcomeSignal(verdict)
 
     def conclude_passed(

@@ -1,11 +1,12 @@
 {
   "schema_version": 1,
   "dependencies": {
-    "test_cases/conftest.py": "a274300ef672f7d0e3176cdb35213bedf54b4874c91da85f5acf2ab7df8d29f7",
+    "test_cases/conftest.py": "39939c4c96c7feb0f415d2c5e1b7860fbc14d022d1b67d1a74bc50bbca2fa6f2",
     "configs/black_box_cases.json": "47331b99ed916496286361571c1372ec827ec4fd37d737f60c4dd66738c4b327"
   },
   "scenario_dependencies": {
-    "test_cases/base.py": "daa1b5412cd80571db140f6d156e06253a644317cef676f423954f076239f7ad",
+    "test_cases/base.py": "21298641bcf522e93a0b86137b493da9f7d767dd6b613f872914315a2b1f4985",
+    "test_cases/pipeline.py": "130549066a2a9ef6d7732296e00517a2940a3ec1ee1aee4bdfc2c062e854352c",
     "test_cases/black_box/base.py": "d45b668355d53049f1709e1e86f8b95d859743c276de4024224b9fab20be4f41",
     "test_cases/black_box/models.py": "b6ed977899520b7442c46aee25e2bc4a63cecc0f4cdd108330edf97319fe5c85",
     "test_cases/black_box/specs.py": "5d9794fb51642ddf270d1b93e6f774a50bcdd2e0fb925d0d4d3247e0df0be0c9",
@@ -13,10 +14,10 @@
     "test_cases/black_box/execution.py": "00687f9572caff7ee8f9d18f4c66cae12baad25e0559bb37cb67249b5d67671e",
     "test_cases/black_box/evidence.py": "ba648f76910436f7319ddaf668e412dced0f6df4adf0dfca4d9c728e52ab0f32",
     "test_cases/black_box/assertion.py": "480f21192d3a3bb3e04eac936d1e9249daff8bf696493ec2ea4f98a223e9371e",
-    "test_cases/black_box/runner.py": "2707b7e15ea9e604119c036f2df2b9acbfa06d92fa0ef2a2e2d383d6599948f8",
+    "test_cases/black_box/runner.py": "fa4a08d0f15926e5caccf3772037df0492f2319042b3fa33382b0ff599a0735b",
     "test_cases/black_box/scenario_handlers.py": "66e50157b3d3a81a301d17c5286327104a5c3455b10f4286b39961262a280eac",
     "configs/grey_box_cases.json": "31a9b01351afee641431a98ee6f64842bb2e7700a020144ce47868f73a0eab19",
-    "test_cases/grey_box/base.py": "e5d083219a7252141f269cf3fb39818d92364efe493543e395b0c5bc514dda3c",
+    "test_cases/grey_box/base.py": "4a3c830be65e55353fe92bc79149af8f8ec0e0120081f743777d1bff2fd36fdd",
     "test_cases/grey_box/specs.py": "f4b0de4850dfce170806cb615ca9103af9c29f7bf6031c0d8ef7617004812164",
     "test_cases/grey_box/tool_scenarios.py": "96154a55847cdd0bb42e6212aff2bf0b448c8f92ba4837f9a77f8b68d3dad520",
     "test_cases/grey_box/communication_scenarios.py": "f886c965f3cfa711d07c8fdff2f55b2edcba0b29bfe8751e26fb4d1123c3e1db",
@@ -28,6 +29,7 @@
   "groups": {
     "test_cases.black_box": [
       "test_cases/base.py",
+      "test_cases/pipeline.py",
       "test_cases/black_box/base.py",
       "test_cases/black_box/models.py",
       "test_cases/black_box/specs.py",
@@ -41,6 +43,7 @@
     "test_cases.grey_box": [
       "configs/grey_box_cases.json",
       "test_cases/base.py",
+      "test_cases/pipeline.py",
       "test_cases/grey_box/base.py",
       "test_cases/grey_box/specs.py",
       "test_cases/grey_box/tool_scenarios.py",

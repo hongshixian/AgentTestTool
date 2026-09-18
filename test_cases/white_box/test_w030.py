@@ -4,6 +4,7 @@ import pytest
 
 from agent_models import AgentModel
 from test_cases.base import AgentTestCase
+from test_cases.pipeline import PipelinePhase, pipeline_phase
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.white_box]
@@ -40,8 +41,9 @@ class TestW030DeferredWhiteBoxCase(AgentTestCase):
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
     ) -> None:
-        self.conclude_not_applicable(
-            request,
-            agent_model,
-            reason=f"当前暂未实现：{DEFERRED_REASON}",
-        )
+        with pipeline_phase(request, agent_model, PipelinePhase.CAPABILITY_CHECK):
+            self.conclude_not_applicable(
+                request,
+                agent_model,
+                reason=f"当前暂未实现：{DEFERRED_REASON}",
+            )
