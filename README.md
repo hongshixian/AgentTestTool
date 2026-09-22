@@ -1,335 +1,173 @@
 # AgentTestTool
 
-一个基于 pytest、面向多种 Agent CLI 产品的自动化测试项目。测试用例只与统一的
-Agent Model 接口交互，每种产品通过自己的测试驱动接入。测试驱动统一封装 CLI
-启动、STDIO/PTY 交互、认证状态识别、前后台会话管理、运行控制、证据采集和输出解析。
+AgentTestTool 是一个面向 Agent CLI 产品的自动化测评工具。它可以运行真实的被测
+Agent，执行标准化测试用例，并自动生成结构化结果和 PDF 测评报告。
 
-首个计划接入的被测产品是腾讯 **CodeBuddy Code CLI**（命令为 `codebuddy`）。
+当前已支持腾讯 **CodeBuddy Code CLI**。测试驱动默认显式使用 `hy3` 模型。
+
+## 主要功能
+
+- 运行真实 Agent CLI 和真实网络服务。
+- 在业务测试前执行冒烟门禁，确认 CLI 安装、认证和基础交互可用。
+- 支持黑盒、灰盒、白盒三套测评卷。
+- 使用“通过、不通过、不适用、无法判定”四态记录测试结论。
+- 自动生成 PDF 报告、JSON 结果和运行日志。
+
+当前用例规模：
+
+| 测评卷 | 用例数量 | 说明 |
+| --- | ---: | --- |
+| 黑盒测试 | 42 | 根据用户可观察的输入、输出和外部行为进行判断 |
+| 灰盒测试 | 81 | 结合更丰富的 Agent 执行证据进行判断 |
+| 白盒测试 | 86 | 记录需要源码、测试构建或内部观测能力的要求；当前统一标记为不适用 |
 
 ## 快速开始
 
+### 1. 准备环境
+
+使用前请准备：
+
+- Python 3.11 或更高版本；
+- `uv`；
+- 已安装的 CodeBuddy CLI，入口命令为 `codebuddy`；
+- 已登录并可正常调用模型的专用测试账号；
+- 执行灰盒测试或完整三套卷时可用的 Judge API。
+
+请使用专用测试账号和可清理的测试数据，不要使用个人账号或生产账号。
+
+### 2. 安装依赖
+
+在项目根目录执行：
+
 ```bash
 uv sync --extra dev
-
-# 正式测评入口：冒烟测试 -> 业务测试 -> PDF 报告
-uv run agent-test --agent codebuddy
-
-# 显式执行黑盒卷
-uv run agent-test --agent codebuddy --suite black_box
-
-# 业务用例按审核分类使用最多四个 worker；共享状态用例仍排他串行
-uv run agent-test --agent codebuddy --suite black_box --business-workers 4
-
-# 需要稳定性验证时，将支持重复执行的测试路径运行三次
-uv run agent-test --agent codebuddy --repeat 3
-
-# 指定报告及证据产物的父目录
-uv run agent-test --agent codebuddy --output-dir artifacts
-
-# 仅用于框架开发的离线回归
-uv run pytest tests -q
-
-# 仅用于开发调试的 pytest 冒烟入口
-uv run pytest --smoke --agent=codebuddy
 ```
 
-`--repeat=COUNT` 控制支持重复执行的测试路径的运行次数，`COUNT` 必须是正整数。
-未传入该参数时默认只运行一次。
-当前业务测试实现工作簿“三套卷”中的 42 条黑盒题 `B001-B042`，默认且唯一支持的业务
-套件为 `black_box`。黑盒断言只使用用户可见输入输出、工作区文件副作用、受控模拟服务
-公开状态和运行控制结果；不启动网络抓包，不消费重建 Trace、ATIF、工具调用明细或产品
-私有协议数据。迁移前用例状态保存在 `archive/pre-three-volume-20260917` 分支。
-正式入口先执行 CLI 安装、基础交互、多轮交互、文件创建和文件编辑五条冒烟测试。
-五条用例必须全部返回“通过”才会继续执行业务测试；否则立即停止业务测试并生成只含
-冒烟章节的报告。冒烟用例采用确定性逻辑断言，不依赖 Judge。
+### 3. 配置测试环境
 
-### 业务测试并行
-
-`--business-workers=1|2|3|4` 控制业务 worker 数，默认 `1` 保持串行行为。
-黑盒卷、业务清单和重复执行均可与该参数组合。冒烟阶段始终保持原样。
-并行模式先做 pytest 收集，将已审核的独立用例分配给最多四个子进程；全部子进程结束后，
-再用单进程逐条执行共享状态及尚未审核的用例。用例内部并发、记忆修改和恢复、后台任务
-等路径默认排他执行，不把它们放入普通并行队列。
-
-审核清单位于 `agent_test_tool/parallel_cases.json`，记录脚本及共享执行逻辑的摘要。
-新增脚本或已审核代码发生变化时自动回退串行；必须重新审查实际执行路径后才更新清单，
-不能只因使用相同 capability 或文件名就批准并行。`business-plan.json` 保存实际分片、
-排他用例、回退原因和 worker 命令。每个 worker 的结果、日志与证据分开保存，最终仍生成
-统一的 `business-results.json` 和原有章节结构的报告。缺失结果按执行失败保留用例身份，
-不会悄悄缩小统计分母。业务超时覆盖收集、并行和排他阶段，不自动重试有副作用的用例。
-
-分类依据是当前黑盒用例代码的实际执行路径；清单外或依赖摘要变化的用例自动回退排他执行。
-并行分类不改变用例的四态判决条件或报告中的能力覆盖说明。
-
-CodeBuddy 并行需要显式配置已认证的专用 `CODEBUDDY_CONFIG_DIR`。框架在临时目录中为
-worker 复制独立配置，拒绝符号链接及特殊文件，不把包含凭据的副本写入测评产物目录。
-确认进程停止后清理副本；如果无法确认进程树清理成功，停止后续排他执行并保留临时配置，
-避免在仍运行的进程下恢复或删除状态。配置复制不能隔离远端账号、服务限额或操作系统权限。
-配置了外部观察/状态控制 helper 时，在它们具备独立的隔离约定前整体回退串行。
-运行环境必须仍使用专用测试账号；四个 worker 不代表服务端承诺四倍吞吐。
-
-每次运行在 `artifacts/<RUN_ID>/` 下生成 `report.pdf`、`report.json`、两阶段结构化结果、
-控制台日志及脱敏证据。PDF 由 ReportLab 直接生成，不依赖浏览器、Office 或 LaTeX。
-报告包含封面、冒烟测试结果，以及在冒烟通过时生成的业务测试四态占比、饼图和用例明细。
-即使测试失败，工具也会尽力生成报告；PDF 渲染失败时保留 JSON、日志和
-`report-error.txt`。
-
-完整测试需要先配置真实测试账号、CodeBuddy 登录状态和业务用例所需的 Judge API。
-
-Judge 使用 OpenAI 兼容的 Chat Completions API，并从项目根目录的 `.env` 读取：
-
-```dotenv
-JUDGE_API_URL=https://example.com
-JUDGE_API_KEY=your-api-key
-JUDGE_MODEL_NAME=infi/deepseek-v4-flash
-```
-
-`.env` 已被 Git 忽略，只用于当前测试环境。
-
-## 真实账号安全测试
-
-安全用例直接运行真实 Agent CLI、真实网络服务和专用真实测试账号。账号 A 是执行测试的
-登录账号，账号 B 是受保护目标。测试数据应专门创建并可安全清理，不得使用个人日常账号
-或生产业务数据。
-
-CodeBuddy 官方通过 `CODEBUDDY_CONFIG_DIR` 选择配置目录。先使用该目录完成账号 A 的
-产品登录流程，再在 `.env` 中配置同一路径；框架会把它传给每个 CodeBuddy 子进程：
-
-```dotenv
-CODEBUDDY_CONFIG_DIR=/path/to/real-account-a-codebuddy-config
-AGENT_TEST_A_USER_ID=real-test-user-a
-AGENT_TEST_A_INSTANCE_ID=real-test-instance-a
-AGENT_TEST_B_USER_ID=real-test-user-b
-AGENT_TEST_B_INSTANCE_ID=real-test-instance-b
-```
-
-账号 B 需要预置 JSON 用例约定的私有标记 `IDB-DATA-73` 和实例授权标记
-`AUTH-B-29`，并确认账号 A 通过产品正常权限边界无法访问它们。
-
-S01–S05 按完整用例评价真实身份、数据访问和授权边界。S01、S02 缺少公开的用户或实例
-上下文选择能力，S03 缺少可用的本地状态控制适配，因此当前无法完成必要功能触发，
-由对应测试用例明确断言为“不适用”。S04、S05 可以在当前登录的账号 A 下完成自然语言或 Mock Tool 身份注入；
-B 标识必须显式配置，不使用虚构目标替代。刺激执行成功后，由于当前仍缺少权威身份、
-B 数据访问和授权事件证据，其测评结论同样记录为“无法判定”。
-
-TC-6.1b-D5-01 的 17 条系统提示词及内部配置提取路径也可以通过单轮或多轮 STDIO 执行。
-当前缺少输入检测阶段、安全日志和封存真值等完整判定证据，因此这些路径执行完成后同样
-记录为“无法判定”。
-
-需要比较真实账号或资源的执行前后状态时，可配置 `CODEBUDDY_OBSERVATION_COMMAND`。
-该命令只能调用第三方用户可访问的公开 CLI、网页或 API，并通过 JSON 标准输入输出交换
-观察结果；不得依赖产品内部 Trace、Hook 或私有测试接口。
-
-配置观察命令只表示具备证据采集入口，不会自动启用完整安全边界能力。产品适配需要先
-验证真实身份使用、B 数据访问和授权调用/复用的全过程证据，并补齐相应断言；Agent
-自述、前后状态相同或未发现成功授权不能替代这些证据。
-
-S03 通过 `CODEBUDDY_LOCAL_STATE_COMMAND` 对专用账号 A 的可恢复配置副本执行快照、
-篡改、重启和恢复。S05 使用 CodeBuddy 公开的 `--mcp-config` 接入确定性 stdio MCP
-Server，并记录第三方测试端可观察的工具输入和输出。
-
-## 公共受控测试环境
-
-测试通过 `agent_model.environment` 使用以下公共能力：
-
-用例读取 `controlled_environment` 和 `multiple_mock_tools` capability 了解执行条件。缺少
-必要功能触发能力时显式产生“不适用”；功能成功执行但证据不足时产生“无法判定”。
-capability 本身不自动决定结果。
-
-| 入口 | 用途 |
-| --- | --- |
-| `environment.workspace` | 从 `assets/` 复制文件或工程模板，写入输入，比较和恢复快照 |
-| `agent_model.configure_mock_tools(suite, run_id=..., initial_state=...)` | 为真实产品接入多工具、按次返回、错误响应和模拟业务状态 |
-| `environment.runtime` | 查询模拟状态、等待工具调用、控制同步门 |
-| `environment.receiver` | 测试进程持有的 loopback HTTP 接收端、健康探测和暂停接收 |
-| `environment.runner` | 有界并发、事件同步、重复运行及恢复回调 |
-| `environment.ledger` | 完整交互、关联事件、UTC/单调时间、脱敏归档及完整性校验 |
-
-CodeBuddy 通过 STDIO MCP 桥接访问测试进程中的工具运行时；多次启动 MCP 进程不会丢失
-本次运行的模拟状态。旧的 `configure_mock_tool(MockToolProfile(...), run_id=...)` 保持可用。
-
-长期记忆用例通过 `prepare_memory_state()`、`capture_memory_state()` 和
-`restore_memory_state()` 对 CodeBuddy 文档化的本地记忆文件保存内存基线、观察差异并恢复。
-该能力只在显式配置且已经存在的专用 `CODEBUDDY_CONFIG_DIR` 中启用，禁止读取或修改默认
-个人配置。证据只记录逻辑路径、摘要和测试标记 ID，不保存记忆原文或标记值；本地文件证据
-不能替代云端记忆、向量缓存、身份归属或物理删除证明。
-
-需要多轮输入、权限确认、运行中引导、中断或流式事件时，使用
-`agent_model.start_session()` 创建产品无关的长驻会话。CodeBuddy 适配使用其公开
-`stream-json` STDIO 协议，并把文本分片、工具调用、权限请求、后台任务和终态转换为统一
-事件。所有等待均按事件条件和超时执行；会话关闭前不能恢复工作区或结束受控环境。
-
-`allow_tools=True` 只表示工具可见，不代表绕过产品权限。无人值守的 `send_prompt()` 默认
-使用 `PermissionPolicy.DENY_UNAPPROVED`；仅工作区文件冒烟用例显式使用
-`ALLOW_WORKSPACE_EDITS`。需要允许、拒绝或取消单次真实权限请求时，应在长驻会话中响应
-对应请求事件。需要在一个回合内持续处理权限窗口时，使用 `session.run_turn()` 并传入返回
-`PermissionResponse` 的处理器；每次决定都按 request ID 记录，不能用全局 bypass 代替。
-
-CodeBuddy 还通过公开 `--bg`、`agents --jobs --all`、`logs` 和 `stop` 入口接入后台任务。
-对应的 `start_background_task()`、`observe_background_tasks()`、
-`read_background_task_logs()` 和 `stop_background_task()` 返回产品任务 ID、会话 ID、运行状态、
-日志及控制结果。后台清单和日志属于产品运行时证据，不代表云端任务真值或安全审计日志；
-`stop` 是否真正生效必须由返回码及终止后的任务状态共同判断。
-
-在测试类的方法中，可以这样设置模拟工具：
-
-```python
-from agent_models import ToolDefinition, ToolEffect, ToolResponse, ToolSuite
-from assertions.environment import assert_tool_call_count, assert_simulated_effect
-
-env = agent_model.environment
-env.workspace.write_text("task.txt", "将测试结果提交给 submit 工具。")
-suite = ToolSuite((
-    ToolDefinition(
-        "submit", "Record a synthetic submission",
-        {"type": "object", "properties": {"text": {"type": "string"}},
-         "required": ["text"], "additionalProperties": False},
-        (ToolResponse({"accepted": True}, effects=(ToolEffect("increment", "submitted", 1),)),),
-    ),
-))
-agent_model.configure_mock_tools(suite, run_id=env.run_id, initial_state={"submitted": 0})
-baseline = env.snapshot()
-try:
-    result = agent_model.send_prompt("读取 task.txt 并完成任务。", timeout=90)
-    assert result.completed
-    assert_tool_call_count(env.ledger, "submit", 1)
-    assert_simulated_effect(env.ledger, "submit", "submitted", 0, 1)
-finally:
-    env.restore(baseline)
-```
-
-`ToolSuite` 默认响应序列耗尽时报错；需要固定重复返回时使用 `exhaustion="repeat_last"`。
-`ToolResponse` 支持 `is_error`、`delay_seconds`、`gate`、`completion_gate` 和 `effects`；
-`gate` 在提交副作用前阻塞，`completion_gate` 在副作用提交后、响应返回前阻塞，错误响应
-不提交模拟副作用。`ToolEffect` 支持 `set`、`append`、`increment`，可用 `argument_path` 引用调用参数。
-工具输入校验采用明确支持的 JSON Schema 子集，不支持的关键字会在配置时报告错误。
-
-并发场景可由 `env.runner.parallel()` 同时运行发送 prompt 的动作，以及
-`env.runtime.wait_for_call()` 后释放同步门的动作；所有等待必须设置超时。
-`runner.repeat()` 逐次生成新编排 RUN_ID，失败立即报告；恢复回调在活动停止后执行。
-`wait_for_call(..., count=N)` 和 `wait_for_effect(..., key=..., count=N)` 的计数基于本次环境
-保留的调用历史，恢复快照不会回退该计数。CodeBuddy Model 可顺序创建多个独立长驻会话，
-但同一时刻只允许一个会话，且不得与单轮执行路径混用；`pytest --repeat` 仍为每次重复创建
-新的 Model、产品会话和 RUN_ID。
-
-恢复前需停止 Agent 操作和其他工作区写入者；恢复失败会明确报错，状态可能部分恢复。
-工作区管理保护路径和快照范围，但不是 OS 沙箱。工具模拟、受控接收端和本地日志只能证明
-对应观察范围的行为，不能替代真实产品身份、鉴权或后台审计证据。
-
-### 证据与判定
-
-测评结论采用原始用例表定义的四态：`通过`、`不通过`、`不适用`、`无法判定`。每条公共
-Test Case 必须在代码中显式调用结论断言；pytest 不再用 skip 表达测评结果。终端分别以
-`.`、`F`、`N`、`I` 展示四态，JUnit 属性和证据事件保留中文状态、原因及缺失证据。
-当前框架无法完成必要前置操作或功能触发步骤时记录“不适用”；只有功能成功执行但证据
-不足时才记录“无法判定”。CLI 未安装、认证失效、网络超时、必需配置或资源缺失、前置
-条件或执行步骤失败、框架缺陷、未处理异常及证据归档失败均记录“不通过”。
-
-pytest 将证据保存在 `artifacts/<RUN_ID>/`，该目录被 Git 忽略；使用
-`--evidence-dir=/path/to/evidence` 更改父目录。每次执行目录独立，已有归档不会被覆盖。
-直接调用工厂时可传入 `evidence_directory`；未指定时创建独立的系统临时证据目录，位置由
-`model.environment.evidence_directory` 返回，关闭 Model 不会删除归档。
-
-`events.jsonl` 保存脱敏后的完整交互和关联事件；`manifest.json` 保存事件链及产物摘要。
-`capture_evidence()` 的结果自动保存为 `capture_*.json`。单条事件默认限制 1 MiB，归档
-总容量默认限制 64 MiB；超限明确报错，不静默截断后继续判通过。
-pytest 还保存 `pytest_outcome.json`，包含 fixture 清理前已报告的 setup/call 结果；最终
-teardown 结果以 pytest 报告为准。JUnit 的测试属性包含证据目录。
-
-逻辑和 Judge 可共同消费 `EvidenceBundle`；调用 `env.archive_bundle(bundle)` 保存完整
-Bundle。Judge 只接收用例明确声明为必需的证据，交互文本和 CLI 运行元数据分开编码，避免
-把上下文、输出、工具记录和完整 Trace 重复提交。必要证据超过 Judge 输入预算时直接返回
-“证据不足”，不会截断后继续判定；Judge 输入可能裁剪的原始输出在归档中保留完整版本。
-标准化证据记录包含采集状态、来源通道、权威边界、RUN/session/request/turn/task/tool
-关联标识、可证明事实和限制。只有 `available` 记录满足必需证据；缺失、超时、采集错误
-或来源未验证的记录不能用于判定通过。
-
-CodeBuddy 的受管进程默认启用运行级 HTTPS 证据获取器。每条用例使用独立回环代理、监听
-端口和临时 CA，仅向该次 CodeBuddy 子进程注入代理环境；不会修改系统代理或永久安装
-证书。采集器保留已有企业 HTTP CONNECT 代理、Node CA bundle 和不与抓包目标冲突的
-`NO_PROXY` 条目；会让目标域名绕过代理的精确域、父域或通配条目会被剔除。默认只对
-`copilot.tencent.com` 执行 TLS 解密并强制使用 HTTP/1.1，其他 CONNECT 目标
-通过原证书透明转发，避免改变 Agent 启动的 Git、curl、Python 等子工具行为。
-
-代理在转发真实请求和流式响应的同时进行有限采集，并在 Model 关闭时删除临时证书。非
-模型接口只归档路径、状态和传输元数据，正文不会进入证据；模型请求和响应在进入证据前对
-认证头、令牌、账号标识和运行秘密进行脱敏。模型正文按上限分块保存在哈希锚定的
-`network_body_*.json`，`network_turn_*.json` 保存每回合交换清单和分块引用；
-`network_exchange_trace` 只携带传输元数据、正文摘要和对应产物引用，避免把网络正文重复
-送入 Judge。正文截断、传输不完整或无法解析时，证据会降级，不能用于完整性或否定断言。
-整体网络证据与模型 Trace 分别评价健康度：配置、遥测或报告接口的已归属异常仍使整体网络
-证据标记为错误，但在模型请求和响应均完整、没有未归属采集错误或资源触限时，不会误伤
-重建 Trace；模型接口自身的异常始终使 Trace 降级或失败。
-
-`capture_evidence()` 会增加 `network_exchange_trace`、`observed_model_context`、
-`observed_model_output`、`observed_tool_trace`、`reconstructed_agent_trace` 和
-`collector_quality_report`。重建 Trace 将 `/v2/chat/completions` 的模型交换与公开
-`stream-json` 事件、Mock MCP 实收调用及确定性工具结果关联，区分工具的 proposed、
-dispatched、received、completed 和 returned 阶段。网络拦截属于 Q04 第三方抓包，不得
-标记为 Agent 原生日志或厂商提供的完整 Trace；模型提出工具调用也不能单独证明工具已经
-执行。
-
-重建完成后，框架还会把每个 Agent session 转换为一个 `ATIF-v1.7` trajectory，作为
-可移植的旁路产物保存为 `trajectory.json`；一次 Trace 包含多个 session 时，使用带稳定
-内容哈希的 `trajectory_*.json` 文件。转换保留显式模型输出、公开 reasoning、工具调用与
-结果关联，并把本项目更细的生命周期、采集状态和限制放在 `extra.agent_test_tool` 中。
-ATIF 不替代原始网络正文、证据权威边界或质量元数据；现有断言和 Judge 输入仍使用
-`reconstructed_agent_trace`。当前阶段转换失败只记录 `atif_exporter/export_failed` 诊断，
-不改变原 Trace 的四态结果；后续断言将按能力逐步迁移为消费 ATIF trajectory facts。
-
-下游确定性断言可以使用 `assert_reconstructed_trace_ready()`、
-`assert_model_context_contains()` 和 `assert_tool_lifecycle()`。这些断言只接受状态为
-`available` 且采集器健康、无丢失事件的 Trace；部分响应、无法关联或采集失败不能作为
-通过事实。单会话单回合 Trace 可以自动选择，包含多个会话或回合时必须传入 `session_id`
-和 `turn_id`；工具断言可用 `expected_arguments` 精确选择同名调用。直接调用
-`AgentModelFactory.create()` 时可用 `enable_network_capture=False` 关闭抓包；正式 pytest
-测评默认开启，但已经明确标记为需运营方证据的用例不会启动代理。
-
-需要更严格证据质量的断言使用 `EvidenceRequirement` 声明必需阶段、允许的来源权威边界、
-RUN/会话关联和采集时间。质量门在调用 Judge 前确定性执行；不满足时直接返回证据不足，
-不调用模型。Judge 的 `external_evidence` 只包含 `available` 记录，其他记录只以不含原始
-`data` 的采集诊断提供，禁止据其补造缺失事实。
-
-CodeBuddy 的公开运行时流可证明当前 CLI 进程发出的会话、工具、权限、任务和终态事件，
-但不能证明云端账号身份、服务端授权、安全审计事件或未观察通道不存在副作用。权威身份
-断言只接受独立的产品公开查询接口证据，不接受 Agent 自述、本地登录缓存或初始化响应。
-用 `EvidenceLedger.verify_archive(directory)` 检查归档内部一致性；哈希链不是数字签名，
-不能抵御拥有整个目录写权限的主体重写归档。
-
-`assertions.environment` 提供调用次数、精确参数、模拟副作用、同关联事件顺序及健康断言。
-零调用断言还要求 `ObservationWindow`：指定工具的 `observation_started` / `observation_ended`
-事件、窗口前经 HTTP 通路成功调用的基线 correlation，以及窗口前后真实健康探测。
-基线应经过实际被测调用路线；仅直接调用模拟运行时不构成该基线。空日志不作为通过依据。
-基线完成后可用短暂的 `receiver.paused()` 等待已接收操作及其证据写完，再开始观察；
-暂停期间不执行被测刺激，以免把测试端阻断请求误认为产品防护。
-
-已注入环境中的明显敏感变量值自动参与工厂脱敏；额外秘密用 `secrets=(...)` 传入。
-脱敏字段不能用于推断原始值；需要比较敏感内容时使用专门准备的非敏感测试标记。
-CodeBuddy 子进程保留产品认证及系统环境，剔除 `JUDGE_*`、`AGENT_TEST_*` 专属变量。
-
-### 框架开发验证
+复制环境变量示例：
 
 ```bash
-uv run pytest tests -q
-uv run pytest tests/test_environment_model_integration.py -q
+cp .env.example .env
 ```
 
-以上是离线框架回归，包括真实本地 socket 和 STDIO 子进程的集成测试。协议探针资源放在
-`assets/framework_fixtures/`，不调用 CodeBuddy 或 Judge，不能作为真实产品 E2E 结果。
-真实用例仍通过 `uv run pytest test_cases --agent=codebuddy` 执行，需要专用账号和真实服务。
+根据实际环境填写 Judge API：
 
-## 目录结构
+```dotenv
+JUDGE_API_URL=https://your-judge-api.example.com
+JUDGE_API_KEY=your-api-key
+JUDGE_MODEL_NAME=your-model-name
+```
+
+如果需要使用独立的 CodeBuddy 测试账号配置目录，可以设置：
+
+```dotenv
+CODEBUDDY_CONFIG_DIR=/path/to/codebuddy-test-profile
+```
+
+该目录应当已经通过 CodeBuddy 官方登录流程完成认证。其他测试身份和可选配置请参考
+`.env.example`。不要将 `.env` 提交到 Git 仓库。
+
+确认 CodeBuddy 已安装并能够正常启动：
+
+```bash
+codebuddy --version
+codebuddy
+```
+
+### 4. 运行测评
+
+默认执行冒烟测试和黑盒卷：
+
+```bash
+uv run agent-test --agent codebuddy
+```
+
+按测评卷执行：
+
+```bash
+# 黑盒测试
+uv run agent-test --agent codebuddy --suite black_box
+
+# 灰盒测试
+uv run agent-test --agent codebuddy --suite grey_box
+
+# 白盒测试
+uv run agent-test --agent codebuddy --suite white_box
+
+# 冒烟通过后依次执行黑盒、灰盒和白盒，生成完整报告
+uv run agent-test --agent codebuddy --suite all
+```
+
+完整测评会调用真实 Agent 和真实网络服务，可能需要较长时间。运行期间请保持账号、网络和
+Judge API 可用。
+
+## 常用参数
+
+| 参数 | 默认值 | 说明 |
+| --- | --- | --- |
+| `--suite` | `black_box` | 选择 `all`、`black_box`、`grey_box` 或 `white_box` |
+| `--agent` | `codebuddy` | 选择被测 Agent 产品 |
+| `--output-dir` | `artifacts` | 设置运行产物父目录 |
+| `--repeat` | `1` | 设置业务测试重复次数 |
+| `--business-workers` | `1` | 设置单卷业务测试的 worker 数量，可选 1 至 4 |
+| `--smoke-timeout` | `900` | 设置冒烟阶段总超时，单位为秒 |
+| `--business-timeout` | `86400` | 设置业务阶段总超时，单位为秒 |
+| `--business-manifest` | 无 | 只运行清单列出的单卷用例，不能与 `--suite all` 同用 |
+
+例如，使用四个 worker 执行灰盒卷：
+
+```bash
+uv run agent-test \
+  --agent codebuddy \
+  --suite grey_box \
+  --business-workers 4
+```
+
+CodeBuddy 并行执行前必须配置已认证的 `CODEBUDDY_CONFIG_DIR`。`--suite all` 会依次执行三套卷，不会跨卷并行。
+
+查看完整命令帮助：
+
+```bash
+uv run agent-test --help
+```
+
+## 查看报告
+
+每次运行会在以下目录创建独立产物：
 
 ```text
-agent_test_tool/ 正式工作流入口、四态结果采集及 ReportLab PDF 报告
-agent_models/   Agent Model 抽象与各 CLI 产品实现
-assertions/      传统逻辑断言及 Judge 智能断言
-test_cases/     pytest 公共测试用例
-test_cases/smoke/     五条正式冒烟门禁
-test_cases/black_box/ 工作簿 B001-B042 黑盒卷及公共执行逻辑
-assets/         测试用例共用静态资源
-configs/        产品配置示例
-tests/          框架离线回归与本地协议集成验证
-artifacts/      逐次运行的本地脱敏证据（Git 忽略）
-AGENTS.md       Agent 协作与开发约定
+artifacts/<RUN_ID>/
 ```
+
+主要文件包括：
+
+| 文件 | 内容 |
+| --- | --- |
+| `report.pdf` | 用于阅读和交付的 PDF 测评报告 |
+| `report.json` | 完整结构化测评结果 |
+| `smoke-results.json` | 冒烟测试结果 |
+| `business*.json` | 业务测试及各测评卷的结构化结果 |
+| `*.stdout.log` / `*.stderr.log` | 各执行阶段的控制台日志 |
+
+完整 PDF 报告包含冒烟测试、黑盒测试、灰盒测试和白盒测试，各测评卷分别展示总体结果和
+用例详情。
+
+冒烟测试必须全部通过，工具才会继续执行业务测试。冒烟未通过时仍会生成冒烟报告；业务
+测试中存在“不通过”时，命令会返回非零退出码，但仍会正常生成报告。
+
+## 结果状态
+
+| 状态 | 含义 |
+| --- | --- |
+| 通过 | 用例执行完成，结果满足判定要求 |
+| 不通过 | 被测行为不满足要求，或执行过程中发生错误 |
+| 不适用 | 当前产品或测试条件不具备用例所需能力 |
+| 无法判定 | 操作已经执行，但现有证据不足以形成结论 |
+
+## 使用注意事项
+
+- 请确保测试账号具有足够的模型调用额度。
+- 不要在测试工作区放置个人文件、生产凭据或无法恢复的数据。
+- `.env`、访问令牌、账号配置、会话数据和运行产物不应提交到代码仓库。
+- 并行执行会增加账号和外部服务压力，建议先使用默认串行模式验证环境。
