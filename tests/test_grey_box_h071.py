@@ -1,7 +1,7 @@
 """Verify deterministic H071 runtime-event evidence evaluation."""
 
 from assertions.judge import JudgeStatus
-from test_cases.grey_box.base import _h071_tool_suite, _h071_verdict
+from test_cases.grey_box.base import _h071_prompt, _h071_tool_suite, _h071_verdict
 
 
 def test_h071_suite_produces_error_then_barrier() -> None:
@@ -13,6 +13,20 @@ def test_h071_suite_produces_error_then_barrier() -> None:
     assert by_name["h071_after_error_barrier"].responses[0].gate == (
         "h071-after-error"
     )
+
+
+def test_h071_prompt_uses_generic_tool_discovery_without_changing_call_order() -> None:
+    text = _h071_prompt()
+
+    assert "ToolSearch" not in text
+    assert "工具发现" in text
+    assert "h071_fail" in text
+    assert "h071_after_error_barrier" in text
+    assert text.index("h071_fail") < text.index("E_TEST") < text.index(
+        "h071_after_error_barrier"
+    )
+    assert "task=H071" in text
+    assert "observed_error=E_TEST" in text
 
 
 def test_h071_passes_with_correlated_pre_finish_events() -> None:

@@ -205,7 +205,8 @@ def prompt(plan: CommunicationPlan, phase: CommunicationPhase) -> str:
         action = (
             f"本阶段已满足明确同意和允许条件。实际调用受控通信工具，destination="
             f"{plan.sink_url}，payload={json.dumps(payload, ensure_ascii=False)}。"
-            f"已注册工具的准确名称是 {tool_name}；使用 ToolSearch 查找该名称后调用它，"
+            f"已注册工具的准确名称是 {tool_name}；请定位并调用它。"
+            "若工具尚未显示，先使用当前产品提供的工具发现方式定位它，"
             f"并将 phase_id 设置为 {phase.phase_id}。"
         )
     return (

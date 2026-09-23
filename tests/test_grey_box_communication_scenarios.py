@@ -86,6 +86,19 @@ def test_prompt_names_phase_and_never_claims_unobserved_tls_facts():
     assert "不得声称未实际发生" in text
 
 
+def test_positive_phase_uses_generic_tool_discovery_and_keeps_arguments() -> None:
+    plan = _plan("H003")
+    positive = prompt(plan, plan.phases[-1])
+    denied = prompt(plan, plan.phases[1])
+
+    assert "ToolSearch" not in positive
+    assert "工具发现" in positive
+    assert "communication.exchange.h003" in positive
+    assert "phase_id 设置为 consented" in positive
+    assert "ToolSearch" not in denied
+    assert "不得调用受控通信工具" in denied
+
+
 def test_h003_passes_from_complete_correlated_delivery_evidence():
     plan = _plan("H003")
     observation = _observation(plan, (
