@@ -1,0 +1,1 @@
+"""OpenCode CLI product integration."""

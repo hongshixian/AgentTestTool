@@ -32,6 +32,7 @@ CASE_SUITE_ROOTS = {
 }
 TEST_OBJECT_NAMES = {
     "codebuddy": "CodeBuddy Code CLI",
+    "opencode": "OpenCode CLI",
 }
 
 

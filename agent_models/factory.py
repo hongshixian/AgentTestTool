@@ -6,6 +6,7 @@ import os
 from collections.abc import Sequence
 from contextlib import AbstractContextManager
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from agent_models.base import AgentModel
 from configs.environment import sensitive_environment_values
@@ -42,6 +43,79 @@ class AgentModelFactory:
         if os.environ.get("AGENT_TEST_EVIDENCE_PROFILE", "").strip() == "black_box":
             enable_network_capture = False
         normalized = product.strip().lower()
+        if normalized == "opencode":
+            from agent_models.environment.session import ControlledEnvironment
+            from agent_models.opencode.driver import OpenCodeDriver
+            from agent_models.opencode.model import OpenCodeAgentModel
+            from agent_models.opencode.profile import DEFAULT_TEST_MODEL, OpenCodeTestProfile
+            from evidence_collectors.base import CollectionContext
+            from evidence_collectors.manager import EvidenceCollectorManager
+            from evidence_collectors.network import HttpsMitmCollector
+
+            config_path = os.environ.get("OPENCODE_TEST_CONFIG", "").strip()
+            profile = OpenCodeTestProfile(
+                model=os.environ.get("OPENCODE_TEST_MODEL", "").strip() or DEFAULT_TEST_MODEL,
+                source=Path(config_path).expanduser() if config_path else None,
+            )
+            try:
+                environment = ControlledEnvironment(
+                    workspace,
+                    evidence_directory=evidence_directory,
+                    assets_root=assets_root,
+                    run_id=run_id,
+                    secrets=(*sensitive_environment_values(), *secrets, profile.secret),
+                )
+            except BaseException:
+                profile.close()
+                raise
+            collector_manager: EvidenceCollectorManager | None = None
+            try:
+                case_path = (test_case_id or "").replace("\\", "/")
+                if enable_network_capture and "/grey_box/" in case_path:
+                    endpoint = urlsplit(profile.provider_base_url)
+                    if endpoint.scheme != "https" or not endpoint.hostname:
+                        raise ValueError("OpenCode test provider has no HTTPS endpoint for evidence capture")
+                    collector_manager = EvidenceCollectorManager((
+                        HttpsMitmCollector(
+                            mitm_hosts=(endpoint.hostname,),
+                            base_environment=profile.process_environment(),
+                        ),
+                    ))
+                    launch = collector_manager.prepare(CollectionContext(
+                        run_id=environment.run_id,
+                        test_case_id=test_case_id or "unassigned-test-case",
+                        product="opencode",
+                        workspace=workspace,
+                        evidence_dir=environment.evidence_directory,
+                        secrets=(*sensitive_environment_values(), *secrets, profile.secret),
+                        acquisition_methods=("Q04-network-interception",),
+                    ))
+                    collector_manager.start()
+                    profile.set_launch_overrides(launch.environment_overrides)
+                hook_capture = None
+                if "/grey_box/" in case_path:
+                    from agent_models.opencode.hooks.capture import OpenCodeHookCapture
+
+                    hook_capture = OpenCodeHookCapture(
+                        evidence_directory=environment.evidence_directory,
+                        workspace=workspace,
+                        run_id=environment.run_id,
+                    )
+                    profile.attach_hook_capture(hook_capture)
+                return OpenCodeAgentModel(
+                    workspace=workspace,
+                    profile=profile,
+                    driver=OpenCodeDriver(workspace=workspace, profile=profile),
+                    environment=environment,
+                    collector_manager=collector_manager,
+                    hook_capture=hook_capture,
+                )
+            except BaseException:
+                if collector_manager is not None:
+                    collector_manager.close()
+                environment.close()
+                profile.close()
+                raise
         if normalized == "codebuddy":
             from agent_models.codebuddy.driver import CodeBuddyDriver
             from agent_models.codebuddy.evidence import CodeBuddyCommandEvidenceProvider
