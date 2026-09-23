@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -104,7 +105,7 @@ def _harness(source_root: tuple[Path, dict[str, str], Path]) -> OpenCodeWhiteBox
     root, hashes, cli = source_root
     return OpenCodeWhiteBoxHarness(
         root, cli_command=(sys.executable, str(cli)),
-        binary_path=cli, expected_hashes=hashes,
+        binary_path=Path(sys.executable), expected_hashes=hashes,
     )
 
 
@@ -116,7 +117,8 @@ def test_permission_probe_executes_pinned_source_with_spy(
 
     assert probe.binding.installed_version == "1.18.32"
     assert probe.binding.source_hashes == source_root[1]
-    assert probe.binding.installed_binary_sha256 == _sha(source_root[2].read_bytes())
+    assert probe.binding.installed_binary_sha256 == _sha(Path(sys.executable).read_bytes())
+    assert not probe.binding.version_binary_identity_verified
     assert probe.observed_decisions == {"allow", "deny", "ask", "error"}
     assert [item.get("action", item.get("error")) for item in probe.observations] == [
         "allow", "deny", "ask", "TypeError",
@@ -166,6 +168,71 @@ def test_wrong_installed_version_fails_closed(source_root: tuple[Path, dict[str,
 
     with pytest.raises(WhiteBoxBindingError, match="Installed OpenCode version"):
         _harness(source_root).bind()
+
+
+def test_version_command_cannot_bind_to_another_binary_digest(
+    source_root: tuple[Path, dict[str, str], Path],
+) -> None:
+    root, hashes, cli = source_root
+    harness = OpenCodeWhiteBoxHarness(
+        root, cli_command=(sys.executable, str(cli)),
+        binary_path=cli, expected_hashes=hashes,
+    )
+
+    with pytest.raises(WhiteBoxBindingError, match="CLI executable does not match binary_path"):
+        harness.bind()
+
+
+def test_version_from_command_with_extra_arguments_is_not_certified(
+    source_root: tuple[Path, dict[str, str], Path],
+) -> None:
+    root, hashes, cli = source_root
+    harness = OpenCodeWhiteBoxHarness(
+        root, cli_command=(sys.executable, str(cli)),
+        binary_path=Path(sys.executable), expected_hashes=hashes,
+    )
+
+    binding = harness.bind()
+
+    assert not binding.version_binary_identity_verified
+    assert binding.installed_binary_sha256 == _sha(Path(sys.executable).read_bytes())
+
+
+def test_single_executable_version_and_digest_can_be_bound(
+    source_root: tuple[Path, dict[str, str], Path], monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root, hashes, _ = source_root
+    harness = OpenCodeWhiteBoxHarness(
+        root, cli_command=(sys.executable,),
+        binary_path=Path(sys.executable), expected_hashes=hashes,
+    )
+    monkeypatch.setattr(
+        "agent_models.opencode.whitebox.subprocess.run",
+        lambda command, **kwargs: subprocess.CompletedProcess(command, 0, "1.18.32\n"),
+    )
+
+    assert harness.bind().version_binary_identity_verified
+
+
+def test_version_query_uses_the_resolved_binary_that_is_hashed(
+    source_root: tuple[Path, dict[str, str], Path], monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    root, hashes, _ = source_root
+    harness = OpenCodeWhiteBoxHarness(
+        root, cli_command=("opencode-fixture",),
+        binary_path=Path(sys.executable), expected_hashes=hashes,
+    )
+    calls = []
+    monkeypatch.setattr("agent_models.opencode.whitebox.shutil.which", lambda name: sys.executable)
+
+    def run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        calls.append(tuple(command))
+        return subprocess.CompletedProcess(command, 0, "1.18.32\n")
+
+    monkeypatch.setattr("agent_models.opencode.whitebox.subprocess.run", run)
+
+    assert harness.bind().version_binary_identity_verified
+    assert calls == [(str(Path(sys.executable).resolve()), "--version")]
 
 
 def test_wrong_package_version_even_with_matching_digest_is_rejected(

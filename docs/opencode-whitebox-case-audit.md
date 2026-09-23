@@ -140,13 +140,26 @@ only the nearest inspected boundary, **not evidence that the feature exists**.
 ## Interpretation and next acceptance gate
 
 `C` means a plausible source-level entry, **not** that a script can already pass.
-The existing `agent_models/opencode/whitebox.py` POC confirms only the pinned
-production **permission rule function**, not W062's executor behavior. No
-product-provided log is treated as a verified security audit record without
+The offline probes in `agent_models/opencode/whitebox.py`, `whitebox_w062.py`,
+`whitebox_w066.py`, and `whitebox_cancel.py` execute selected, hash-checked
+production function bodies. W062's local probe also observes an executor
+wrapper, but none of these probes exercises the full production entry or
+establishes every required branch and Spy. They are **not executable W cases**.
+No product-provided log is treated as a verified security audit record without
 checking its producer and serialized bytes. `G` applies to the *unmodified
 built-in product* under the original case specification, not to hypothetical
 plugins or features we might implement later. `U` requires a spec/product
 semantics review before converting a placeholder into an executable test.
+
+A pinned `v1.18.32` checkout builds a working Linux CLI using the pinned Bun
+and lockfile. Its executable hash differs from the installed npm executable,
+and independent builds were not byte-for-byte identical. The source probes
+therefore cannot assert coverage of the installed binary. The next harness
+must either establish deployment provenance or explicitly assess the tested
+source-built binary as a separate target. Of the 86 W cases, 4 have initial
+source entries (`C`), 29 require semantic confirmation (`U`), and 53 have no
+established native equivalent for an essential requirement (`G`). None has
+yet passed the complete acceptance gate.
 
 Start with W062, W066, W085 and W086. For **each** claimed executable case require:
 

@@ -41,6 +41,7 @@ class SourceBinding:
     source_hashes: Mapping[str, str]
     installed_version: str
     installed_binary_sha256: str
+    version_binary_identity_verified: bool = False
 
 
 @dataclass(frozen=True)
@@ -157,6 +158,19 @@ def _isolated_env(root: Path) -> dict[str, str]:
     return env
 
 
+def _copy_verified_source(source_root: Path, binding: SourceBinding, relative: str, target: Path) -> None:
+    """Snapshot a bound file and verify the bytes passed to the source probe."""
+    try:
+        data = (source_root / relative).read_bytes()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+        actual = _digest(target)
+    except OSError as error:
+        raise WhiteBoxBindingError(f"Bound source snapshot unavailable: {relative}") from error
+    if actual != binding.source_hashes.get(relative):
+        raise WhiteBoxBindingError(f"Bound source digest changed after binding: {relative}")
+
+
 class OpenCodeWhiteBoxHarness:
     """Bounded source-function probe; never claims full production-path coverage."""
 
@@ -203,16 +217,17 @@ class OpenCodeWhiteBoxHarness:
             if commit != self.expected_commit:
                 raise WhiteBoxBindingError("Checkout revision does not match pinned release tag")
 
-        binary = self.binary_path
-        if binary is None:
-            located = shutil.which(self.cli_command[0])
-            if located is None:
-                raise WhiteBoxBindingError("OpenCode executable is not installed")
-            binary = Path(located)
-        binary = binary.resolve(strict=True)
+        located = shutil.which(self.cli_command[0])
+        if located is None:
+            raise WhiteBoxBindingError("OpenCode executable is not installed")
+        command_binary = Path(located).resolve(strict=True)
+        binary = self.binary_path.resolve(strict=True) if self.binary_path is not None else command_binary
+        if binary != command_binary:
+            raise WhiteBoxBindingError("CLI executable does not match binary_path")
         with tempfile.TemporaryDirectory(prefix="opencode-whitebox-version-") as temp:
             version = subprocess.run(
-                [*self.cli_command, "--version"], cwd=temp, env=_isolated_env(Path(temp)),
+                [str(command_binary), *self.cli_command[1:], "--version"],
+                cwd=temp, env=_isolated_env(Path(temp)),
                 capture_output=True, text=True, timeout=15, check=False,
             )
         if version.returncode != 0 or version.stdout.strip() != RELEASE:
@@ -224,6 +239,7 @@ class OpenCodeWhiteBoxHarness:
             source_hashes=observed,
             installed_version=version.stdout.strip(),
             installed_binary_sha256=_digest(binary),
+            version_binary_identity_verified=len(self.cli_command) == 1,
         )
 
     def reproduce_build(
@@ -252,7 +268,10 @@ class OpenCodeWhiteBoxHarness:
             raise WhiteBoxBindingError("Two builds produced different artifacts")
         return BuildEvidence(
             command=tuple(command), artifact=artifact, artifact_sha256=digests[0],
-            repetitions=2, matches_installed_binary=digests[0] == binding.installed_binary_sha256,
+            repetitions=2,
+            matches_installed_binary=(
+                binding.version_binary_identity_verified and digests[0] == binding.installed_binary_sha256
+            ),
         )
 
     def probe_permission_rule(self) -> PermissionProbe:
