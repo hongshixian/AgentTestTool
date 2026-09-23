@@ -3,7 +3,8 @@
 AgentTestTool 是一个面向 Agent CLI 产品的自动化测评工具。它可以运行真实的被测
 Agent，执行标准化测试用例，并自动生成结构化结果和 PDF 测评报告。
 
-当前已支持腾讯 **CodeBuddy Code CLI**。测试驱动默认显式使用 `hy3` 模型。
+当前支持腾讯 **CodeBuddy Code CLI** 和 **OpenCode CLI**。CodeBuddy 默认使用 `hy3`；
+OpenCode 默认使用配置好的 `iiis/infi/deepseek-v4.1-flash`。
 
 ## 主要功能
 
@@ -19,7 +20,7 @@ Agent，执行标准化测试用例，并自动生成结构化结果和 PDF 测�
 | --- | ---: | --- |
 | 黑盒测试 | 42 | 根据用户可观察的输入、输出和外部行为进行判断 |
 | 灰盒测试 | 81 | 结合更丰富的 Agent 执行证据进行判断 |
-| 白盒测试 | 86 | 记录需要源码、测试构建或内部观测能力的要求；当前统一标记为不适用 |
+| 白盒测试 | 86 | 记录需要源码、测试构建或内部观测能力的要求；当前脚本统一标记为不适用 |
 
 ## 快速开始
 
@@ -29,8 +30,8 @@ Agent，执行标准化测试用例，并自动生成结构化结果和 PDF 测�
 
 - Python 3.11 或更高版本；
 - `uv`；
-- 已安装的 CodeBuddy CLI，入口命令为 `codebuddy`；
-- 已登录并可正常调用模型的专用测试账号；
+- 已安装的目标 CLI：`codebuddy` 或 `opencode`；
+- 可调用的测试模型；CodeBuddy 需要已登录的专用测试账号，OpenCode 默认使用配置了 API Key 的 IIIS 模型；
 - 执行灰盒测试或完整三套卷时可用的 Judge API。
 
 请使用专用测试账号和可清理的测试数据，不要使用个人账号或生产账号。
@@ -59,20 +60,32 @@ JUDGE_API_KEY=your-api-key
 JUDGE_MODEL_NAME=your-model-name
 ```
 
-如果需要使用独立的 CodeBuddy 测试账号配置目录，可以设置：
+使用 CodeBuddy 时，如果需要使用独立的测试账号配置目录，可以设置：
 
 ```dotenv
 CODEBUDDY_CONFIG_DIR=/path/to/codebuddy-test-profile
 ```
 
-该目录应当已经通过 CodeBuddy 官方登录流程完成认证。其他测试身份和可选配置请参考
-`.env.example`。不要将 `.env` 提交到 Git 仓库。
+该目录应当已经通过 CodeBuddy 官方登录流程完成认证。
 
-确认 CodeBuddy 已安装并能够正常启动：
+使用 OpenCode 时，请设置独立的模型供应商配置文件；该文件中的 API Key 应引用环境变量或
+密钥文件，不要直接写入配置正文：
+
+```dotenv
+OPENCODE_TEST_CONFIG=/path/to/dedicated/opencode.json
+OPENCODE_TEST_MODEL=iiis/infi/deepseek-v4.1-flash
+IIIS_API_KEY=your-dedicated-test-api-key
+```
+
+具体配置格式见 [OpenCode 使用说明](docs/opencode-adapter.md)。使用默认 IIIS 模型无需
+登录 OpenCode 账号，但需要可用的供应商 API Key。其他可选配置请参考 `.env.example`。
+不要将 `.env`、密钥文件或真实账号配置提交到 Git 仓库。
+
+确认被测 CLI 已安装并能够正常启动，例如：
 
 ```bash
 codebuddy --version
-codebuddy
+opencode --version
 ```
 
 ### 4. 运行测评
@@ -99,6 +112,12 @@ uv run agent-test --agent codebuddy --suite white_box
 uv run agent-test --agent codebuddy --suite all
 ```
 
+运行 OpenCode 的完整三套卷：
+
+```bash
+uv run agent-test --agent opencode --suite all
+```
+
 完整测评会调用真实 Agent 和真实网络服务，可能需要较长时间。运行期间请保持账号、网络和
 Judge API 可用。
 
@@ -107,7 +126,7 @@ Judge API 可用。
 | 参数 | 默认值 | 说明 |
 | --- | --- | --- |
 | `--suite` | `black_box` | 选择 `all`、`black_box`、`grey_box` 或 `white_box` |
-| `--agent` | `codebuddy` | 选择被测 Agent 产品 |
+| `--agent` | `codebuddy` | 选择 `codebuddy` 或 `opencode` |
 | `--output-dir` | `artifacts` | 设置运行产物父目录 |
 | `--repeat` | `1` | 设置业务测试重复次数 |
 | `--business-workers` | `1` | 设置单卷业务测试的 worker 数量，可选 1 至 4 |
@@ -125,6 +144,7 @@ uv run agent-test \
 ```
 
 CodeBuddy 并行执行前必须配置已认证的 `CODEBUDDY_CONFIG_DIR`。`--suite all` 会依次执行三套卷，不会跨卷并行。
+OpenCode 首版建议使用默认的单 worker 执行。
 
 查看完整命令帮助：
 
@@ -168,6 +188,7 @@ artifacts/<RUN_ID>/
 ## 使用注意事项
 
 - 请确保测试账号具有足够的模型调用额度。
+- OpenCode 的白盒卷目前仍为占位用例；各卷的适配范围见 [OpenCode 使用说明](docs/opencode-adapter.md)。
 - 不要在测试工作区放置个人文件、生产凭据或无法恢复的数据。
 - `.env`、访问令牌、账号配置、会话数据和运行产物不应提交到代码仓库。
 - 并行执行会增加账号和外部服务压力，建议先使用默认串行模式验证环境。
