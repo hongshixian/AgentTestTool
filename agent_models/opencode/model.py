@@ -92,7 +92,7 @@ class OpenCodeAgentModel(AgentModel):
                 and self._hook_capture is not None
                 and self.profile.model == DEFAULT_TEST_MODEL
             ),
-            white_box_case_ids=frozenset({"W062"}),
+            white_box_case_ids=frozenset({"W062", "W066", "W085", "W086"}),
         )
 
     def execute_white_box_case(self, request: WhiteBoxCaseRequest) -> WhiteBoxCaseResult:
@@ -101,6 +101,12 @@ class OpenCodeAgentModel(AgentModel):
         The source-runtime target is deliberately separate from the installed
         npm CLI binary; the result records that target distinction.
         """
+        if request.case_id == "W066":
+            return self._execute_w066(request)
+        if request.case_id == "W085":
+            return self._execute_w085(request)
+        if request.case_id == "W086":
+            return self._execute_w086(request)
         if request.case_id != "W062":
             raise NotImplementedError(
                 f"OpenCode white-box case is not implemented: {request.case_id}"
@@ -289,6 +295,517 @@ class OpenCodeAgentModel(AgentModel):
             execution_completed=runtime.complete,
             cleanup_completed=runtime.cleanup_completed,
             metrics=metrics, evidence=bundle,
+            artifact_refs=(str(artifact), str(bundle_artifact)),
+        )
+
+    def _execute_w066(self, request: WhiteBoxCaseRequest) -> WhiteBoxCaseResult:
+        expected_variants = ("normal_text", "injection_text", "empty_string", "valid_json")
+        if tuple(request.variants) != expected_variants:
+            raise ValueError("W066 requires the four workbook tool-result variants in order")
+        source_value = os.environ.get("OPENCODE_WHITEBOX_SOURCE", "").strip()
+        bun_value = os.environ.get("OPENCODE_WHITEBOX_BUN", "").strip()
+        if not source_value or not bun_value:
+            raise RuntimeError(
+                "W066 source-runtime target requires OPENCODE_WHITEBOX_SOURCE and "
+                "OPENCODE_WHITEBOX_BUN"
+            )
+        from agent_models.opencode.whitebox import OpenCodeWhiteBoxHarness, SOURCE_HASHES
+        from agent_models.opencode.whitebox_w066_runtime import (
+            W066_RUNTIME_SOURCE_HASHES, run_w066_runtime_harness,
+        )
+
+        runtime = run_w066_runtime_harness(
+            OpenCodeWhiteBoxHarness(
+                Path(source_value),
+                expected_hashes={**SOURCE_HASHES, **W066_RUNTIME_SOURCE_HASHES},
+            ),
+            bun_command=(bun_value,), run_id=self.environment.run_id,
+            timeout=request.timeout_seconds,
+        )
+        observed_at = datetime.now(timezone.utc).isoformat()
+        product_source = EvidenceSource(
+            provider="opencode-whitebox-harness", channel="source-runtime-bun",
+            authority=EvidenceAuthority.PRODUCT_RUNTIME, product="opencode",
+            product_version=runtime.binding.release, observed_at=observed_at,
+        )
+        observed_source = EvidenceSource(
+            provider="opencode-whitebox-harness", channel="source-runtime-observation",
+            authority=EvidenceAuthority.EVALUATOR_OBSERVED, product="opencode",
+            product_version=runtime.binding.release, observed_at=observed_at,
+        )
+        controlled_source = EvidenceSource(
+            provider="opencode-whitebox-harness", channel="evaluator-controlled-run",
+            authority=EvidenceAuthority.EVALUATOR_CONTROLLED, product="opencode",
+            product_version=runtime.binding.release, observed_at=observed_at,
+        )
+        correlation = EvidenceCorrelation(run_id=self.environment.run_id)
+        variants = [dict(item) for item in runtime.variants]
+        code_data = {
+            "Case_ID": request.case_id, "Repeat_Index": request.repeat_index,
+            "Target": "OpenCode source-runtime target",
+            "Commit_ID": runtime.binding.checkout_commit or runtime.binding.tag_commit,
+            "Build_Config": f"pinned-checkout-runtime; Bun {runtime.bun_version}; frozen bun.lock",
+            "Entry_Point": "SessionProcessor tool-result -> MessageV2 -> LLMRequestPrep.prepare",
+            "Source_Location": dict(runtime.source_locations),
+            "Source_Hashes": dict(runtime.binding.source_hashes),
+            "Dependency_Command": list(runtime.dependency_command),
+            "Dependency_Exit_Code": runtime.dependency_exit_code,
+            "Dependency_Output_SHA256": runtime.dependency_output_sha256,
+            "Test_Command": list(runtime.test_command),
+            "Test_Exit_Code": runtime.test_exit_code,
+            "Branch_Tag": "w066_four_tool_result_variants",
+            "Expected_Branch_Tags": [
+                "processor.tool-result", "message-v2.tool-result",
+                "request-prep.messages",
+            ],
+            "Visited_Branch_Tags": sorted({
+                tag for item in variants for tag in item.get("branch_tags", [])
+            }),
+            "Production_Imports": list(runtime.production_imports),
+            "Installed_CLI_Binary_Is_Target": False,
+        }
+        spy_data = {
+            "Case_ID": request.case_id, "Phase_ID": "all",
+            "Events": variants,
+            "Uncalled_Functions": [],
+            "Processed_Return_Count": runtime.processed_return_count,
+            "Elevated_To_System_Message_Count": runtime.elevated_to_system_message_count,
+            "Unchecked_Return_Count": runtime.unchecked_return_count,
+            "Unchecked_Return_Count_Status": EvidenceStatus.UNVERIFIED.value,
+            "Checker_Evidence_Limitations": [
+                item.get("checker_observation_limitation") for item in variants
+            ],
+        }
+        state_data = {
+            "Case_ID": request.case_id, "Phase_ID": "all",
+            "State": "tool_results_persisted_and_projected_to_provider",
+            "User_ID": "source-runtime-fixture",
+            "Instance_ID": "source-runtime-instance",
+            "Task_ID": "source-runtime-w066",
+            "Object_ID": "tool_result_message",
+            "Provider_Roles": {
+                item["variant"]: item.get("provider_roles", []) for item in variants
+            },
+            "Bytes_After_Cleanup": 0,
+            "Resource_Limits": {"variant_count": 4},
+            "Cleanup_Completed": runtime.cleanup_completed,
+        }
+        control_data = {
+            "Run_ID": self.environment.run_id, "Case_ID": request.case_id,
+            "Repeat_Index": request.repeat_index, "Phase_ID": "all",
+            "Collector_Ready": runtime.dependency_exit_code == 0 and runtime.test_exit_code == 0,
+            "Positive_Control_OK": runtime.processed_return_count == 4,
+            "Collection_Complete": runtime.complete and not runtime.missing_evidence,
+            "Coverage_Manifest": list(request.variants),
+            "Target_Kind": "source-runtime",
+            "User_Action": "project_tool_results_to_provider_messages",
+            "Action_Ack_At": variants[0].get("started_at"),
+            "Observation_End_At": variants[-1].get("ended_at"),
+            "Clock_Source": "bun_wall_clock_utc",
+            "Dropped_Event_Count": 0,
+        }
+        records = tuple(
+            EvidenceRecord(
+                evidence_id=evidence_id, evidence_type=evidence_type,
+                phase=EvidencePhase.AFTER, data=data, source=source,
+                correlation=correlation, proves=proves,
+            )
+            for evidence_id, evidence_type, data, source, proves in (
+                ("white_box_code", "code_coverage", code_data, product_source, ("pinned tool-result processing path",)),
+                ("white_box_spy", "runtime_spy", spy_data, product_source, ("provider-visible tool-result projection",)),
+                ("white_box_state", "runtime_state", state_data, observed_source, ("stored and projected tool-result state",)),
+                ("white_box_control", "run_control", control_data, controlled_source, ("run correlation and collection completeness",)),
+            )
+        )
+        bundle = EvidenceBundle(
+            sample_id=request.case_id, prompt_id="01", run_id=self.environment.run_id,
+            transcript=(), records=records,
+        )
+        available_metrics = {
+            "Processed_Return_Count": runtime.processed_return_count,
+            "Elevated_To_System_Message_Count": runtime.elevated_to_system_message_count,
+        }
+        artifact_metrics = {
+            **available_metrics,
+            "Unchecked_Return_Count": {
+                "value": runtime.unchecked_return_count,
+                "status": EvidenceStatus.UNVERIFIED.value,
+            },
+        }
+        artifact = self.environment.ledger.save_artifact(
+            "white_box_w066_runtime",
+            {"schema_version": "ats.opencode.w066.v1", "code": code_data,
+             "spy": spy_data, "state": state_data, "control": control_data,
+             "metrics": artifact_metrics,
+             "missing_evidence": list(runtime.missing_evidence)},
+        )
+        bundle_artifact = self.environment.archive_bundle(
+            bundle, name="white_box_w066_evidence_bundle"
+        )
+        metric_ids = ("white_box_spy", "white_box_control")
+        return WhiteBoxCaseResult(
+            case_id=request.case_id, repeat_index=request.repeat_index,
+            execution_completed=runtime.complete,
+            cleanup_completed=runtime.cleanup_completed,
+            metrics=(
+                *(
+                    WhiteBoxMetric(name, value, EvidenceStatus.AVAILABLE, metric_ids)
+                    for name, value in available_metrics.items()
+                ),
+                WhiteBoxMetric(
+                    "Unchecked_Return_Count", runtime.unchecked_return_count,
+                    EvidenceStatus.UNVERIFIED, metric_ids,
+                ),
+            ),
+            evidence=bundle,
+            missing_evidence=runtime.missing_evidence,
+            artifact_refs=(str(artifact), str(bundle_artifact)),
+        )
+
+    def _execute_w085(self, request: WhiteBoxCaseRequest) -> WhiteBoxCaseResult:
+        expected_variants = ("model_generation", "waiting_tool", "between_steps")
+        if tuple(request.variants) != expected_variants:
+            raise ValueError("W085 requires the three workbook stop points in order")
+        source_value = os.environ.get("OPENCODE_WHITEBOX_SOURCE", "").strip()
+        bun_value = os.environ.get("OPENCODE_WHITEBOX_BUN", "").strip()
+        if not source_value or not bun_value:
+            raise RuntimeError(
+                "W085 source-runtime target requires OPENCODE_WHITEBOX_SOURCE and "
+                "OPENCODE_WHITEBOX_BUN"
+            )
+        from agent_models.opencode.whitebox import OpenCodeWhiteBoxHarness, SOURCE_HASHES
+        from agent_models.opencode.whitebox_cancel import (
+            CANCEL_HASHES, OpenCodeWhiteBoxCancelHarness,
+        )
+        from agent_models.opencode.whitebox_w085_runtime import (
+            W085_RUNTIME_SOURCE_HASHES, run_w085_runtime_harness,
+        )
+
+        base = OpenCodeWhiteBoxHarness(
+            Path(source_value),
+            expected_hashes={**SOURCE_HASHES, **CANCEL_HASHES, **W085_RUNTIME_SOURCE_HASHES},
+        )
+        runtime = run_w085_runtime_harness(
+            OpenCodeWhiteBoxCancelHarness(
+                base.source_root, cli_command=base.cli_command,
+                binary_path=base.binary_path, expected_hashes=base.expected_hashes,
+            ),
+            bun_command=(bun_value,), run_id=self.environment.run_id,
+            timeout=request.timeout_seconds,
+        )
+        observed_at = datetime.now(timezone.utc).isoformat()
+        product_source = EvidenceSource(
+            provider="opencode-whitebox-harness", channel="source-runtime-bun",
+            authority=EvidenceAuthority.PRODUCT_RUNTIME, product="opencode",
+            product_version=runtime.binding.release, observed_at=observed_at,
+        )
+        observed_source = EvidenceSource(
+            provider="opencode-whitebox-harness", channel="source-runtime-observation",
+            authority=EvidenceAuthority.EVALUATOR_OBSERVED, product="opencode",
+            product_version=runtime.binding.release, observed_at=observed_at,
+        )
+        controlled_source = EvidenceSource(
+            provider="opencode-whitebox-harness", channel="evaluator-controlled-run",
+            authority=EvidenceAuthority.EVALUATOR_CONTROLLED, product="opencode",
+            product_version=runtime.binding.release, observed_at=observed_at,
+        )
+        correlation = EvidenceCorrelation(run_id=self.environment.run_id)
+        phases = [dict(item) for item in runtime.phases]
+        code_data = {
+            "Case_ID": request.case_id, "Repeat_Index": request.repeat_index,
+            "Target": "OpenCode source-runtime target",
+            "Commit_ID": runtime.binding.checkout_commit or runtime.binding.tag_commit,
+            "Build_Config": f"pinned-checkout-runtime; Bun {runtime.bun_version}; frozen bun.lock",
+            "Entry_Point": "SessionPrompt.cancel -> SessionRunState.cancel -> Runner/processor/model/tool",
+            "Source_Location": dict(runtime.source_locations),
+            "Source_Hashes": dict(runtime.binding.source_hashes),
+            "Dependency_Command": list(runtime.dependency_command),
+            "Dependency_Exit_Code": runtime.dependency_exit_code,
+            "Dependency_Output_SHA256": runtime.dependency_output_sha256,
+            "Test_Command": list(runtime.test_command),
+            "Test_Exit_Code": runtime.test_exit_code,
+            "Branch_Tag": "w085_three_stop_points",
+            "Expected_Branch_Tags": [
+                "session_prompt.cancel", "session_run_state.cancel",
+                "runner.cancel", "processor.interrupt",
+            ],
+            "Visited_Branch_Tags": sorted({
+                tag for phase in phases for tag in phase.get("branch_tags", [])
+            }),
+            "Production_Imports": list(runtime.production_imports),
+            "Installed_CLI_Binary_Is_Target": False,
+        }
+        spy_data = {
+            "Case_ID": request.case_id, "Phase_ID": "all",
+            "Events": [event for phase in phases for event in phase.get("events", [])],
+            "Uncalled_Functions": [
+                f"async_cancel:{operation}"
+                for phase in phases
+                for operation in phase.get("expected_async_cancels", [])
+                if operation not in phase.get("observed_async_cancels", [])
+            ],
+            "Raw_Phases": phases,
+            "New_Model_Starts_After_Stop": runtime.new_model_starts_after_stop,
+            "New_Tool_Starts_After_Stop": runtime.new_tool_starts_after_stop,
+            "Missing_Async_Cancel_Count": runtime.missing_async_cancel_count,
+        }
+        state_data = {
+            "Case_ID": request.case_id, "Phase_ID": "all",
+            "State": "runner_idle_after_each_stop",
+            "User_ID": "source-runtime-fixture",
+            "Instance_ID": "source-runtime-instance",
+            "Task_ID": "source-runtime-w085",
+            "Object_ID": "session_execution_loop",
+            "Runner_Idle_After": {
+                phase["phase_id"]: phase.get("runner_idle_after") for phase in phases
+            },
+            "Bytes_After_Cleanup": 0,
+            "Resource_Limits": {"stop_point_count": 3, "case_timeout_seconds": request.timeout_seconds},
+            "Cleanup_Completed": runtime.cleanup_completed,
+        }
+        control_data = {
+            "Run_ID": self.environment.run_id, "Case_ID": request.case_id,
+            "Repeat_Index": request.repeat_index, "Phase_ID": "all",
+            "Collector_Ready": runtime.dependency_exit_code == 0 and runtime.test_exit_code == 0,
+            "Positive_Control_OK": all(phase.get("model_starts", 0) >= 1 for phase in phases),
+            "Collection_Complete": runtime.complete and runtime.async_cancel_metric_verified,
+            "Coverage_Manifest": list(request.variants),
+            "Target_Kind": "source-runtime",
+            "User_Action": "cancel_session",
+            "Action_Ack_At": phases[0].get("stop_acknowledged_at"),
+            "Observation_End_At": phases[-1].get("ended_at"),
+            "Clock_Source": "bun_wall_clock_utc_and_effect_scheduler",
+            "Dropped_Event_Count": 0,
+        }
+        records = tuple(
+            EvidenceRecord(
+                evidence_id=evidence_id, evidence_type=evidence_type,
+                phase=EvidencePhase.AFTER, data=data, source=source,
+                correlation=correlation, proves=proves,
+            )
+            for evidence_id, evidence_type, data, source, proves in (
+                ("white_box_code", "code_coverage", code_data, product_source, ("pinned cancellation path and stop points",)),
+                ("white_box_spy", "runtime_spy", spy_data, product_source, ("model, tool and async cancel calls",)),
+                ("white_box_state", "runtime_state", state_data, observed_source, ("runner terminal state",)),
+                ("white_box_control", "run_control", control_data, controlled_source, ("run correlation and collection completeness",)),
+            )
+        )
+        bundle = EvidenceBundle(
+            sample_id=request.case_id, prompt_id="01", run_id=self.environment.run_id,
+            transcript=(), records=records,
+        )
+        metrics = {
+            "New_Model_Starts_After_Stop": runtime.new_model_starts_after_stop,
+            "New_Tool_Starts_After_Stop": runtime.new_tool_starts_after_stop,
+            "Missing_Async_Cancel_Count": runtime.missing_async_cancel_count,
+        }
+        metric_statuses = {
+            "New_Model_Starts_After_Stop": EvidenceStatus.AVAILABLE,
+            "New_Tool_Starts_After_Stop": EvidenceStatus.AVAILABLE,
+            "Missing_Async_Cancel_Count": (
+                EvidenceStatus.AVAILABLE
+                if runtime.async_cancel_metric_verified
+                else EvidenceStatus.UNVERIFIED
+            ),
+        }
+        artifact = self.environment.ledger.save_artifact(
+            "white_box_w085_runtime",
+            {"schema_version": "ats.opencode.w085.v1", "code": code_data,
+             "spy": spy_data, "state": state_data, "control": control_data,
+             "metrics": {
+                 name: {"value": value, "status": metric_statuses[name].value}
+                 for name, value in metrics.items()
+             },
+             "missing_evidence": list(runtime.missing_evidence)},
+        )
+        bundle_artifact = self.environment.archive_bundle(
+            bundle, name="white_box_w085_evidence_bundle"
+        )
+        metric_ids = ("white_box_spy", "white_box_control")
+        return WhiteBoxCaseResult(
+            case_id=request.case_id, repeat_index=request.repeat_index,
+            execution_completed=runtime.complete,
+            cleanup_completed=runtime.cleanup_completed,
+            metrics=tuple(
+                WhiteBoxMetric(name, value, metric_statuses[name], metric_ids)
+                for name, value in metrics.items()
+            ),
+            evidence=bundle,
+            missing_evidence=runtime.missing_evidence,
+            artifact_refs=(str(artifact), str(bundle_artifact)),
+        )
+
+    def _execute_w086(self, request: WhiteBoxCaseRequest) -> WhiteBoxCaseResult:
+        if tuple(request.variants) != ("chain_a_b_c", "cycle_a_b_a"):
+            raise ValueError("W086 requires the two workbook task graphs in order")
+        source_value = os.environ.get("OPENCODE_WHITEBOX_SOURCE", "").strip()
+        bun_value = os.environ.get("OPENCODE_WHITEBOX_BUN", "").strip()
+        if not source_value or not bun_value:
+            raise RuntimeError(
+                "W086 source-runtime target requires OPENCODE_WHITEBOX_SOURCE and "
+                "OPENCODE_WHITEBOX_BUN"
+            )
+        from agent_models.opencode.whitebox_cancel import (
+            CANCEL_HASHES, OpenCodeWhiteBoxCancelHarness,
+        )
+        from agent_models.opencode.whitebox_w086_runtime import (
+            W086_RUNTIME_SOURCE_HASHES, run_w086_runtime_harness,
+        )
+
+        runtime = run_w086_runtime_harness(
+            OpenCodeWhiteBoxCancelHarness(
+                Path(source_value),
+                expected_hashes={**CANCEL_HASHES, **W086_RUNTIME_SOURCE_HASHES},
+            ),
+            bun_command=(bun_value,),
+            run_id=self.environment.run_id,
+            timeout=request.timeout_seconds,
+        )
+        observed_at = datetime.now(timezone.utc).isoformat()
+        product_source = EvidenceSource(
+            provider="opencode-whitebox-harness", channel="source-runtime-bun",
+            authority=EvidenceAuthority.PRODUCT_RUNTIME, product="opencode",
+            product_version=runtime.binding.release, observed_at=observed_at,
+        )
+        observed_source = EvidenceSource(
+            provider="opencode-whitebox-harness", channel="source-runtime-observation",
+            authority=EvidenceAuthority.EVALUATOR_OBSERVED, product="opencode",
+            product_version=runtime.binding.release, observed_at=observed_at,
+        )
+        controlled_source = EvidenceSource(
+            provider="opencode-whitebox-harness", channel="evaluator-controlled-run",
+            authority=EvidenceAuthority.EVALUATOR_CONTROLLED, product="opencode",
+            product_version=runtime.binding.release, observed_at=observed_at,
+        )
+        correlation = EvidenceCorrelation(run_id=self.environment.run_id)
+        phases = [dict(item) for item in runtime.phases]
+        expected_tags = [
+            "background_job.real_registration",
+            "session_run_state.top_level_cancel",
+            "background_job.real_cancel",
+            "cancel_traversal.terminated",
+            "background_job.dispatch_positive_control",
+            "background_job.post_cancel_dispatch_window",
+        ]
+        code_data = {
+            "Case_ID": request.case_id, "Repeat_Index": request.repeat_index,
+            "Target": "OpenCode source-runtime target",
+            "Commit_ID": runtime.binding.checkout_commit or runtime.binding.tag_commit,
+            "Build_Config": f"pinned-checkout-runtime; Bun {runtime.bun_version}; frozen bun.lock",
+            "Entry_Point": "BackgroundJob.start -> SessionRunState.cancel -> BackgroundJob.cancel",
+            "Source_Location": dict(runtime.source_locations),
+            "Source_Hashes": dict(runtime.binding.source_hashes),
+            "Dependency_Command": list(runtime.dependency_command),
+            "Dependency_Exit_Code": runtime.dependency_exit_code,
+            "Dependency_Output_SHA256": runtime.dependency_output_sha256,
+            "Test_Command": list(runtime.test_command),
+            "Test_Exit_Code": runtime.test_exit_code,
+            "Branch_Tag": "w086_chain_and_cycle",
+            "Expected_Branch_Tags": expected_tags,
+            "Visited_Branch_Tags": sorted({
+                tag for phase in phases for tag in phase.get("branch_tags", [])
+            }),
+            "Production_Imports": list(runtime.production_imports),
+            "Installed_CLI_Binary_Is_Target": False,
+        }
+        spy_data = {
+            "Case_ID": request.case_id, "Phase_ID": "all",
+            "Events": [
+                event for phase in phases for event in phase.get("events", [])
+            ],
+            "Uncalled_Functions": [
+                f"BackgroundJob.start:after_cancel:{phase['phase_id']}"
+                for phase in phases if not phase.get("new_child_dispatch_ids")
+            ],
+            "Raw_Phases": phases,
+            "Uncancelled_Child_Count": runtime.uncancelled_child_count,
+            "New_Child_Dispatch_Count": runtime.new_child_dispatch_count,
+            "Cancel_Traversal_Terminated": runtime.cancel_traversal_terminated,
+            "Positive_Control_Dispatch_Observed": all(
+                phase.get("positive_control_dispatch_observed") is True for phase in phases
+            ),
+            "Dispatch_Ready_IDs": {
+                phase["phase_id"]: list(phase.get("dispatch_ready_ids", [])) for phase in phases
+            },
+            "Dispatch_Finished_IDs": {
+                phase["phase_id"]: list(phase.get("dispatch_finished_ids", [])) for phase in phases
+            },
+            "Dispatch_Observation_Completed": all(
+                phase.get("dispatch_observation_completed") is True for phase in phases
+            ),
+        }
+        state_data = {
+            "Case_ID": request.case_id, "Phase_ID": "all",
+            "State": "registered_child_graphs_cancelled",
+            "User_ID": "source-runtime-fixture",
+            "Instance_ID": "source-runtime-instance",
+            "Task_ID": "source-runtime-w086",
+            "Object_ID": "background_job_graph",
+            "State_By_Phase": {
+                phase["phase_id"]: phase.get("state_after", {}) for phase in phases
+            },
+            "Bytes_After_Cleanup": 0,
+            "Resource_Limits": {"max_graph_nodes": 3, "cancel_timeout_seconds": 30},
+            "Cleanup_Completed": runtime.cleanup_completed,
+        }
+        control_data = {
+            "Run_ID": self.environment.run_id, "Case_ID": request.case_id,
+            "Repeat_Index": request.repeat_index, "Phase_ID": "all",
+            "Collector_Ready": all(phase.get("collector_ready") is True for phase in phases),
+            "Positive_Control_OK": all(phase.get("positive_control_ok") is True for phase in phases),
+            "Collection_Complete": runtime.complete,
+            "Coverage_Manifest": list(request.variants),
+            "Target_Kind": "source-runtime",
+            "User_Action": "cancel_top_level_session",
+            "Action_Ack_At": phases[0].get("action_ack_at"),
+            "Observation_End_At": phases[-1].get("observation_end_at"),
+            "Clock_Source": "runtime_iso_and_effect_scheduler",
+            "Dropped_Event_Count": sum(int(phase.get("dropped_event_count", 0)) for phase in phases),
+            "Dispatch_Observation_Completed": all(
+                phase.get("dispatch_observation_completed") is True for phase in phases
+            ),
+        }
+        records = tuple(
+            EvidenceRecord(
+                evidence_id=evidence_id, evidence_type=evidence_type,
+                phase=EvidencePhase.AFTER, data=data, source=source,
+                correlation=correlation, proves=proves,
+            )
+            for evidence_id, evidence_type, data, source, proves in (
+                ("white_box_code", "code_coverage", code_data, product_source, ("pinned cancellation entry and branches",)),
+                ("white_box_spy", "runtime_spy", spy_data, product_source, ("registration and cancellation calls",)),
+                ("white_box_state", "runtime_state", state_data, observed_source, ("child and cleanup states",)),
+                ("white_box_control", "run_control", control_data, controlled_source, ("run correlation and collection completeness",)),
+            )
+        )
+        bundle = EvidenceBundle(
+            sample_id=request.case_id, prompt_id="01",
+            run_id=self.environment.run_id, transcript=(), records=records,
+        )
+        metrics = {
+            "Uncancelled_Child_Count": runtime.uncancelled_child_count,
+            "New_Child_Dispatch_Count": runtime.new_child_dispatch_count,
+            "Cancel_Traversal_Terminated": runtime.cancel_traversal_terminated,
+        }
+        artifact = self.environment.ledger.save_artifact(
+            "white_box_w086_runtime",
+            {"schema_version": "ats.opencode.w086.v1", "code": code_data,
+             "spy": spy_data, "state": state_data, "control": control_data,
+             "metrics": metrics},
+        )
+        bundle_artifact = self.environment.archive_bundle(
+            bundle, name="white_box_w086_evidence_bundle"
+        )
+        metric_ids = ("white_box_spy", "white_box_control")
+        return WhiteBoxCaseResult(
+            case_id=request.case_id, repeat_index=request.repeat_index,
+            execution_completed=runtime.complete,
+            cleanup_completed=runtime.cleanup_completed,
+            metrics=tuple(
+                WhiteBoxMetric(name, value, EvidenceStatus.AVAILABLE, metric_ids)
+                for name, value in metrics.items()
+            ),
+            evidence=bundle,
             artifact_refs=(str(artifact), str(bundle_artifact)),
         )
 

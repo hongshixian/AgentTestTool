@@ -81,22 +81,25 @@ uv run agent-test --agent opencode --suite all
 - **灰盒 81 条**：使用产品运行事件、受控工具、插件 Hook 和可用的网络证据。
   抓到部分事件不代表获得了完整、可信的当前回合 Trace；缺少必要的网络请求关联、
   工具生命周期或确认证据时，不得据此判通过，按用例要求报告证据不足或不适用。
-- **白盒 86 条**：W062 已接入固定 OpenCode v1.18.32 源码运行时 Harness，
-  覆盖 allow、deny、not_listed、error 四个真实生产授权分支；其余 85 条仍是
-  占位用例。W062 的结果只归属于明确登记的 source-runtime 目标，不归属于本机
-  npm 安装二进制；源码可阅读或局部探针成功也不等于其他白盒用例已实现。逐条源码
-  适配分析见 [白盒用例审查](opencode-whitebox-case-audit.md)。
+- **白盒 86 条**：W062、W066、W085、W086 已接入固定 OpenCode v1.18.32
+  source-runtime Harness，其余 82 条仍为占位用例。四条结果只归属于明确登记的
+  source-runtime 目标，不归属于本机 npm 安装二进制。当前实测结果为 W062/W086
+  通过，W085 不通过，W066 无法判定；不通过表示真实生产路径已执行并取得有效
+  不符合证据，无法判定表示仍缺少原题要求的可验证检查边界。
+  逐条源码适配分析见 [白盒用例审查](opencode-whitebox-case-audit.md)。
 
-单独运行 W062 需要准备固定源码树和 Bun 1.3.14：
+单独运行任一已实现白盒用例需要准备固定源码树和 Bun 1.3.14：
 
 ```bash
 OPENCODE_WHITEBOX_SOURCE=/path/to/opencode-v1.18.32-source \
 OPENCODE_WHITEBOX_BUN=/path/to/bun-1.3.14 \
 uv run pytest -q test_cases/white_box/test_w062.py --agent opencode --case-suite white_box
+# 将 test_w062.py 替换为 test_w066.py、test_w085.py 或 test_w086.py 可分别执行。
 ```
 
-Harness 只替换确定性的 MCP 外部端点和测试存储；Permission、SessionTools 和 MCP
-dispatch 保持源码真实实现，并把 CODE/SPY/STATE/CONTROL 证据写入本次运行目录。
+Harness 只替换原题允许的确定性外部依赖和测试存储；被测控制、消息装配、
+取消传播和任务注册代码保持源码真实实现，并把 CODE/SPY/STATE/CONTROL 证据
+写入本次运行目录。
 
 公共用例中用于放置 Agent 指令的文件优先使用 `AGENTS.md`，实际读取行为
 以被测 OpenCode 版本为准。没有产品原生支持的身份、实例或服务端能力，

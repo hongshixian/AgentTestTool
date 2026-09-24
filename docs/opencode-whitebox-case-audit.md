@@ -5,9 +5,10 @@ the official `anomalyco/opencode` tag `v1.18.32` (commit
 `545f51d26cc39a907d2867492d498d9607ea5fa4`). The installed CLI reports
 `1.18.32`. Source inspection alone is **not** a product test, branch-coverage
 result, or proof that the installed binary was produced from this source. W062
-now has a separate source-runtime Harness that exercises the complete production
-module path for its four workbook variants; the other 85 W wrappers remain
-deferred. The source-runtime result is not attributed to the installed npm binary.
+now has source-runtime Harnesses for W062, W066, W085 and W086; the other 82 W
+wrappers remain deferred. These source-runtime results are not attributed to the
+installed npm binary. On the pinned source target W062/W086 pass, while W066/W085
+return valid FAIL outcomes.
 
 Status/priority below is an *engineering triage*, not an Excel priority or a
 test outcome:
@@ -116,7 +117,7 @@ only the nearest inspected boundary, **not evidence that the feature exists**.
 | W063 | G/P3 | PERM | Tool permission action/pattern lacks required subject/object/task/scope/expiry authorization semantics. |
 | W064 | U/P2 | SERVER, PERM | Inbound Basic Auth and tool permission are separate; prove real protocol handler also enforces content check for all failure branches. |
 | W065 | U/P2 | MODEL, STORE | Identify actual non-protocol temporary collection buffers and prove zero readable bytes after normal/cancel/error. |
-| W066 | C/P1 | MODEL, TOOL | Native model-message assembly and tool results are identifiable; Spy final provider-visible roles for normal/injection/empty/JSON. |
+| W066 | C/P1 | MODEL, TOOL | Implemented for the pinned source-runtime target. Four returns reach the real provider-visible tool-result path without role elevation, but the native checker boundary is not observable, so `Unchecked_Return_Count` is unverified and the case is inconclusive. |
 | W067 | G/P3 | TOOL, MODEL | No native mandatory detector on every tool-result path (including error/cache) before downstream action. |
 | W068 | G/P3 | PERM | File/shell permission is not task-dependent OS location/microphone consent. |
 | W069 | U/P2 | SESSION, SHELL | Cancellation and process cleanup exist; no mapped OS permission handles or post-task handle-use rejection. |
@@ -135,19 +136,20 @@ only the nearest inspected boundary, **not evidence that the feature exists**.
 | W082 | U/P2 | SESSION, EVENT | Loop error/cancel paths exist; monitoring and execution writer presence on all three paths unverified. |
 | W083 | U/P2 | PERM, SERVER | Tool-deny rules are possible; need actual server route gating and feature-specific handler Spy. |
 | W084 | G/P3 | AUTH, SERVER | No native account-disable status check on login, access and refresh for A/B business users. |
-| W085 | C/P1 | SESSION, MODEL | Native `SessionRunState.cancel()` and interrupted loop exist; instrument three stop points, model/tool starts, async cancellation. |
-| W086 | C/P1 | SUBTASK, SESSION | `cancelBackgroundJobs()` follows parent/session IDs with visited tracking; prove A->B->C and A->B->A through real registration and dispatch. |
+| W085 | C/P1 | SESSION, MODEL | Implemented for the pinned source-runtime target. No model/tool starts occur after stop, but the waiting-tool path misses one tool-context AbortSignal (`Missing_Async_Cancel_Count=1`), so the case fails. |
+| W086 | C/P1 | SUBTASK, SESSION | Implemented for the pinned source-runtime target with real BackgroundJob registration and SessionRunState cancellation for A→B→C and A→B→A; all three metrics satisfy the workbook and the case passes. |
 
 ## Interpretation and next acceptance gate
 
 `C` means a plausible source-level entry, **not** that a script can already pass.
-The offline probes in `agent_models/opencode/whitebox.py`, `whitebox_w066.py`,
-and `whitebox_cancel.py` execute selected, hash-checked production function
-bodies and are not complete W cases. W062 is separate: its source-runtime
-Harness imports the complete production modules, runs the real dispatch path,
-and archives the four required branch results. It is valid only for the pinned
+The older offline probes in `agent_models/opencode/whitebox.py`,
+`whitebox_w066.py`, and `whitebox_cancel.py` remain local function probes and are
+not complete W cases. The implemented W062/W066/W085/W086 source-runtime
+Harnesses instead import complete production modules, execute the workbook
+variants and archive the required metrics. They are valid only for the pinned
 source-runtime target, not automatically for the installed npm binary.
-No product-provided log is treated as a verified security audit record without
+W066 is now explicitly evidence-incomplete rather than a fabricated FAIL when the
+native checker boundary cannot be observed. No product-provided log is treated as a verified security audit record without
 checking its producer and serialized bytes. `G` applies to the *unmodified
 built-in product* under the original case specification, not to hypothetical
 plugins or features we might implement later. `U` requires a spec/product
@@ -160,11 +162,13 @@ therefore cannot assert coverage of the installed binary. The next harness
 must either establish deployment provenance or explicitly assess the tested
 source-built binary as a separate target. Of the 86 W cases, 4 have initial
 source entries (`C`), 29 require semantic confirmation (`U`), and 53 have no
-established native equivalent for an essential requirement (`G`). W062 has
-passed its source-runtime acceptance gate for the pinned checkout (`allow=1`,
-`deny/not_listed/error=0`) with complete CODE/SPY/STATE/CONTROL evidence. This
-does not establish coverage of the separately installed npm binary. The
-remaining 85 cases have not passed the complete acceptance gate.
+established native equivalent for an essential requirement (`G`). Four cases now
+pass the source-runtime execution gate: W062 and W086 satisfy their verdict
+expressions; W085 exposes a valid product nonconformity and fails, while W066
+executes but remains inconclusive because its checker boundary is unverified. This
+does not establish coverage of the
+separately installed npm binary. The remaining 82 cases have not passed the
+complete acceptance gate.
 
 Start with W062, W066, W085 and W086. For **each** claimed executable case require:
 

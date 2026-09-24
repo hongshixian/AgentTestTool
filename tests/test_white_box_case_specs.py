@@ -30,7 +30,7 @@ def test_white_box_wrappers_match_implementation_status() -> None:
         assert "send_prompt" not in source
         if case_id in IMPLEMENTED_CASE_IDS:
             assert 'IMPLEMENTATION_MODE = "implemented"' in source
-            assert "execute_w062_case" in source
+            assert f"execute_{case_id.lower()}_case" in source
             assert "conclude_not_applicable" not in source
             assert "当前暂未实现" not in source
         else:
@@ -46,14 +46,14 @@ def test_generated_wrapper_is_reproducible() -> None:
     ).read_text(encoding="utf-8")
 
 
-def test_manifest_marks_only_w062_as_implemented() -> None:
+def test_manifest_marks_reviewed_white_box_cases_as_implemented() -> None:
     manifest = build_manifest(WORKBOOK, CLAUSES)
     cases = {case["case_id"]: case for case in manifest["cases"]}
 
-    assert manifest["implemented_case_ids"] == ["W062"]
-    assert cases["W062"]["deferred_reason"] == ""
+    assert manifest["implemented_case_ids"] == ["W062", "W066", "W085", "W086"]
+    assert all(cases[case_id]["deferred_reason"] == "" for case_id in IMPLEMENTED_CASE_IDS)
     assert all(
         case["deferred_reason"]
         for case_id, case in cases.items()
-        if case_id != "W062"
+        if case_id not in IMPLEMENTED_CASE_IDS
     )

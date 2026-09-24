@@ -17,7 +17,7 @@ except ModuleNotFoundError:
 SHEET_NAME = "01-测试题目"
 WHITE_BOX_LABEL = "白盒卷"
 EXPECTED_CASE_IDS = tuple(f"W{index:03d}" for index in range(1, 87))
-IMPLEMENTED_CASE_IDS = frozenset({"W062"})
+IMPLEMENTED_CASE_IDS = frozenset({"W062", "W066", "W085", "W086"})
 
 
 def _clauses(path: Path) -> dict[str, dict[str, str]]:
