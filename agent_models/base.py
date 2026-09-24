@@ -20,6 +20,7 @@ from agent_models.interaction import (
 )
 from agent_models.result import AuthResult, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
+from agent_models.white_box import WhiteBoxCaseRequest, WhiteBoxCaseResult
 
 
 class AgentModel(ABC):
@@ -122,6 +123,14 @@ class AgentModel(ABC):
         """Request product-native termination of one background task."""
 
         raise NotImplementedError("This product has no background task control")
+
+    def execute_white_box_case(
+        self,
+        request: WhiteBoxCaseRequest,
+    ) -> WhiteBoxCaseResult:
+        """Run one product-specific source harness behind a shared interface."""
+
+        raise NotImplementedError("This product has no white-box harness")
 
     @abstractmethod
     def capture_evidence(self, request: EvidenceRequest) -> tuple[EvidenceRecord, ...]:

@@ -4,6 +4,9 @@
   "source_sheet": "01-测试题目",
   "suite": "white_box",
   "case_count": 86,
+  "implemented_case_ids": [
+    "W062"
+  ],
   "cases": [
     {
       "case_id": "W001",
@@ -4341,7 +4344,7 @@
       "security_domain": "交互安全",
       "clause_title": "工具调用的用户授权",
       "clause_original_text": "智能体应用调用工具前，应获得用户授权；智能体应用只能调用用户授权过的工具。",
-      "deferred_reason": "缺少与被测部署版本匹配的源码、可复现测试构建、真实生产入口、可替换内部依赖、代码调用 Spy 及控制分支清单，无法执行白盒分支核验"
+      "deferred_reason": ""
     },
     {
       "case_id": "W063",

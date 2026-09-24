@@ -43,3 +43,4 @@ class AgentCapabilities:
     resource_state_evidence: bool = False
     persistent_memory_state: bool = False
     persistent_memory_state_control: bool = False
+    white_box_case_ids: frozenset[str] = frozenset()

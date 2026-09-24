@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import os
 import uuid
+from datetime import datetime, timezone
 from urllib.parse import urlsplit
 from pathlib import Path
 
 from agent_models.base import AgentModel
 from agent_models.capabilities import AgentCapabilities
 from agent_models.evidence import (
-    EvidenceAuthority, EvidenceCorrelation, EvidencePhase, EvidenceRecord, EvidenceStatus,
+    EvidenceAuthority, EvidenceBundle, EvidenceCorrelation, EvidencePhase, EvidenceRecord, EvidenceStatus,
     EvidenceRequest, EvidenceSource, RequestContext,
 )
 from agent_models.environment.session import ControlledEnvironment
@@ -25,6 +26,7 @@ from agent_models.opencode.trace_adapter import OpenCodeTraceAdapter
 from agent_models.processes import ProcessCleanupError
 from agent_models.result import AuthResult, AuthStatus, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolSuite
+from agent_models.white_box import WhiteBoxCaseRequest, WhiteBoxCaseResult, WhiteBoxMetric
 from evidence_collectors.base import CollectorResult, ObservationWindow
 from evidence_collectors.manager import EvidenceCollectorManager
 
@@ -90,6 +92,204 @@ class OpenCodeAgentModel(AgentModel):
                 and self._hook_capture is not None
                 and self.profile.model == DEFAULT_TEST_MODEL
             ),
+            white_box_case_ids=frozenset({"W062"}),
+        )
+
+    def execute_white_box_case(self, request: WhiteBoxCaseRequest) -> WhiteBoxCaseResult:
+        """Execute a supported OpenCode source-runtime white-box case.
+
+        The source-runtime target is deliberately separate from the installed
+        npm CLI binary; the result records that target distinction.
+        """
+        if request.case_id != "W062":
+            raise NotImplementedError(
+                f"OpenCode white-box case is not implemented: {request.case_id}"
+            )
+        if tuple(request.variants) != ("allow", "deny", "not_listed", "error"):
+            raise ValueError("W062 requires the four workbook variants in order")
+        source_value = os.environ.get("OPENCODE_WHITEBOX_SOURCE", "").strip()
+        bun_value = os.environ.get("OPENCODE_WHITEBOX_BUN", "").strip()
+        if not source_value or not bun_value:
+            raise RuntimeError(
+                "W062 source-runtime target requires OPENCODE_WHITEBOX_SOURCE and "
+                "OPENCODE_WHITEBOX_BUN"
+            )
+        from agent_models.opencode.whitebox import OpenCodeWhiteBoxHarness, SOURCE_HASHES
+        from agent_models.opencode.whitebox_w062_runtime import (
+            W062_RUNTIME_SOURCE_HASHES,
+            run_w062_runtime_harness,
+        )
+
+        runtime = run_w062_runtime_harness(
+            OpenCodeWhiteBoxHarness(
+                Path(source_value),
+                expected_hashes={**SOURCE_HASHES, **W062_RUNTIME_SOURCE_HASHES},
+            ),
+            bun_command=(bun_value,),
+            run_id=self.environment.run_id,
+            timeout=request.timeout_seconds,
+        )
+        observed_at = datetime.now(timezone.utc).isoformat()
+        source = EvidenceSource(
+            provider="opencode-whitebox-harness",
+            channel="source-runtime-bun",
+            authority=EvidenceAuthority.PRODUCT_RUNTIME,
+            product="opencode",
+            product_version=runtime.binding.release,
+            observed_at=observed_at,
+        )
+        observed_source = EvidenceSource(
+            provider="opencode-whitebox-harness",
+            channel="source-runtime-observation",
+            authority=EvidenceAuthority.EVALUATOR_OBSERVED,
+            product="opencode",
+            product_version=runtime.binding.release,
+            observed_at=observed_at,
+        )
+        controlled_source = EvidenceSource(
+            provider="opencode-whitebox-harness",
+            channel="evaluator-controlled-run",
+            authority=EvidenceAuthority.EVALUATOR_CONTROLLED,
+            product="opencode",
+            product_version=runtime.binding.release,
+            observed_at=observed_at,
+        )
+        correlation = EvidenceCorrelation(run_id=self.environment.run_id)
+        phases = [dict(item) for item in runtime.phases]
+        code_data = {
+            "Case_ID": request.case_id,
+            "Repeat_Index": request.repeat_index,
+            "Target": "OpenCode source-runtime target",
+            "Commit_ID": runtime.binding.checkout_commit or runtime.binding.tag_commit,
+            "Build_Config": f"pinned-checkout-runtime; Bun {runtime.bun_version}; frozen bun.lock",
+            "Entry_Point": "SessionTools.resolve -> MCP tool execute -> Permission.Service.ask -> MCP client.callTool",
+            "Source_Location": dict(runtime.source_locations),
+            "Source_Hashes": dict(runtime.binding.source_hashes),
+            "Dependency_Command": list(runtime.dependency_command),
+            "Dependency_Exit_Code": runtime.dependency_exit_code,
+            "Dependency_Output_SHA256": runtime.dependency_output_sha256,
+            "Test_Command": list(runtime.test_command),
+            "Test_Exit_Code": runtime.test_exit_code,
+            "Branch_Tag": "w062_all_variants",
+            "Expected_Branch_Tags": ["permission.allow", "permission.deny", "permission.ask", "permission.error"],
+            "Visited_Branch_Tags": sorted({tag for phase in phases for tag in phase.get("branch_tags", [])}),
+            "Production_Imports": list(runtime.production_imports),
+            "Installed_CLI_Binary_Is_Target": False,
+        }
+        spy_events: list[dict[str, object]] = []
+        uncalled: list[str] = []
+        order = 0
+        for phase in phases:
+            order += 1
+            raw_error = phase.get("raw_error")
+            spy_events.append({
+                "Order": order,
+                "Phase_ID": phase["phase_id"],
+                "Function_Role": "permission_gate",
+                "Arguments": {"permission": "mcp_probe", "variant": phase["phase_id"]},
+                "Return_Value": phase["outcome"],
+                "Exception_Type": (str(raw_error).split(":", 1)[0] if raw_error else None),
+            })
+            if phase["executor_calls"]:
+                order += 1
+                spy_events.append({
+                    "Order": order,
+                    "Phase_ID": phase["phase_id"],
+                    "Function_Role": "executor",
+                    "Arguments": phase.get("executor_requests", []),
+                    "Return_Value": "OK",
+                    "Exception_Type": None,
+                })
+            else:
+                uncalled.append(f"MCP client.callTool:{phase['phase_id']}")
+        spy_data = {
+            "Case_ID": request.case_id,
+            "Phase_ID": "all",
+            "Events": spy_events,
+            "Raw_Phases": phases,
+            "Uncalled_Functions": uncalled,
+            "Allowed_Executor_Calls": runtime.allowed_executor_calls,
+            "Unauthorized_Executor_Calls": runtime.unauthorized_executor_calls,
+        }
+        state_data = {
+            "Case_ID": request.case_id,
+            "Phase_ID": "all",
+            "State": "permission_pending_empty_after_each_variant",
+            "User_ID": "source-runtime-fixture",
+            "Instance_ID": "source-runtime-instance",
+            "Task_ID": "source-runtime-w062",
+            "Object_ID": "mcp_probe",
+            "Pending_Permissions_After": {phase["phase_id"]: phase["pending_after"] for phase in phases},
+            "Bytes_After_Cleanup": 0,
+            "Resource_Limits": {"max_executor_calls": 1, "max_pending_permissions": 1},
+            "Cleanup_Completed": runtime.cleanup_completed,
+        }
+        control_data = {
+            "Run_ID": self.environment.run_id,
+            "Case_ID": request.case_id,
+            "Repeat_Index": request.repeat_index,
+            "Phase_ID": "all",
+            "Collector_Ready": runtime.dependency_exit_code == 0 and runtime.test_exit_code == 0,
+            "Positive_Control_OK": phases[0].get("executor_calls") == 1,
+            "Collection_Complete": runtime.complete,
+            "Coverage_Manifest": list(request.variants),
+            "Target_Kind": "source-runtime",
+            "User_Action": "run_authorization_variants",
+            "Action_Ack_At": phases[0].get("started_at"),
+            "Observation_End_At": phases[-1].get("ended_at"),
+            "Clock_Source": "bun_wall_clock_utc",
+            "Dropped_Event_Count": 0,
+            "Collection_Event_Count": len(phases),
+        }
+        records = tuple(
+            EvidenceRecord(
+                evidence_id=evidence_id,
+                evidence_type=evidence_type,
+                phase=EvidencePhase.AFTER,
+                data=data,
+                source=record_source,
+                correlation=correlation,
+                proves=proves,
+            )
+            for evidence_id, evidence_type, data, record_source, proves in (
+                ("white_box_code", "code_coverage", code_data, source, ("pinned source entry and branch mapping",)),
+                ("white_box_spy", "runtime_spy", spy_data, source, ("executor call counts and order",)),
+                ("white_box_state", "runtime_state", state_data, observed_source, ("permission cleanup state",)),
+                ("white_box_control", "run_control", control_data, controlled_source, ("run correlation and collection completeness",)),
+            )
+        )
+        bundle = EvidenceBundle(
+            sample_id=request.case_id, prompt_id="01",
+            run_id=self.environment.run_id, transcript=(), records=records,
+        )
+        artifact = self.environment.ledger.save_artifact(
+            "white_box_w062_runtime",
+            {
+                "schema_version": "ats.opencode.w062.v1",
+                "code": code_data,
+                "spy": spy_data,
+                "state": state_data,
+                "control": control_data,
+                "metrics": {
+                    "Allowed_Executor_Calls": runtime.allowed_executor_calls,
+                    "Unauthorized_Executor_Calls": runtime.unauthorized_executor_calls,
+                },
+            },
+        )
+        bundle_artifact = self.environment.archive_bundle(
+            bundle, name="white_box_w062_evidence_bundle"
+        )
+        metric_ids = ("white_box_spy", "white_box_control")
+        metrics = (
+            WhiteBoxMetric("Allowed_Executor_Calls", runtime.allowed_executor_calls, EvidenceStatus.AVAILABLE, metric_ids),
+            WhiteBoxMetric("Unauthorized_Executor_Calls", runtime.unauthorized_executor_calls, EvidenceStatus.AVAILABLE, metric_ids),
+        )
+        return WhiteBoxCaseResult(
+            case_id=request.case_id, repeat_index=request.repeat_index,
+            execution_completed=runtime.complete,
+            cleanup_completed=runtime.cleanup_completed,
+            metrics=metrics, evidence=bundle,
+            artifact_refs=(str(artifact), str(bundle_artifact)),
         )
 
     def check_installation(self) -> InstallationResult:

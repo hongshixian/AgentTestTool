@@ -3,10 +3,11 @@
 Scope: `configs/white_box_cases.json` (`W001`-`W086`, 86 cases), compared with
 the official `anomalyco/opencode` tag `v1.18.32` (commit
 `545f51d26cc39a907d2867492d498d9607ea5fa4`). The installed CLI reports
-`1.18.32`. Source inspection is **not** a product test, branch-coverage result,
-or proof that the installed binary was produced from this source. Every current
-W wrapper still returns "not applicable"; **0/86 full white-box cases have
-been implemented or passed**. No external model was called for this audit.
+`1.18.32`. Source inspection alone is **not** a product test, branch-coverage
+result, or proof that the installed binary was produced from this source. W062
+now has a separate source-runtime Harness that exercises the complete production
+module path for its four workbook variants; the other 85 W wrappers remain
+deferred. The source-runtime result is not attributed to the installed npm binary.
 
 Status/priority below is an *engineering triage*, not an Excel priority or a
 test outcome:
@@ -111,7 +112,7 @@ only the nearest inspected boundary, **not evidence that the feature exists**.
 | W059 | G/P3 | MODEL, TOOL | No mandatory output detector covering text, tool, attachment, streaming send points. |
 | W060 | U/P2 | TOOL, MCP | Tool schema/argument parsing exists; prove weather/calc field allowlist actually strips unrelated context fields. |
 | W061 | G/P3 | PERM, MCP | Rule-based tool permissions are not a known-malicious-tool recognizer with unavailable fail-closed path. |
-| W062 | C/P1 | PERM, TOOL | Probe covers real `evaluate()` allow/deny/default ask/error rules; next instrument production `ask()` -> tool dispatcher/executor, all four variants and call counts. |
+| W062 | C/P1 | PERM, TOOL | Implemented for the pinned source-runtime target: real `Permission.Service`, `SessionTools.resolve()` and MCP executor path; four variants and executor counts are archived. It is not attributed to the installed npm binary. |
 | W063 | G/P3 | PERM | Tool permission action/pattern lacks required subject/object/task/scope/expiry authorization semantics. |
 | W064 | U/P2 | SERVER, PERM | Inbound Basic Auth and tool permission are separate; prove real protocol handler also enforces content check for all failure branches. |
 | W065 | U/P2 | MODEL, STORE | Identify actual non-protocol temporary collection buffers and prove zero readable bytes after normal/cancel/error. |
@@ -140,11 +141,12 @@ only the nearest inspected boundary, **not evidence that the feature exists**.
 ## Interpretation and next acceptance gate
 
 `C` means a plausible source-level entry, **not** that a script can already pass.
-The offline probes in `agent_models/opencode/whitebox.py`, `whitebox_w062.py`,
-`whitebox_w066.py`, and `whitebox_cancel.py` execute selected, hash-checked
-production function bodies. W062's local probe also observes an executor
-wrapper, but none of these probes exercises the full production entry or
-establishes every required branch and Spy. They are **not executable W cases**.
+The offline probes in `agent_models/opencode/whitebox.py`, `whitebox_w066.py`,
+and `whitebox_cancel.py` execute selected, hash-checked production function
+bodies and are not complete W cases. W062 is separate: its source-runtime
+Harness imports the complete production modules, runs the real dispatch path,
+and archives the four required branch results. It is valid only for the pinned
+source-runtime target, not automatically for the installed npm binary.
 No product-provided log is treated as a verified security audit record without
 checking its producer and serialized bytes. `G` applies to the *unmodified
 built-in product* under the original case specification, not to hypothetical
@@ -158,8 +160,11 @@ therefore cannot assert coverage of the installed binary. The next harness
 must either establish deployment provenance or explicitly assess the tested
 source-built binary as a separate target. Of the 86 W cases, 4 have initial
 source entries (`C`), 29 require semantic confirmation (`U`), and 53 have no
-established native equivalent for an essential requirement (`G`). None has
-yet passed the complete acceptance gate.
+established native equivalent for an essential requirement (`G`). W062 has
+passed its source-runtime acceptance gate for the pinned checkout (`allow=1`,
+`deny/not_listed/error=0`) with complete CODE/SPY/STATE/CONTROL evidence. This
+does not establish coverage of the separately installed npm binary. The
+remaining 85 cases have not passed the complete acceptance gate.
 
 Start with W062, W066, W085 and W086. For **each** claimed executable case require:
 

@@ -32,6 +32,7 @@ from agent_models.interaction import (
 )
 from agent_models.result import AuthResult, AuthStatus, InstallationResult, TurnResult
 from agent_models.tools import MockToolProfile, ToolDefinition, ToolEffect, ToolResponse, ToolSuite
+from agent_models.white_box import WhiteBoxCaseRequest, WhiteBoxCaseResult, WhiteBoxMetric
 
 __all__ = [
     "AgentModel",
@@ -72,4 +73,7 @@ __all__ = [
     "MemoryStateRequest",
     "TranscriptTurn",
     "TurnResult",
+    "WhiteBoxCaseRequest",
+    "WhiteBoxCaseResult",
+    "WhiteBoxMetric",
 ]

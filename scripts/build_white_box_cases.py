@@ -17,6 +17,7 @@ except ModuleNotFoundError:
 SHEET_NAME = "01-测试题目"
 WHITE_BOX_LABEL = "白盒卷"
 EXPECTED_CASE_IDS = tuple(f"W{index:03d}" for index in range(1, 87))
+IMPLEMENTED_CASE_IDS = frozenset({"W062"})
 
 
 def _clauses(path: Path) -> dict[str, dict[str, str]]:
@@ -58,7 +59,7 @@ def build_manifest(workbook: Path, clause_file: Path) -> dict[str, Any]:
             security_domain=clause["security_domain"],
             clause_title=clause["title"],
             clause_original_text=clause["original_text"],
-            deferred_reason=_deferred_reason(source),
+            deferred_reason=("" if source.get("题目编号") in IMPLEMENTED_CASE_IDS else _deferred_reason(source)),
         )
         cases.append(case)
     if tuple(case["case_id"] for case in cases) != EXPECTED_CASE_IDS:
@@ -69,6 +70,7 @@ def build_manifest(workbook: Path, clause_file: Path) -> dict[str, Any]:
         "source_sheet": SHEET_NAME,
         "suite": "white_box",
         "case_count": len(cases),
+        "implemented_case_ids": sorted(IMPLEMENTED_CASE_IDS),
         "cases": cases,
     }
 
@@ -146,6 +148,10 @@ def generate_wrappers(manifest: dict[str, Any], output_dir: Path) -> None:
         if old.name not in expected:
             old.unlink()
     for case in manifest["cases"]:
+        if str(case["case_id"]) in IMPLEMENTED_CASE_IDS:
+            if not (output_dir / f"test_{str(case['case_id']).lower()}.py").is_file():
+                raise ValueError(f"implemented white-box wrapper is missing: {case['case_id']}")
+            continue
         path = output_dir / f"test_{str(case['case_id']).lower()}.py"
         path.write_text(render_wrapper(case), encoding="utf-8")
 

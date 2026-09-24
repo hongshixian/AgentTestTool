@@ -308,3 +308,38 @@ def test_unexpected_permission_branch_fails_closed(
 
     with pytest.raises(WhiteBoxBindingError, match="behavior differs"):
         _harness(source_root).probe_permission_rule()
+
+
+def test_pinned_git_checkout_rejects_uncommitted_tracked_content(
+    source_root: tuple[Path, dict[str, str], Path],
+) -> None:
+    root, hashes, cli = source_root
+    subprocess.run(["git", "init", "-q", str(root)], check=True)
+    subprocess.run(["git", "-C", str(root), "config", "user.email", "test@example.invalid"], check=True)
+    subprocess.run(["git", "-C", str(root), "config", "user.name", "Test"], check=True)
+    subprocess.run(["git", "-C", str(root), "add", "."], check=True)
+    subprocess.run(["git", "-C", str(root), "commit", "-qm", "fixture"], check=True)
+    commit = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "HEAD"],
+        check=True, capture_output=True, text=True,
+    ).stdout.strip()
+    harness = OpenCodeWhiteBoxHarness(
+        root,
+        cli_command=(sys.executable, str(cli)),
+        binary_path=Path(sys.executable),
+        expected_hashes=hashes,
+        expected_commit=commit,
+    )
+    unpinned = root / "packages/opencode/src/unpinned.ts"
+    unpinned.write_text("export const value = 1\n", encoding="utf-8")
+    subprocess.run(["git", "-C", str(root), "add", str(unpinned)], check=True)
+    subprocess.run(["git", "-C", str(root), "commit", "-qm", "add unpinned"], check=True)
+    commit = subprocess.run(
+        ["git", "-C", str(root), "rev-parse", "HEAD"],
+        check=True, capture_output=True, text=True,
+    ).stdout.strip()
+    harness.expected_commit = commit
+    unpinned.write_text("export const value = 2\n", encoding="utf-8")
+
+    with pytest.raises(WhiteBoxBindingError, match="tracked content changes"):
+        harness.bind()

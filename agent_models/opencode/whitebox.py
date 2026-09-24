@@ -216,6 +216,23 @@ class OpenCodeWhiteBoxHarness:
             commit = result.stdout.strip() if result.returncode == 0 else None
             if commit != self.expected_commit:
                 raise WhiteBoxBindingError("Checkout revision does not match pinned release tag")
+            for staged in (False, True):
+                command = [
+                    "git", "-c", "core.fileMode=false", "-C", str(self.source_root),
+                    "diff", "--quiet",
+                ]
+                if staged:
+                    command.append("--cached")
+                command.append("--")
+                clean = subprocess.run(
+                    command, capture_output=True, text=True, timeout=10, check=False,
+                )
+                if clean.returncode == 1:
+                    raise WhiteBoxBindingError(
+                        "Pinned source checkout has tracked content changes"
+                    )
+                if clean.returncode != 0:
+                    raise WhiteBoxBindingError("Pinned source checkout cleanliness is unverifiable")
 
         located = shutil.which(self.cli_command[0])
         if located is None:
