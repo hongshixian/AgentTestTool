@@ -6,11 +6,19 @@
 Agent Model 接口交互；每种 CLI 产品通过自己的测试驱动接入。测试驱动统一封装产品的
 进程交互、认证状态、会话管理和输出解析。新增产品时通过对应的测试驱动接入已有测试体系。
 
-本项目按第三方黑盒 E2E 定位运行真实应用和真实网络服务。认证使用专门准备的真实测试
-账号；断言只依赖第三方可从公开 CLI、网页、API、文件系统和工具 I/O 观察到的证据。
+本项目以第三方 E2E 定位运行真实应用和真实网络服务，认证使用专门准备的真实测试账号。
+测评分为冒烟门禁和三套业务卷：
 
-首个计划接入的被测产品是腾讯 **CodeBuddy Code CLI**，其入口命令为
-`codebuddy`。
+- 黑盒卷（B001-B042）：只依赖公开 CLI、网页、API、文件系统和工具 I/O 可观察的证据。
+- 灰盒卷（H001-H081）：额外使用产品运行事件、受控工具、原生 Hook 和网络 Trace 证据。
+- 白盒卷（W001-W086）：基于与被测版本匹配的源码和 Harness；缺少对应能力的用例记录为“不适用”。
+
+当前已接入的被测产品：
+
+- 腾讯 **CodeBuddy Code CLI**，入口命令 `codebuddy`，默认测试模型 `hy3`。
+- **OpenCode CLI**，入口命令 `opencode`，默认测试模型 `iiis/infi/deepseek-v4.1-flash`；
+  白盒 W062、W066、W085、W086 已接入固定 OpenCode v1.18.32 源码 Harness，详见
+  `docs/opencode-adapter.md`。
 
 ## 技术约定
 
@@ -30,13 +38,15 @@ Agent Model 接口交互；每种 CLI 产品通过自己的测试驱动接入。
 
 ```text
 agent_test_tool/
-├── cli.py                  # 唯一正式测评命令入口
-├── runner.py               # 冒烟门禁、业务执行和报告编排
+├── cli.py                  # 唯一正式测评命令入口（--agent、--suite 等）
+├── runner.py               # 冒烟门禁、分卷业务执行和报告编排
+├── parallel_runner.py      # 隔离 worker 分片与独占用例调度
+├── parallel_policy.py      # 并行准入策略；已审查的可并行用例及依赖哈希见 parallel_cases.json
+├── parallel_results.py     # 分片结果合并
 ├── result_plugin.py        # pytest 四态结构化结果采集
-└── reporting/              # ReportLab PDF 数据模型、统计和渲染
+└── reporting/              # ReportLab PDF 数据模型、统计、渲染和条款表 clauses.json
 
 agent_models/
-├── __init__.py
 ├── base.py                 # AgentModel 抽象接口
 ├── factory.py              # AgentModelFactory 与产品注册
 ├── result.py               # TurnResult、AuthResult 等同步结果
@@ -45,7 +55,10 @@ agent_models/
 ├── tools.py                # 产品无关的确定性 Mock Tool 配置
 ├── local_state.py          # 本地状态篡改与恢复请求模型
 ├── memory.py               # 持久化记忆标记与状态观察请求模型
+├── white_box.py            # 产品无关的源码级白盒请求与结果模型
 ├── capabilities.py         # 产品能力声明
+├── processes.py            # 子进程及其独立会话后代的生命周期约束
+├── windows_job.py          # Windows Job Object 后代进程收敛
 ├── environment/            # 第三方可控制的公共测试环境
 │   ├── session.py          # 工作区、工具、编排与证据生命周期
 │   ├── workspace.py        # 静态资源预置、快照、差异和恢复
@@ -53,26 +66,36 @@ agent_models/
 │   ├── receiver.py         # 测试进程持有的本地 HTTP 接收端
 │   ├── orchestration.py    # 有界并发、事件同步和重复恢复
 │   └── ledger.py           # 脱敏证据、关联事件和归档校验
-└── codebuddy/
-    ├── __init__.py
-    ├── model.py            # CodeBuddy AgentModel 的组件组装
-    ├── driver.py           # CodeBuddy 测试驱动：进程、认证、会话和输出解析
-    ├── interactive.py      # CodeBuddy 公开 stream-json 长驻会话适配
-    ├── trace_adapter.py    # 网络、运行流和 Mock MCP 证据的 Trace 重建
-    ├── evidence.py         # 产品公开界面的黑盒观察证据适配
-    ├── mock_tool.py        # CodeBuddy Mock Tool 会话组装与证据采集
-    ├── mock_mcp_server.py  # 确定性 stdio MCP 测试服务
-    ├── local_state.py      # 隔离配置的快照、篡改、重启与恢复适配
-    └── memory.py           # 专用配置中的记忆文件观察、差异和恢复
+├── codebuddy/              # CodeBuddy Code CLI（codebuddy）
+│   ├── model.py            # CodeBuddy AgentModel 的组件组装
+│   ├── driver.py           # 测试驱动：进程、认证、会话和输出解析
+│   ├── interactive.py      # 公开 stream-json 长驻会话适配
+│   ├── trace_adapter.py    # 网络、运行流和 Mock MCP 证据的 Trace 重建
+│   ├── evidence.py         # 产品公开界面的黑盒观察证据适配
+│   ├── mock_tool.py        # Mock Tool 会话组装与证据采集
+│   ├── mock_mcp_server.py  # 确定性 stdio MCP 测试服务
+│   ├── local_state.py      # 隔离配置的快照、篡改、重启与恢复适配
+│   ├── memory.py           # 专用配置中的记忆文件观察、差异和恢复
+│   └── worker_profile.py   # 并行 worker 的一次性私有配置
+└── opencode/               # OpenCode CLI（opencode）
+    ├── model.py            # OpenCode AgentModel 的组件组装
+    ├── driver.py           # 测试驱动：进程、会话和输出解析
+    ├── interactive.py      # 长驻会话适配
+    ├── profile.py          # 与用户会话、插件隔离的临时配置
+    ├── mock_tool.py        # Mock Tool 接线
+    ├── network_trace.py    # 网络证据采集
+    ├── trace_adapter.py    # Trace 重建
+    ├── hooks/              # 灰盒专用的原生插件 Hook 采集
+    ├── whitebox.py         # 固定源码白盒 Harness 公共部分
+    ├── whitebox_cancel.py  # 白盒取消传播探针
+    └── whitebox_w0xx*.py   # W062、W066、W085、W086 的源码探针与运行时 Harness
 
 assertions/
-├── __init__.py
 ├── logical.py              # 基于逻辑判断的传统断言
 ├── environment.py          # 工具调用、模拟副作用及观察窗口断言
 ├── trace.py                # 回合隔离的模型上下文和工具生命周期断言
 ├── outcome.py              # 通过、不通过、不适用、无法判定四态结果
 └── judge/
-    ├── __init__.py
     ├── model.py            # Judge 模型统一接口及实现
     └── result.py           # JudgeVerdict 等结构化判定结果
 
@@ -80,58 +103,46 @@ evidence_collectors/
 ├── base.py                 # 产品无关的采集生命周期、窗口、状态和健康度
 ├── manager.py              # 多采集器编排、失败聚合和逆序清理
 ├── trace.py                # 产品无关的 Agent Trace 中间表示
+├── os_permissions.py       # 失败即关闭的 OS 权限观察接口（不内置采集源）
+├── atif/                   # Agent Trace 到 ATIF 的转换、模型与校验
 └── network/
     └── https_mitm.py       # 运行级 HTTPS 代理、脱敏和有限流量采集
 
 test_cases/
 ├── base.py                 # 公共测试用例基类 AgentTestCase
-├── conftest.py             # pytest 参数、fixture 和 AgentModel 初始化
+├── conftest.py             # pytest 参数、fixture、分卷收集和 AgentModel 初始化
+├── pipeline.py             # 各卷共用的流水线阶段与日志事件
 ├── security.py             # 安全用例共享的真实测试身份配置
-├── scenarios/              # 不被 pytest 收集的 Test Sample 公共执行逻辑
-│   ├── cross_identity_replay.py
-│   ├── instance_id_boundaries.py
-│   ├── local_instance_state_tampering.py
-│   ├── memory_write_boundaries.py
-│   ├── natural_language_identity_override.py
-│   ├── protected_configuration_extraction.py
-│   └── tool_result_identity_injection.py
-├── test_agent_identity.py
-├── test_multi_turn.py
-├── test_file_creation.py
-├── test_user_a_credentials_with_user_b_instance.py
-├── test_destroyed_instance_identifier_reuse.py
-├── test_user_a_credentials_with_user_b_identity.py
-├── test_null_instance_identifier_no_fallback.py
-├── test_unknown_instance_identifier_no_fallback.py
-├── test_oversized_instance_identifier_no_fallback.py
-├── test_local_json_instance_identifier_tampering.py
-├── test_local_preference_instance_identifier_tampering.py
-├── test_direct_identity_claim.py
-├── test_admin_identity_override.py
-├── test_forged_system_identity.py
-├── test_text_tool_identity_injection.py
-└── test_structured_tool_identity_injection.py
+├── smoke/                  # 冒烟门禁用例（ATS-0.0x-D*-00-S01）
+├── black_box/              # 黑盒卷 B001-B042：薄包装 test_bNNN.py + 共享执行器
+│   ├── runner.py           # BlackBoxCaseRunner
+│   ├── specs.py            # 从 configs/black_box_cases.json 加载用例规格
+│   └── scenario_handlers.py  # 按外部可观察场景分组的产品无关处理器
+├── grey_box/               # 灰盒卷 H001-H081：薄包装 test_hNNN.py + 共享执行器
+│   ├── base.py             # GreyBoxCaseRunner
+│   ├── specs.py            # 从 configs/grey_box_cases.json 加载用例规格
+│   └── *_scenarios.py      # 模型、工具、通信场景的计划与判定
+├── white_box/              # 白盒卷 W001-W086：未实现用例记录为不适用
+│   └── w0xx_case.py        # 已实现用例的执行逻辑
+└── scenarios/              # 早期 ATS 场景与母用例的公共执行逻辑，不被 pytest 收集
 
-tests/
-├── test_evidence.py          # 证据模型与断言的离线回归测试
-├── test_scenario_shapes.py   # ATS 场景结构的离线回归测试
-├── test_codebuddy_driver.py
-├── test_codebuddy_evidence.py
-├── test_codebuddy_local_state.py
-├── test_codebuddy_mock_tool.py
-└── test_security_settings.py
+tests/                      # 框架自身的离线回归测试
+
+scripts/
+└── build_{black,grey,white}_box_cases.py  # 从三套卷工作簿生成 configs 清单和薄包装
 
 assets/
-└── README.md               # 测试用例共用的静态资源
+├── README.md               # 测试用例共用的静态资源
+└── framework_fixtures/     # 框架离线回归用的 CLI 协议探针
 
 configs/
 ├── agents.example.yaml     # 不含秘密的产品配置示例
+├── {black,grey,white}_box_cases.json  # 生成的三套卷用例清单
 └── environment.py          # 根目录 .env 加载方法
 
+docs/                       # OpenCode 适配、白盒审查、流水线日志等说明
+local_docs/                 # 本地工作簿与审计过程记录，永久禁止纳入 Git 管理
 .env.example                # Judge、产品真实测试账号与安全用例配置示例
-pyproject.toml
-AGENTS.md
-README.md
 ```
 
 目录内的示例文件表示职责和命名方式，不要求在尚无对应实现时创建空文件。
@@ -146,8 +157,11 @@ README.md
 - 开启工具与绕过授权是两个独立选择。`allow_tools=True` 不得隐式启用权限绕过；无人值守单轮默认拒绝未预先授权的操作，绕过或允许工作区编辑必须通过 `PermissionPolicy` 显式声明。
 - 新增 CLI Agent 时，增加对应的产品目录并注册到 `AgentModelFactory`，由统一接口运行已有测试用例。
 - `test_cases/` 中的用例必须适用于所有声明了相应 capability 的产品；capability 仅向用例描述执行条件，测评结果由用例代码显式断言。
-- 最终场景级 JSON 中的每个 `test_prompt` 对应 `test_cases/` 下一个独立 test case 文件；同一 Test Sample 的公共执行逻辑放在 `test_cases/scenarios/`，其文件名不得以 `test_` 开头。
-- `tests/` 只存放测试框架自身的离线回归测试，不属于被测 Agent 的公共 Test Case，也不使用 ATS 用例 ID。
+- 三套业务卷的用例规格保存在 `configs/<suite>_cases.json`，由 `scripts/build_<suite>_cases.py` 从三套卷工作簿生成；`test_bNNN.py`、`test_hNNN.py` 和未实现的 `test_wNNN.py` 是生成的薄包装，修改用例行为应改共享执行器、场景模块或生成脚本，而不是手改单个包装。
+- 共享执行逻辑和场景模块的文件名不得以 `test_` 开头；`test_cases/scenarios/` 保留早期 ATS 场景与母用例逻辑。
+- 业务卷用例通过模块级 `TEST_CASE_LEVEL`（`black_box`、`grey_box`、`white_box`）归属测评卷，冒烟用例使用 `smoke` marker；`conftest.py` 按 `--case-suite` 收集。
+- `tests/` 只存放测试框架自身的离线回归测试，不属于被测 Agent 的公共 Test Case，也不使用测评用例 ID。
+- 白盒结果只归属于明确登记的源码运行目标，不得推广到本机安装的发行版二进制。
 - `assertions/` 统一维护测试断言；`logical.py` 提供确定性的传统断言，`assertions/judge/` 提供基于 Judge 模型的智能断言。
 - `assertions/judge/` 独立于具体 Agent 产品，只消费标准化的交互结果、工作区产物和用例评价准则。
 - 安全测试使用专用真实账号和可清理的真实测试数据；账号 A 是当前登录身份，账号 B 是受保护目标。
@@ -183,18 +197,28 @@ README.md
 
 ### 文件放置与命名
 
-- 测试用例代码文件统一放在根目录的 `test_cases/` 中。
-- 一个测试用例使用一个独立的代码文件。
-- 最终场景级 JSON 中每个 `test_samples[].test_prompts[]` 都是可独立执行的 test case；不得把同一 Test Sample 的多个 Test Prompt 聚合在同一个测试文件中。
-- Test Sample ID 直接采用 JSON 中对应 `test_samples[].sample_id` 的值，例如 `ATS-5.1b-D5-02-S01`。
-- Test case ID 使用 `<Test Sample ID>-<Prompt ID>` 组合并保持全局唯一，例如 `ATS-5.1b-D5-02-S01-01`；Prompt ID 使用数字编号，避免再引入语义化旧 ID。
-- `ATS` 表示可执行的自动化测试样本；`5.1b` 表示来源条款，`D5` 表示评测维度，`02` 表示该条款和维度下的源用例序号，`S01` 表示从源用例泛化出的测试样本序号。
-- Test case 文件必须声明 `TEST_CASE_ID`、`TEST_SAMPLE_ID` 和 `TEST_PROMPT_ID`，并与 JSON 来源及测试类文档字符串保持一致。
-- 原始用例 ID `TC-<条款编号>-D<维度编号>-<源用例序号>` 和场景 ID `SCN-<条款编号>-D<维度编号>-<源用例序号>-<场景序号>` 只用于来源追溯，不作为 pytest 测试类的主用例 ID。
-- 文件名使用 `test_<用例英文简称>.py` 格式，全小写并采用 snake_case，例如 `test_agent_identity.py`；文件名中不包含测试用例 ID。
-- 测试类名使用 `Test<规范化TestCaseID><用例英文简称>` 格式并采用 PascalCase。规范化时移除 ID 中的连字符和句点，并将字母统一为大写；例如 `ATS-5.1b-D5-02-S01-01` 可对应 `TestATS51BD502S0101UserACredentialsWithUserBInstance`。
-- 测试方法名必须以 `test_` 开头并采用 snake_case，例如 `test_agent_returns_identity_response`。
-- 测试类名中的规范化 ID 和类文档字符串中的完整 ID 必须对应同一个测试用例。
+- 测试用例代码文件统一放在根目录 `test_cases/` 的对应分卷目录中，一个测试用例使用一个独立的代码文件。
+
+三套业务卷（当前主体）：
+
+- 用例 ID 直接采用三套卷工作簿“题目编号”：黑盒 `B001`、灰盒 `H001`、白盒 `W001`，三位数字编号。
+- 文件名为 `test_<小写用例 ID>.py`，例如 `test_cases/black_box/test_b001.py`。
+- 测试类名为 `Test<用例 ID><BlackBox|GreyBox|WhiteBox>Case`；未实现白盒用例为 `TestW001DeferredWhiteBoxCase`。
+- 模块级声明 `TEST_CASE_ID`、`TEST_CASE_LEVEL`、`SECURITY_DOMAIN`、`STANDARD_CLAUSE`、`CLAUSE_TITLE`、`CLAUSE_ORIGINAL_TEXT` 和 `CASE_TITLE`，与 `configs/<suite>_cases.json` 一致；白盒已实现用例另声明 `IMPLEMENTATION_MODE = "implemented"`，未实现用例声明 `DEFERRED_REASON`。
+- 黑盒、灰盒薄包装分别继承 `BlackBoxCaseRunner`、`GreyBoxCaseRunner`，只调用共享执行入口。
+
+冒烟和早期 ATS 场景用例：
+
+- 冒烟用例 ID 使用 `ATS-0.0x-D<维度>-00-S01`，放在 `test_cases/smoke/`。
+- 场景级 JSON 中每个 `test_samples[].test_prompts[]` 都是可独立执行的 test case；Test Case ID 使用 `<Test Sample ID>-<Prompt ID>`，例如 `ATS-5.1b-D5-02-S01-01`，并声明 `TEST_CASE_ID`、`TEST_SAMPLE_ID` 和 `TEST_PROMPT_ID`。
+- `ATS` 表示可执行的自动化测试样本；`5.1b` 表示来源条款，`D5` 表示评测维度，`02` 表示源用例序号，`S01` 表示泛化出的测试样本序号。
+- 原始用例 ID `TC-...` 和场景 ID `SCN-...` 只用于来源追溯，不作为 pytest 测试类的主用例 ID。
+- 文件名使用 `test_<用例英文简称>.py`，不含用例 ID；测试类名使用 `Test<规范化TestCaseID><用例英文简称>`，规范化时移除连字符和句点并统一大写，例如 `TestATS00XD100S01AgentIdentity`。
+
+通用要求：
+
+- 测试方法名必须以 `test_` 开头并采用 snake_case。
+- 测试类名中的 ID 和类文档字符串中的完整 ID 必须对应同一个测试用例。
 
 ### 测试类
 
@@ -208,7 +232,8 @@ README.md
 - 测试用例代码文件的模块文档字符串使用英文，以一句话简要说明测试用例名称。
 - 测试类的文档字符串使用中文，依次说明测试用例 ID、测试用例名称、测试目标、前置条件、测试步骤和预期结果。
 - 前置条件、测试步骤和预期结果使用缩进一级的带编号有序列表。
-- 使用以下格式作为新测试用例模板：
+- 黑盒、灰盒生成的薄包装可使用一句话英文类文档字符串（`Test case B001: <名称>.`），完整说明保存在用例清单中。
+- 手写用例（冒烟、已实现白盒等）使用以下格式作为模板：
 
 ```python
 """Verify that account A credentials cannot replay account B's instance identifier."""
@@ -261,21 +286,30 @@ class TestATS51BD502S0101UserACredentialsWithUserBInstance(AgentTestCase):
 - 提交前根据变更范围选择测试：如果本次提交只新增或修改独立 test case，且未改动公共基类、fixture、Agent Model、测试驱动、断言等公共组件，仅需单独执行新增或改动的 test case。
 - 如果改动了公共类或公共组件，提交前必须分析可能受到影响的 test case，并执行所有可能受影响的 test case；影响范围较广或无法准确界定时执行全量测试。
 - 所选测试未通过或无法执行时，在提交和交付说明中记录具体情况，不得声称未经实际执行的测试已经通过。
-- 提交和推送前检查暂存内容，确认 `.env`、访问令牌、认证缓存和测试产生的敏感数据未被纳入版本管理。
+- 提交和推送前检查暂存内容，确认 `.env`、`local_docs/`、访问令牌、认证缓存和测试产生的敏感数据未被纳入版本管理。
 
 ## 常用命令
 
 ```bash
 uv sync --extra dev
-uv run agent-test --agent codebuddy
-uv run pytest test_cases
-uv run pytest tests
+uv run agent-test --agent codebuddy                      # 冒烟 + 黑盒卷（默认）
+uv run agent-test --agent codebuddy --suite all          # 冒烟 + 黑盒、灰盒、白盒依次执行
+uv run agent-test --agent opencode --suite grey_box
+uv run agent-test --agent codebuddy --suite grey_box --business-workers 4
+uv run pytest tests                                      # 框架离线回归
+uv run pytest test_cases --case-suite grey_box --agent opencode
+uv run pytest test_cases/black_box/test_b001.py --case-suite black_box
 uv run pytest test_cases --repeat=3
 uv run pytest --smoke
+uv run python scripts/build_grey_box_cases.py            # 从工作簿重新生成清单和薄包装
 ```
 
-`uv run agent-test --agent codebuddy` 是正式测评的唯一入口，依次执行冒烟测试、业务测试和
-PDF 报告生成。冒烟测试只有在非空、无收集或框架错误且每条用例均返回“通过”时才通过；
+`uv run agent-test` 是正式测评的唯一入口，依次执行冒烟测试、所选业务卷和 PDF 报告生成；
+`--suite all` 依次执行三套卷，不跨卷并行。`--business-workers` 大于 1 时 CodeBuddy 必须配置
+已认证的 `CODEBUDDY_CONFIG_DIR`，只有在 `agent_test_tool/parallel_cases.json` 中审查登记、且依赖文件哈希未变化的用例
+才进入隔离并行分片，其余用例一律独占执行；修改已登记用例或其依赖后需重新审查并更新哈希。
+
+冒烟测试只有在非空、无收集或框架错误且每条用例均返回“通过”时才通过；
 冒烟未通过时不得执行业务测试，但仍须生成只包含冒烟结果的报告。正式 PDF 由 ReportLab
 直接生成，不依赖浏览器、Office 或 LaTeX。
 
@@ -324,6 +358,7 @@ PDF 报告生成。冒烟测试只有在非空、无收集或框架错误且每�
 ## 安全边界
 
 - 不提交 `.env`、访问令牌、会话记录或真实用户数据。
+- `local_docs/` 只存放本地工作簿、原始用例表和审计过程记录，必须保持在 `.gitignore` 中，禁止纳入 Git 管理：不得 `git add -f`、不得移出忽略规则，也不得将其中文件复制到受版本管理的目录后提交。
 - 未经明确授权，不调用真实第三方 Agent 服务，不执行破坏性命令。
 - 测试夹具与示例中的凭据必须是明显无效的占位值。
 - 日志和测试快照在落盘前应对敏感字段做脱敏处理。
