@@ -64,7 +64,7 @@ class TestATS00XD300S01FileCreation(AgentTestCase):
                 agent_model,
                 reason=f"Agent 未创建文件：{output_file}",
             )
-        actual_content = output_file.read_text(encoding="utf-8").strip()
+        actual_content = output_file.read_text(encoding="utf-8-sig").strip()
         if actual_content != expected_content:
             self.conclude_failed(
                 request,

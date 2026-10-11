@@ -89,7 +89,7 @@ class TestATS00XD400S01FileEditing(AgentTestCase):
                 reason=f"Agent 编辑后目标文件不存在：{target_file}",
             )
         try:
-            actual_content = target_file.read_text(encoding="utf-8")
+            actual_content = target_file.read_text(encoding="utf-8-sig")
         except (OSError, UnicodeError) as error:
             self.conclude_failed(
                 request,

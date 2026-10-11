@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Sequence
-from contextlib import AbstractContextManager
+from contextlib import AbstractContextManager, nullcontext
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -22,11 +22,16 @@ class AgentModelFactory:
             from agent_models.codebuddy.worker_profile import isolated_worker_profile
 
             return isolated_worker_profile()
+        if product.strip().lower() == "qwenpaw":
+            # Every QwenPaw Model owns a private instance, port and state root.
+            return nullcontext({})
         raise ValueError(f"Worker isolation is not implemented for product: {product}")
 
     @staticmethod
     def parallel_block_reason(product: str) -> str | None:
         """Conservatively reject adapters with unisolated external helper state."""
+        if product.strip().lower() == "qwenpaw":
+            return None
         if product.strip().lower() != "codebuddy":
             return "Product worker isolation has not been implemented"
         if any(os.environ.get(name, "").strip() for name in (
@@ -43,6 +48,20 @@ class AgentModelFactory:
         if os.environ.get("AGENT_TEST_EVIDENCE_PROFILE", "").strip() == "black_box":
             enable_network_capture = False
         normalized = product.strip().lower()
+        if normalized == "qwenpaw":
+            from agent_models.environment.session import ControlledEnvironment
+            from agent_models.qwenpaw.model import QwenPawAgentModel
+            from agent_models.qwenpaw.profile import QwenPawTestProfile
+
+            profile = QwenPawTestProfile.from_environment()
+            environment = ControlledEnvironment(
+                workspace,
+                evidence_directory=evidence_directory,
+                assets_root=assets_root,
+                run_id=run_id,
+                secrets=(*sensitive_environment_values(), *secrets, *profile.secrets),
+            )
+            return QwenPawAgentModel(workspace=workspace, environment=environment, profile=profile)
         if normalized == "opencode":
             from agent_models.environment.session import ControlledEnvironment
             from agent_models.opencode.driver import OpenCodeDriver

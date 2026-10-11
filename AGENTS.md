@@ -19,6 +19,8 @@ Agent Model 接口交互；每种 CLI 产品通过自己的测试驱动接入。
 - **OpenCode CLI**，入口命令 `opencode`，默认测试模型 `iiis/infi/deepseek-v4.1-flash`；
   白盒 W062、W066、W085、W086 已接入固定 OpenCode v1.18.32 源码 Harness，详见
   `docs/opencode-adapter.md`。
+- **QwenPaw**（2.2.1），通过公开 REST/SSE 控制台 API 接入而非 CLI，默认测试模型 IIIS
+  `infi/glm-5.3-flash`；接入方式与证据边界详见 `docs/qwenpaw-adapter.md`。
 
 ## 技术约定
 
@@ -77,18 +79,24 @@ agent_models/
 │   ├── local_state.py      # 隔离配置的快照、篡改、重启与恢复适配
 │   ├── memory.py           # 专用配置中的记忆文件观察、差异和恢复
 │   └── worker_profile.py   # 并行 worker 的一次性私有配置
-└── opencode/               # OpenCode CLI（opencode）
-    ├── model.py            # OpenCode AgentModel 的组件组装
-    ├── driver.py           # 测试驱动：进程、会话和输出解析
-    ├── interactive.py      # 长驻会话适配
-    ├── profile.py          # 与用户会话、插件隔离的临时配置
-    ├── mock_tool.py        # Mock Tool 接线
-    ├── network_trace.py    # 网络证据采集
-    ├── trace_adapter.py    # Trace 重建
-    ├── hooks/              # 灰盒专用的原生插件 Hook 采集
-    ├── whitebox.py         # 固定源码白盒 Harness 公共部分
-    ├── whitebox_cancel.py  # 白盒取消传播探针
-    └── whitebox_w0xx*.py   # W062、W066、W085、W086 的源码探针与运行时 Harness
+├── opencode/               # OpenCode CLI（opencode）
+│   ├── model.py            # OpenCode AgentModel 的组件组装
+│   ├── driver.py           # 测试驱动：进程、会话和输出解析
+│   ├── interactive.py      # 长驻会话适配
+│   ├── profile.py          # 与用户会话、插件隔离的临时配置
+│   ├── mock_tool.py        # Mock Tool 接线
+│   ├── network_trace.py    # 网络证据采集
+│   ├── trace_adapter.py    # Trace 重建
+│   ├── hooks/              # 灰盒专用的原生插件 Hook 采集
+│   ├── whitebox.py         # 固定源码白盒 Harness 公共部分
+│   ├── whitebox_cancel.py  # 白盒取消传播探针
+│   └── whitebox_w0xx*.py   # W062、W066、W085、W086 的源码探针与运行时 Harness
+└── qwenpaw/                # QwenPaw（REST/SSE 控制台 API，非 CLI）
+    ├── model.py            # QwenPaw AgentModel：STRICT 审批与逐次权限决定
+    ├── server.py           # 每个 Model 独立实例的无交互初始化、就绪与进程树清理
+    ├── client.py           # 控制台 SSE 解析、审批轮询、停止与回合结果
+    ├── mock_tool.py        # 经公开 /api/mcp 注册评测方 stdio MCP 桥
+    └── profile.py          # 固定版本、模型与凭据来源
 
 assertions/
 ├── logical.py              # 基于逻辑判断的传统断言

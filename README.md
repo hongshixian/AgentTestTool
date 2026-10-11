@@ -3,8 +3,9 @@
 AgentTestTool 是一个面向 Agent CLI 产品的自动化测评工具。它可以运行真实的被测
 Agent，执行标准化测试用例，并自动生成结构化结果和 PDF 测评报告。
 
-当前支持腾讯 **CodeBuddy Code CLI** 和 **OpenCode CLI**。CodeBuddy 默认使用 `hy3`；
-OpenCode 默认使用配置好的 `iiis/infi/deepseek-v4.1-flash`。
+当前支持腾讯 **CodeBuddy Code CLI**、**OpenCode CLI** 和 **QwenPaw**。CodeBuddy 默认使用 `hy3`；
+OpenCode 默认使用配置好的 `iiis/infi/deepseek-v4.1-flash`；QwenPaw 通过其 REST/SSE API 接入，
+默认使用 IIIS `infi/glm-5.3-flash`（见 [QwenPaw 使用说明](docs/qwenpaw-adapter.md)）。
 
 ## 主要功能
 
@@ -30,7 +31,7 @@ OpenCode 默认使用配置好的 `iiis/infi/deepseek-v4.1-flash`。
 
 - Python 3.11 或更高版本；
 - `uv`；
-- 已安装的目标 CLI：`codebuddy` 或 `opencode`；
+- 已安装的目标 CLI：`codebuddy`、`opencode`，或固定版本的 `qwenpaw==2.2.1`；
 - 可调用的测试模型；CodeBuddy 需要已登录的专用测试账号，OpenCode 默认使用配置了 API Key 的 IIIS 模型；
 - 执行灰盒测试或完整三套卷时可用的 Judge API。
 
@@ -126,7 +127,7 @@ Judge API 可用。
 | 参数 | 默认值 | 说明 |
 | --- | --- | --- |
 | `--suite` | `black_box` | 选择 `all`、`black_box`、`grey_box` 或 `white_box` |
-| `--agent` | `codebuddy` | 选择 `codebuddy` 或 `opencode` |
+| `--agent` | `codebuddy` | 选择 `codebuddy`、`opencode` 或 `qwenpaw` |
 | `--output-dir` | `artifacts` | 设置运行产物父目录 |
 | `--repeat` | `1` | 设置业务测试重复次数 |
 | `--business-workers` | `1` | 设置单卷业务测试的 worker 数量，可选 1 至 4 |

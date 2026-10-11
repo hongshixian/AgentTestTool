@@ -24,6 +24,7 @@ class _AgentStub:
     workspace: Path
     replacement: str | None
     interaction_error: Exception | None = None
+    encoding: str = "utf-8"
     capabilities: AgentCapabilities = AgentCapabilities(file_operations=True)
     environment: object = field(
         default_factory=lambda: SimpleNamespace(ledger=_Ledger())
@@ -41,7 +42,7 @@ class _AgentStub:
         )
         assert "AgentTestTool file editing passed." in prompt
         if self.replacement is not None:
-            target_file.write_text(self.replacement, encoding="utf-8")
+            target_file.write_text(self.replacement, encoding=self.encoding)
         return TurnResult(
             response="完成",
             raw_output="完成",
@@ -62,6 +63,21 @@ class TestSmokeFileEditingShape:
         agent = _AgentStub(
             workspace=tmp_path,
             replacement="AgentTestTool file editing passed.",
+        )
+
+        with pytest.raises(AssessmentOutcomeSignal) as outcome:
+            FileEditingCase().test_agent_edits_existing_file_with_requested_content(
+                agent, _request()  # type: ignore[arg-type]
+            )
+
+        assert outcome.value.verdict.status is AssessmentStatus.PASS
+
+    def test_utf8_bom_is_encoding_not_content(self, tmp_path: Path) -> None:
+        # Some agents' file tools write a UTF-8 BOM to .txt files for Windows tools.
+        agent = _AgentStub(
+            workspace=tmp_path,
+            replacement="AgentTestTool file editing passed.",
+            encoding="utf-8-sig",
         )
 
         with pytest.raises(AssessmentOutcomeSignal) as outcome:
