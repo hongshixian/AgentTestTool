@@ -109,7 +109,7 @@ class OpenClawAgentModel(AgentModel):
             driver = self._ensure_driver()
         except RuntimeError as error:
             return AuthResult(AuthStatus.ERROR, str(error))
-        outcome = driver.run_turn("只回复 AUTH_OK。", session_id="auth_" + uuid.uuid4().hex[:12], timeout=180.0,
+        outcome = driver.run_turn("只回复 AUTH_OK。", session_id="auth_" + uuid.uuid4().hex[:12], timeout=300.0,
                                   policy=PermissionPolicy.DENY_UNAPPROVED, allow_tools=False)
         if outcome.ok and outcome.response.strip():
             return AuthResult(AuthStatus.AUTHENTICATED, "OpenClaw test model is available")
