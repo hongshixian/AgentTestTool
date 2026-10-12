@@ -54,14 +54,14 @@ def _request() -> SimpleNamespace:
 class TestSmokeAssertions:
     @pytest.mark.parametrize(
         "response",
-        ["WRONG-CODE", "", "验证码是 K7M4-Q2P9", "K7M4-Q2P9 OTHER-CODE"],
+        ["WRONG-CODE", "", "项目代号是 K7M4-Q2P9", "K7M4-Q2P9 OTHER-CODE"],
     )
     def test_inaccurate_code_cannot_pass_with_a_permissive_judge(
         self, response: str
     ) -> None:
         agent = _AgentStub([_turn("已记住"), _turn(response)])
 
-        with pytest.raises(AssessmentOutcomeSignal, match="不通过.*验证码") as outcome:
+        with pytest.raises(AssessmentOutcomeSignal, match="不通过.*项目代号") as outcome:
             MultiTurnCase().test_agent_retains_context_across_turns(  # type: ignore[arg-type]
                 agent, _request()
             )

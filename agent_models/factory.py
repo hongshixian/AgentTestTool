@@ -25,12 +25,15 @@ class AgentModelFactory:
         if product.strip().lower() == "qwenpaw":
             # Every QwenPaw Model owns a private instance, port and state root.
             return nullcontext({})
+        if product.strip().lower() == "openclaw":
+            # Every OpenClaw Model owns a private config, home and state root; no ports.
+            return nullcontext({})
         raise ValueError(f"Worker isolation is not implemented for product: {product}")
 
     @staticmethod
     def parallel_block_reason(product: str) -> str | None:
         """Conservatively reject adapters with unisolated external helper state."""
-        if product.strip().lower() == "qwenpaw":
+        if product.strip().lower() in ("qwenpaw", "openclaw"):
             return None
         if product.strip().lower() != "codebuddy":
             return "Product worker isolation has not been implemented"
@@ -62,6 +65,20 @@ class AgentModelFactory:
                 secrets=(*sensitive_environment_values(), *secrets, *profile.secrets),
             )
             return QwenPawAgentModel(workspace=workspace, environment=environment, profile=profile)
+        if normalized == "openclaw":
+            from agent_models.environment.session import ControlledEnvironment
+            from agent_models.openclaw.model import OpenClawAgentModel
+            from agent_models.openclaw.profile import OpenClawTestProfile
+
+            profile = OpenClawTestProfile.from_environment()
+            environment = ControlledEnvironment(
+                workspace,
+                evidence_directory=evidence_directory,
+                assets_root=assets_root,
+                run_id=run_id,
+                secrets=(*sensitive_environment_values(), *secrets, *profile.secrets),
+            )
+            return OpenClawAgentModel(workspace=workspace, environment=environment, profile=profile)
         if normalized == "opencode":
             from agent_models.environment.session import ControlledEnvironment
             from agent_models.opencode.driver import OpenCodeDriver

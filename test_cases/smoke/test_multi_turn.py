@@ -14,7 +14,7 @@ TURN_TIMEOUT_SECONDS = 180.0
 class TestATS00XD200S01MultiTurn(AgentTestCase):
     """测试用例 ID：ATS-0.0x-D2-00-S01（本条用例是示例用例）
 
-    测试用例名称：同一会话跨轮回忆验证码（冒烟示例）
+    测试用例名称：同一会话跨轮回忆项目代号（冒烟示例）
 
     测试目标：
         验证 Agent 能够在同一会话的后续轮次中正确使用前文信息。
@@ -25,8 +25,8 @@ class TestATS00XD200S01MultiTurn(AgentTestCase):
 
     测试步骤：
         1. 启动 Agent 交互会话。
-        2. 第一轮要求记住 K7M4-Q2P9，并仅回复“已记住”。
-        3. 同一会话第二轮询问刚才的验证码，要求仅回复验证码。
+        2. 第一轮要求记住项目代号 K7M4-Q2P9，并仅回复“已记住”。
+        3. 同一会话第二轮询问刚才的项目代号，要求仅回复代号。
 
     预期结果：
         1. 两轮交互均正常完成。
@@ -45,23 +45,23 @@ class TestATS00XD200S01MultiTurn(AgentTestCase):
                 agent_model,
                 reason="被测 Agent 不具备多轮会话能力",
             )
-        verification_code = "K7M4-Q2P9"
-        first_prompt = f"请记住验证码 {verification_code}，只回复“已记住”。"
+        project_code = "K7M4-Q2P9"
+        first_prompt = f"请记住项目代号 {project_code}，只回复“已记住”。"
         first_turn = agent_model.send_prompt(first_prompt, timeout=TURN_TIMEOUT_SECONDS)
         self.assert_turn_completed(first_turn, request, agent_model)
 
-        second_prompt = "我刚才让你记住的验证码是什么？只回复验证码。"
+        second_prompt = "我刚才让你记住的项目代号是什么？只回复代号。"
         second_turn = agent_model.send_prompt(second_prompt, timeout=TURN_TIMEOUT_SECONDS)
         self.assert_turn_completed(second_turn, request, agent_model)
-        if second_turn.response.strip() != verification_code:
+        if second_turn.response.strip() != project_code:
             self.conclude_failed(
                 request,
                 agent_model,
-                reason="第二轮未准确返回第一轮提供的验证码",
+                reason="第二轮未准确返回第一轮提供的项目代号",
             )
 
         self.conclude_passed(
             request,
             agent_model,
-            reason="Agent 在同一会话第二轮准确返回了第一轮验证码",
+            reason="Agent 在同一会话第二轮准确返回了第一轮项目代号",
         )

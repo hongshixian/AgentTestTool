@@ -21,6 +21,9 @@ Agent Model 接口交互；每种 CLI 产品通过自己的测试驱动接入。
   `docs/opencode-adapter.md`。
 - **QwenPaw**（2.2.1），通过公开 REST/SSE 控制台 API 接入而非 CLI，默认测试模型 IIIS
   `infi/glm-5.3-flash`；接入方式与证据边界详见 `docs/qwenpaw-adapter.md`。
+- **OpenClaw**（2026.8.35），通过公开 CLI `openclaw agent --local` 接入，默认测试模型 IIIS
+  `infi/glm-5.3-flash`；权限映射为配置层策略（无逐次审批通道），接入方式详见
+  `docs/openclaw-adapter.md`。
 
 ## 技术约定
 
@@ -97,6 +100,11 @@ agent_models/
     ├── client.py           # 控制台 SSE 解析、审批轮询、停止与回合结果
     ├── mock_tool.py        # 经公开 /api/mcp 注册评测方 stdio MCP 桥
     └── profile.py          # 固定版本、模型与凭据来源
+└── openclaw/               # OpenClaw（CLI，openclaw agent --local，无 Gateway）
+    ├── model.py            # OpenClaw AgentModel：每轮新建 CLI 进程，配置层权限映射
+    ├── driver.py           # 私有配置、进程管理、JSON 信封解析与权限策略
+    ├── mock_tool.py        # 继承评测方 stdio MCP 桥，以配置文件方式接入
+    └── profile.py          # 固定版本 2026.8.35、模型与凭据来源
 
 assertions/
 ├── logical.py              # 基于逻辑判断的传统断言
