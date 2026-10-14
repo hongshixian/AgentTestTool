@@ -35,6 +35,7 @@ TEST_OBJECT_NAMES = {
     "opencode": "OpenCode CLI",
     "qwenpaw": "QwenPaw",
     "openclaw": "OpenClaw",
+    "codex": "Codex CLI",
 }
 
 

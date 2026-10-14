@@ -28,12 +28,15 @@ class AgentModelFactory:
         if product.strip().lower() == "openclaw":
             # Every OpenClaw Model owns a private config, home and state root; no ports.
             return nullcontext({})
+        if product.strip().lower() == "codex":
+            # Codex shares the operator's authenticated CODEX_HOME; each turn is its own process.
+            return nullcontext({})
         raise ValueError(f"Worker isolation is not implemented for product: {product}")
 
     @staticmethod
     def parallel_block_reason(product: str) -> str | None:
         """Conservatively reject adapters with unisolated external helper state."""
-        if product.strip().lower() in ("qwenpaw", "openclaw"):
+        if product.strip().lower() in ("qwenpaw", "openclaw", "codex"):
             return None
         if product.strip().lower() != "codebuddy":
             return "Product worker isolation has not been implemented"
@@ -79,6 +82,20 @@ class AgentModelFactory:
                 secrets=(*sensitive_environment_values(), *secrets, *profile.secrets),
             )
             return OpenClawAgentModel(workspace=workspace, environment=environment, profile=profile)
+        if normalized == "codex":
+            from agent_models.codex.model import CodexAgentModel
+            from agent_models.codex.profile import CodexTestProfile
+            from agent_models.environment.session import ControlledEnvironment
+
+            environment = ControlledEnvironment(
+                workspace,
+                evidence_directory=evidence_directory,
+                assets_root=assets_root,
+                run_id=run_id,
+                secrets=(*sensitive_environment_values(), *secrets),
+            )
+            return CodexAgentModel(workspace=workspace, environment=environment,
+                                   profile=CodexTestProfile.from_environment())
         if normalized == "opencode":
             from agent_models.environment.session import ControlledEnvironment
             from agent_models.opencode.driver import OpenCodeDriver
