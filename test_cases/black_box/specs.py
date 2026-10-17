@@ -10,7 +10,11 @@ from typing import Mapping
 from agent_models.evidence import JsonValue
 from test_cases.black_box.models import AssertionRule, BlackBoxCaseSpec, PublicStepSpec, WorkspaceFileSpec
 
-DEFAULT_CATALOG = Path(__file__).resolve().parents[2] / "configs" / "black_box_cases.json"
+CONFIG_DIR = Path(__file__).resolve().parents[2] / "configs"
+DEFAULT_CATALOG = CONFIG_DIR / "black_box_cases.json"
+# Every ``black_box_*.json`` manifest contributes cases; load order is filename order,
+# which also sets report section order for batches whose clauses are not in the registry.
+DEFAULT_CATALOG_PATTERN = "black_box_*.json"
 
 
 def _mapping(value: object, name: str) -> dict[str, JsonValue]:
@@ -109,16 +113,38 @@ def case_spec_from_mapping(value: Mapping[str, JsonValue]) -> BlackBoxCaseSpec:
     )
 
 
-def load_black_box_specs(path: Path = DEFAULT_CATALOG) -> dict[str, BlackBoxCaseSpec]:
-    with Path(path).open(encoding="utf-8") as stream:
-        payload = json.load(stream)
-    specs = tuple(case_spec_from_mapping(entry) for entry in _entries(payload))
-    if len({spec.case_id for spec in specs}) != len(specs):
-        raise ValueError("black-box catalog contains duplicate case IDs")
-    return {spec.case_id: spec for spec in specs}
+def catalog_paths(path: Path | None = None) -> tuple[Path, ...]:
+    """Return every manifest to merge; an explicit path disables discovery."""
+    if path is not None:
+        return (Path(path),)
+    discovered = tuple(sorted(CONFIG_DIR.glob(DEFAULT_CATALOG_PATTERN)))
+    if not discovered:
+        raise ValueError(f"no black-box catalog matched {DEFAULT_CATALOG_PATTERN!r}")
+    return discovered
 
 
-def load_black_box_spec(case_id: str, path: Path = DEFAULT_CATALOG) -> BlackBoxCaseSpec:
+def load_black_box_specs(path: Path | None = None) -> dict[str, BlackBoxCaseSpec]:
+    """Load and merge every discovered manifest, rejecting duplicate case IDs."""
+    specs: dict[str, BlackBoxCaseSpec] = {}
+    origins: dict[str, Path] = {}
+    for catalog in catalog_paths(path):
+        with catalog.open(encoding="utf-8") as stream:
+            payload = json.load(stream)
+        for entry in _entries(payload):
+            spec = case_spec_from_mapping(entry)
+            if spec.case_id in specs:
+                raise ValueError(
+                    f"black-box case ID {spec.case_id!r} is defined in both "
+                    f"{origins[spec.case_id].name} and {catalog.name}"
+                )
+            specs[spec.case_id] = spec
+            origins[spec.case_id] = catalog
+    if not specs:
+        raise ValueError("black-box catalogs contain no cases")
+    return specs
+
+
+def load_black_box_spec(case_id: str, path: Path | None = None) -> BlackBoxCaseSpec:
     try:
         return load_black_box_specs(path)[case_id]
     except KeyError as error:

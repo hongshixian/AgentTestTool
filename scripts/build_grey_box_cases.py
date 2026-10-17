@@ -9,9 +9,9 @@ from pathlib import Path
 from typing import Any
 
 try:
-    from scripts.build_black_box_cases import FIELD_NAMES, read_rows
+    from scripts.build_black_box_cases import FIELD_NAMES, case_identifier, read_rows, wrapper_filename
 except ModuleNotFoundError:  # Direct execution keeps the scripts directory on sys.path.
-    from build_black_box_cases import FIELD_NAMES, read_rows
+    from build_black_box_cases import FIELD_NAMES, case_identifier, read_rows, wrapper_filename
 
 
 SHEET_NAME = "01-测试题目"
@@ -29,10 +29,6 @@ DEFERRED_REASONS = {
     "H076": "CodeBuddy CLI 缺少可对应应用切后台的明确生命周期和后台权限事件",
     "H077": "缺少全任务空闲屏障后的真实 OS 权限访问事件",
 }
-EXPECTED_CASE_IDS = tuple(
-    f"H{index:03d}" for index in range(1, 82)
-    if f"H{index:03d}" not in DEFERRED_CASE_IDS
-)
 
 
 def _clauses(path: Path) -> dict[str, dict[str, str]]:
@@ -67,8 +63,9 @@ def build_manifest(workbook: Path, clause_file: Path) -> dict[str, Any]:
             })
         else:
             cases.append(case)
-    if tuple(case["case_id"] for case in cases) != EXPECTED_CASE_IDS:
-        raise ValueError("grey-box IDs do not match the reviewed 73-case scope")
+    case_ids = [case["case_id"] for case in cases]
+    if len(set(case_ids)) != len(case_ids):
+        raise ValueError("grey-box workbook contains duplicate case IDs")
     return {
         "schema_version": "1.0",
         "source_workbook": workbook.name,
@@ -81,14 +78,8 @@ def build_manifest(workbook: Path, clause_file: Path) -> dict[str, Any]:
     }
 
 
-def wrapper_filename(case: dict[str, Any]) -> str:
-    return f"test_{str(case['case_id']).lower()}.py"
-
-
 def render_wrapper(case: dict[str, Any]) -> str:
     case_id = str(case["case_id"])
-    if re.fullmatch(r"H\d{3}", case_id) is None:
-        raise ValueError(f"invalid grey-box case ID: {case_id}")
     values = {
         "case_id": case_id,
         "title": str(case["title"]),
@@ -117,7 +108,7 @@ CLAUSE_ORIGINAL_TEXT = {quoted["original"]}
 CASE_TITLE = {quoted["title"]}
 
 
-class Test{case_id}GreyBoxCase(GreyBoxCaseRunner):
+class Test{case_identifier(case_id)}GreyBoxCase(GreyBoxCaseRunner):
     """Test case {case_id}: {values["title"]}."""
 
     def test_grey_box_case(

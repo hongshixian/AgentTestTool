@@ -9,14 +9,13 @@ from pathlib import Path
 from typing import Any
 
 try:
-    from scripts.build_black_box_cases import FIELD_NAMES, read_rows
+    from scripts.build_black_box_cases import FIELD_NAMES, case_identifier, read_rows, wrapper_filename
 except ModuleNotFoundError:
-    from build_black_box_cases import FIELD_NAMES, read_rows
+    from build_black_box_cases import FIELD_NAMES, case_identifier, read_rows, wrapper_filename
 
 
 SHEET_NAME = "01-测试题目"
 WHITE_BOX_LABEL = "白盒卷"
-EXPECTED_CASE_IDS = tuple(f"W{index:03d}" for index in range(1, 87))
 IMPLEMENTED_CASE_IDS = frozenset({"W062", "W066", "W085", "W086"})
 
 
@@ -62,8 +61,9 @@ def build_manifest(workbook: Path, clause_file: Path) -> dict[str, Any]:
             deferred_reason=("" if source.get("题目编号") in IMPLEMENTED_CASE_IDS else _deferred_reason(source)),
         )
         cases.append(case)
-    if tuple(case["case_id"] for case in cases) != EXPECTED_CASE_IDS:
-        raise ValueError("white-box IDs do not match the reviewed 86-case scope")
+    case_ids = [case["case_id"] for case in cases]
+    if len(set(case_ids)) != len(case_ids):
+        raise ValueError("white-box workbook contains duplicate case IDs")
     return {
         "schema_version": "1.0",
         "source_workbook": workbook.name,
@@ -77,8 +77,6 @@ def build_manifest(workbook: Path, clause_file: Path) -> dict[str, Any]:
 
 def render_wrapper(case: dict[str, Any]) -> str:
     case_id = str(case["case_id"])
-    if re.fullmatch(r"W\d{3}", case_id) is None:
-        raise ValueError(f"invalid white-box case ID: {case_id}")
     values = {
         "case_id": case_id,
         "title": str(case["title"]),
@@ -109,7 +107,7 @@ CASE_TITLE = {quoted["title"]}
 DEFERRED_REASON = {quoted["reason"]}
 
 
-class Test{case_id}DeferredWhiteBoxCase(AgentTestCase):
+class Test{case_identifier(case_id)}DeferredWhiteBoxCase(AgentTestCase):
     """测试用例 ID：{case_id}
 
     测试用例名称：{values["title"]}

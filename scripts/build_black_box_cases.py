@@ -13,7 +13,6 @@ from typing import Any
 
 SHEET_NAME = "01-测试题目"
 BLACK_BOX_LABEL = "黑盒卷"
-EXPECTED_CASE_IDS = tuple(f"B{index:03d}" for index in range(1, 43))
 FIELD_NAMES = {
     "题目编号": "case_id",
     "卷子一级分类": "suite",
@@ -157,8 +156,9 @@ def build_manifest(workbook: Path, clause_file: Path) -> dict[str, Any]:
             clause_original_text=clause["original_text"],
         )
         cases.append(case)
-    if tuple(case["case_id"] for case in cases) != EXPECTED_CASE_IDS:
-        raise ValueError("black-box case IDs must be exactly B001 through B042 in order")
+    case_ids = [case["case_id"] for case in cases]
+    if len(set(case_ids)) != len(case_ids):
+        raise ValueError("black-box workbook contains duplicate case IDs")
     for case in cases:
         if case["input_config"].get("Case_ID") != case["case_id"]:
             raise ValueError(f"{case['case_id']} input JSON Case_ID does not match")
@@ -178,16 +178,25 @@ def _quoted(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
+def case_identifier(case_id: str) -> str:
+    """Convert an opaque case ID into a valid Python class-name fragment."""
+    cleaned = re.sub(r"[^0-9A-Za-z]+", "", case_id)
+    if not cleaned:
+        raise ValueError(f"case ID has no identifier characters: {case_id!r}")
+    return f"Case{cleaned}" if cleaned[0].isdigit() else cleaned
+
+
 def wrapper_filename(case: dict[str, Any]) -> str:
-    return f"test_{str(case['case_id']).lower()}.py"
+    stem = re.sub(r"[^0-9a-z]+", "_", str(case["case_id"]).lower()).strip("_")
+    if not stem:
+        raise ValueError(f"case ID has no filename characters: {case['case_id']!r}")
+    return f"test_{stem}.py"
 
 
 def render_wrapper(case: dict[str, Any]) -> str:
     """Render one thin wrapper whose behavior remains in BlackBoxCaseRunner."""
 
     case_id = str(case["case_id"])
-    if not re.fullmatch(r"B\d{3}", case_id):
-        raise ValueError(f"invalid black-box case ID: {case_id!r}")
     title = str(case["title"])
     return f'''"""Execute black-box case {case_id} through the shared case runner."""
 
@@ -207,7 +216,7 @@ CLAUSE_ORIGINAL_TEXT = {_quoted(str(case["clause_original_text"]))}
 CASE_TITLE = {_quoted(title)}
 
 
-class Test{case_id}BlackBoxCase(BlackBoxCaseRunner):
+class Test{case_identifier(case_id)}BlackBoxCase(BlackBoxCaseRunner):
     """Test case {case_id}: {title}."""
 
     def test_black_box_case(

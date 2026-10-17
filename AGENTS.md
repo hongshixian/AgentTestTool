@@ -224,11 +224,13 @@ local_docs/                 # 本地工作簿与审计过程记录，永久禁�
 
 三套业务卷（当前主体）：
 
-- 用例 ID 直接采用三套卷工作簿“题目编号”：黑盒 `B001`、灰盒 `H001`、白盒 `W001`，三位数字编号。
-- 文件名为 `test_<小写用例 ID>.py`，例如 `test_cases/black_box/test_b001.py`。
-- 测试类名为 `Test<用例 ID><BlackBox|GreyBox|WhiteBox>Case`；未实现白盒用例为 `TestW001DeferredWhiteBoxCase`。
+- 用例 ID 是取自工作簿“题目编号”的不透明字符串，框架只要求非空且在全部黑盒清单中全局唯一；编号前缀不携带卷别、批次或条款含义。现有批次为黑盒 `B001`-`B042`、灰盒 `H001`-`H081`、白盒 `W001`-`W086`，后续批次可使用其他编号规则。
+- 文件名为 `test_<规范化用例 ID>.py`：移除 ID 中的非字母数字字符并转小写，例如 `B001` 生成 `test_b001.py`。
+- 测试类名为 `Test<规范化用例 ID><BlackBox|GreyBox|WhiteBox>Case`，规范化时移除非字母数字字符，以数字开头时加 `Case` 前缀；未实现白盒用例为 `Test<用例 ID>DeferredWhiteBoxCase`。
 - 模块级声明 `TEST_CASE_ID`、`TEST_CASE_LEVEL`、`SECURITY_DOMAIN`、`STANDARD_CLAUSE`、`CLAUSE_TITLE`、`CLAUSE_ORIGINAL_TEXT` 和 `CASE_TITLE`，与 `configs/<suite>_cases.json` 一致；白盒已实现用例另声明 `IMPLEMENTATION_MODE = "implemented"`，未实现用例声明 `DEFERRED_REASON`。
+- `STANDARD_CLAUSE` 是自由文本分组键，可以用标准条款号（如 `5.1 c)`），也可以用条款标题或其他标签；报告按该文本分组，并按 `SECURITY_DOMAIN` 区分未登记条款组。用例 ID 不推导条款，也不要求条款存在编号规则。
 - 黑盒、灰盒薄包装分别继承 `BlackBoxCaseRunner`、`GreyBoxCaseRunner`，只调用共享执行入口。
+- 黑盒卷可由多个批次共同组成：`configs/black_box_*.json` 按文件名顺序合并加载，用例 ID 跨文件重复即报错；新批次新增独立清单文件，不修改已有批次清单。
 
 冒烟和早期 ATS 场景用例：
 
@@ -255,7 +257,7 @@ local_docs/                 # 本地工作簿与审计过程记录，永久禁�
 - 测试用例代码文件的模块文档字符串使用英文，以一句话简要说明测试用例名称。
 - 测试类的文档字符串使用中文，依次说明测试用例 ID、测试用例名称、测试目标、前置条件、测试步骤和预期结果。
 - 前置条件、测试步骤和预期结果使用缩进一级的带编号有序列表。
-- 黑盒、灰盒生成的薄包装可使用一句话英文类文档字符串（`Test case B001: <名称>.`），完整说明保存在用例清单中。
+- 黑盒、灰盒生成的薄包装可使用一句话英文类文档字符串（`Test case <用例 ID>: <名称>.`），完整说明保存在用例清单中。
 - 手写用例（冒烟、已实现白盒等）使用以下格式作为模板：
 
 ```python

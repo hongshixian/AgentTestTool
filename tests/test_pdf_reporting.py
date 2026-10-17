@@ -341,17 +341,18 @@ class TestPDFReporting:
         )
         assert clauses[-1].section_title == "运行安全-7.2 c)"
 
-    def test_clause_grouping_uses_source_id_and_keeps_unmatched_cases(self) -> None:
+    def test_clause_grouping_uses_declared_clause_and_keeps_unmatched_cases(self) -> None:
         first = _case(
             "CUSTOM-CASE",
             AssessmentStatus.PASS,
             CaseCategory.BUSINESS,
-            source_case_id="TC-6.1b-D5-01",
+            standard_clause="6.1 b)",
         )
         second = _case(
-            "ATS-5.1a-D2-01-S01-01",
+            "OPAQUE-CASE-2",
             AssessmentStatus.FAIL,
             CaseCategory.BUSINESS,
+            standard_clause="5.1 a)",
         )
         unmatched = _case(
             "LEGACY-SEMANTIC-ID",
@@ -367,11 +368,60 @@ class TestPDFReporting:
         assert [group.section_title for group in groups] == [
             "基础安全-5.1 a)",
             "交互安全-6.1 b)",
-            "未匹配条款-未匹配条款",
+            "未匹配条款",
         ]
         assert groups[0].results == (second,)
         assert groups[1].results == (first,)
         assert groups[2].results == (unmatched,)
+
+    def test_case_ids_never_imply_a_clause(self) -> None:
+        legacy_id = _case(
+            "ATS-5.1a-D2-01-S01-01",
+            AssessmentStatus.PASS,
+            CaseCategory.BUSINESS,
+        )
+
+        groups = group_results_by_clause((legacy_id,), TEST_CLAUSES)
+        populated = [group for group in groups if group.results]
+
+        assert [group.section_title for group in populated] == ["未匹配条款"]
+        assert populated[0].results == (legacy_id,)
+
+    def test_free_text_clause_groups_are_ordered_by_first_appearance(self) -> None:
+        first_domain = _case(
+            "T001",
+            AssessmentStatus.PASS,
+            CaseCategory.BUSINESS,
+            security_domain="内容安全与有害用途防范",
+            standard_clause="外部材料中的指令隔离",
+        )
+        second_domain = _case(
+            "T002",
+            AssessmentStatus.FAIL,
+            CaseCategory.BUSINESS,
+            security_domain="执行完整性与稳健性",
+            standard_clause="失败及部分完成的处理",
+        )
+        same_clause = _case(
+            "T003",
+            AssessmentStatus.PASS,
+            CaseCategory.BUSINESS,
+            security_domain="内容安全与有害用途防范",
+            standard_clause="外部材料中的指令隔离",
+        )
+
+        groups = group_results_by_clause(
+            (first_domain, second_domain, same_clause),
+            TEST_CLAUSES,
+        )
+
+        titles = [group.section_title for group in groups]
+        assert titles.index("内容安全与有害用途防范-外部材料中的指令隔离") < titles.index(
+            "执行完整性与稳健性-失败及部分完成的处理"
+        )
+        populated = [group for group in groups if group.results]
+        assert len(populated) == 2
+        assert len(populated[0].results) == 2
 
     def test_statistics_always_include_all_four_outcomes(self) -> None:
         results = (

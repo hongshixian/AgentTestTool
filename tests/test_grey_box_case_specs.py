@@ -11,7 +11,7 @@ import pytest
 
 from agent_models import EvidenceBundle, EvidencePhase, EvidenceRecord, TranscriptTurn, TurnResult
 from assertions.judge import JudgeStatus
-from scripts.build_grey_box_cases import DEFERRED_CASE_IDS, EXPECTED_CASE_IDS, build_manifest
+from scripts.build_grey_box_cases import DEFERRED_CASE_IDS, build_manifest
 import test_cases.grey_box.base as grey_box_base
 from test_cases.grey_box.base import (
     GreyBoxCaseRunner,
@@ -31,15 +31,21 @@ CLAUSES = ROOT / "agent_test_tool" / "reporting" / "clauses.json"
 CATALOG = ROOT / "configs" / "grey_box_cases.json"
 
 
+def _manifest_case_ids(payload: dict) -> tuple[str, ...]:
+    return tuple(case["case_id"] for case in payload["cases"])
+
+
 def test_manifest_matches_reviewed_73_case_scope() -> None:
     payload = json.loads(CATALOG.read_text(encoding="utf-8"))
+    case_ids = _manifest_case_ids(payload)
 
     assert payload["case_count"] == 73
-    assert tuple(case["case_id"] for case in payload["cases"]) == EXPECTED_CASE_IDS
+    assert len(set(case_ids)) == len(case_ids)
+    assert len(case_ids) + len(DEFERRED_CASE_IDS) == 81
     assert set(payload["deferred_case_ids"]) == DEFERRED_CASE_IDS
     assert {case["case_id"] for case in payload["deferred_cases"]} == DEFERRED_CASE_IDS
     assert all(case["deferred_reason"] for case in payload["deferred_cases"])
-    assert not DEFERRED_CASE_IDS.intersection(EXPECTED_CASE_IDS)
+    assert not DEFERRED_CASE_IDS.intersection(case_ids)
 
 
 def test_manifest_is_reproducible_from_workbook() -> None:
@@ -49,12 +55,16 @@ def test_manifest_is_reproducible_from_workbook() -> None:
 
 
 def test_every_case_has_one_independent_wrapper() -> None:
-    wrapper_ids = {
-        path.stem.removeprefix("test_").upper()
-        for path in (ROOT / "test_cases" / "grey_box").glob("test_h*.py")
+    payload = json.loads(CATALOG.read_text(encoding="utf-8"))
+    expected_stems = {
+        f"test_{case_id.lower()}.py"
+        for case_id in (*_manifest_case_ids(payload), *DEFERRED_CASE_IDS)
+    }
+    actual_stems = {
+        path.name for path in (ROOT / "test_cases" / "grey_box").glob("test_h*.py")
     }
 
-    assert wrapper_ids == set(EXPECTED_CASE_IDS) | DEFERRED_CASE_IDS
+    assert actual_stems == expected_stems
 
 
 def test_deferred_wrappers_directly_record_not_applicable_reason() -> None:

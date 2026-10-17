@@ -73,8 +73,9 @@ class BlackBoxCaseSpec:
     metadata: Mapping[str, JsonValue] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        if not self.case_id.startswith("B") or not self.case_id[1:].isdigit():
-            raise ValueError("black-box case ID must use B followed by digits")
+        # Case IDs are opaque, globally unique strings; no batch prefix is implied.
+        if not self.case_id.strip():
+            raise ValueError("black-box case ID must be nonempty")
         if not self.title.strip():
             raise ValueError("black-box case title must be nonempty")
         if isinstance(self.repeat_count, bool) or self.repeat_count < 1:

@@ -12,10 +12,7 @@ from typing import Iterable, Mapping, Sequence
 from .models import CaseResult
 
 
-_CASE_CLAUSE_PATTERN = re.compile(
-    r"^(?:ATS|TC)-(?P<clause>\d+(?:\.\d+)+[A-Za-z]?)(?:-|$)",
-    re.IGNORECASE,
-)
+UNMATCHED_GROUP_TITLE = "未匹配条款"
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,16 +33,17 @@ class ClauseDefinition:
 
 @dataclass(frozen=True, slots=True)
 class ClauseResultGroup:
-    """Cases assigned to one clause, or to the unmatched fallback group."""
+    """Cases assigned to one clause, or to a free-text fallback group."""
 
     clause: ClauseDefinition | None
     results: tuple[CaseResult, ...]
+    fallback_title: str = UNMATCHED_GROUP_TITLE
 
     @property
     def section_title(self) -> str:
         """Return a stable display title for this group."""
         if self.clause is None:
-            return "未匹配条款-未匹配条款"
+            return self.fallback_title
         return self.clause.section_title
 
 
@@ -82,15 +80,13 @@ def load_clause_definitions() -> tuple[ClauseDefinition, ...]:
 
 
 def clause_key_from_case(case: CaseResult) -> str | None:
-    """Extract a normalized standard-clause key from one business result."""
+    """Return the declaration's clause text as an opaque grouping key.
+
+    Clause values are free-form strings: a batch may carry workbook clause numbers,
+    descriptive titles, or any other label. Case IDs never imply a clause.
+    """
     explicit = _normalize_clause_key(case.standard_clause)
-    if explicit:
-        return explicit
-    for candidate in (case.source_case_id, case.case_id):
-        match = _CASE_CLAUSE_PATTERN.match(candidate.strip())
-        if match:
-            return match.group("clause").casefold()
-    return None
+    return explicit or None
 
 
 def _normalize_clause_key(value: str) -> str:
@@ -123,19 +119,20 @@ def group_results_by_clause(
             )
     definitions = tuple(by_key.values())
     buckets: dict[str, list[CaseResult]] = {clause.key: [] for clause in definitions}
-    unmatched: list[CaseResult] = []
+    unmatched: dict[str, list[CaseResult]] = {}
     for result in result_items:
         key = clause_key_from_case(result)
         if key is None or key not in buckets:
-            unmatched.append(result)
+            title = result.security_domain.strip() or UNMATCHED_GROUP_TITLE
+            unmatched.setdefault(title, []).append(result)
         else:
             buckets[key].append(result)
     groups = [
         ClauseResultGroup(clause=clause, results=tuple(buckets[clause.key]))
         for clause in definitions
     ]
-    if unmatched:
-        groups.append(ClauseResultGroup(clause=None, results=tuple(unmatched)))
+    for title, items in unmatched.items():
+        groups.append(ClauseResultGroup(clause=None, results=tuple(items), fallback_title=title))
     return tuple(groups)
 
 
