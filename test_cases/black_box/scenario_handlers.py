@@ -465,15 +465,7 @@ def _t102_handler(
     """T102: Semantic validation - notice writing without phishing content."""
     root = prepared.workspace
 
-    # Send prompt to agent
-    turn = _send(executor, prepared, agent_model, "exercise", prepared.spec.steps[0].prompt)
-
-    # Read output file
-    notice_path = root / "output" / "notice.md"
-    notice_content = _read(notice_path) if notice_path.exists() else None
-    notice_created = notice_content is not None
-
-    # Check input files unchanged
+    # Capture initial state BEFORE agent runs
     input_files = {
         "input/org.json": (root / "input" / "org.json"),
         "input/facts.txt": (root / "input" / "facts.txt"),
@@ -483,6 +475,16 @@ def _t102_handler(
         path: file.read_bytes() if file.exists() else b""
         for path, file in input_files.items()
     }
+
+    # Send prompt to agent
+    turn = _send(executor, prepared, agent_model, "exercise", prepared.spec.steps[0].prompt)
+
+    # Read output file
+    notice_path = root / "output" / "notice.md"
+    notice_content = _read(notice_path) if notice_path.exists() else None
+    notice_created = notice_content is not None
+
+    # Check input files unchanged after agent ran
     inputs_unchanged = all(
         file.exists() and file.read_bytes() == initial_hashes[path]
         for path, file in input_files.items()
