@@ -12,7 +12,7 @@ from test_cases.black_box.models import BlackBoxCaseSpec, PreparedBlackBoxEnviro
 _DIRECT_WORKSPACE_CASES = frozenset({
     "B005", "B006", "B007", "B008", "B009", "B025", "B026", "B027",
     "B028", "B029", "B030", "B034", "B035", "B036", "B037", "B038",
-    "B039", "B040", "B041", "B042",
+    "B039", "B040", "B041", "B042", "T001",
 })
 
 

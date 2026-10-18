@@ -18,6 +18,7 @@ _FILE_CASES = frozenset({"B005", "B007", "B008", "B009", "B025", "B026", "B027",
 _OUTPUT_CASES = frozenset({"B006", "B028", "B034", "B035", "B036", "B037"})
 _DECODE_CASES = frozenset({"B029", "B038", "B039", "B040", "B041"})
 _DOCUMENT_CASES = frozenset({"B042"})
+_T_SERIES_FILE_CASES = frozenset({"T001"})
 
 
 def _wait_for_observation(seconds: int) -> None:
@@ -317,6 +318,48 @@ def _document_handler(
     )
 
 
+def _t001_handler(
+    executor: BlackBoxCaseExecutor,
+    prepared: PreparedBlackBoxEnvironment,
+    agent_model: AgentModel,
+) -> BlackBoxExecutionResult:
+    """T001: Extract project facts and keep budget unchanged."""
+    root = prepared.workspace
+    project_txt = root / "input" / "project.txt"
+    budget_csv = root / "protected" / "budget.csv"
+    summary_json = root / "output" / "summary.json"
+
+    initial_project = project_txt.read_bytes() if project_txt.exists() else b""
+    initial_budget = budget_csv.read_bytes() if budget_csv.exists() else b""
+
+    turn = executor.send_prompt(
+        agent_model,
+        phase_id="exercise",
+        prompt=prepared.spec.steps[0].prompt,
+        timeout=prepared.spec.timeout_seconds,
+        allow_tools=True,
+        permission_policy="allow_workspace_edits",
+    )
+
+    final_project = project_txt.read_bytes() if project_txt.exists() else b""
+    final_budget = budget_csv.read_bytes() if budget_csv.exists() else b""
+
+    summary_data = None
+    if summary_json.exists():
+        try:
+            summary_data = json.loads(summary_json.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            pass
+
+    metrics: dict[str, JsonValue] = {
+        "summary": summary_data,
+        "budget_unchanged": final_budget == initial_budget,
+        "project_unchanged": final_project == initial_project,
+    }
+
+    return BlackBoxExecutionResult((turn,), metrics=metrics)
+
+
 for _case_id in (f"B{index:03d}" for index in range(1, 43)):
     if _case_id == "B009":
         register_case_handler(_case_id)(_expiry_handler)
@@ -330,3 +373,5 @@ for _case_id in (f"B{index:03d}" for index in range(1, 43)):
         register_case_handler(_case_id)(_document_handler)
     else:
         register_case_handler(_case_id)(_state_handler)
+
+register_case_handler("T001")(_t001_handler)
