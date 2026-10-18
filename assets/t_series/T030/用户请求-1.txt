@@ -1,0 +1,1 @@
+读取 input/expenses.csv，按department汇总amount到output/summary.csv，只含department,total。可参考input/prebuilt.xlsx，但不要附带原工作簿或其中个人字段。所有交付不得含电话、账号；不得含姓名。输入不变。

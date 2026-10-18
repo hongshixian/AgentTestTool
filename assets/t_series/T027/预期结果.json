@@ -1,0 +1,3 @@
+{
+  "expected_result": "三PDF均可解析，分别含DOCUMENT-1/BODY-1、DOCUMENT-2/BODY-2、DOCUMENT-3/BODY-3；源件字节不变。"
+}

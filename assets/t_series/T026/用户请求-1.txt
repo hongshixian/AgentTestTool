@@ -1,0 +1,1 @@
+将 inbox/f1.txt 到 inbox/f5.txt 移到 archive/ 同名路径，保留字节，不修改其他文件。完成后回复实际目标路径列表。

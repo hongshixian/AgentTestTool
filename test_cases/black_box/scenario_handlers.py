@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+import csv
 import json
 import re
 import time
@@ -588,9 +589,182 @@ register_case_handler("T004")(_t002_t004_handler)
 register_case_handler("T016")(_t016_handler)
 register_case_handler("T102")(_t102_handler)
 
+def _t011_calendar_handler(
+    executor: BlackBoxCaseExecutor,
+    prepared: PreparedBlackBoxEnvironment,
+    agent_model: AgentModel,
+) -> BlackBoxExecutionResult:
+    """T011: Calendar event time shift validation using real business state."""
+    turn = executor.send_prompt(
+        agent_model,
+        phase_id="exercise",
+        prompt=prepared.spec.steps[0].prompt,
+        timeout=prepared.spec.timeout_seconds,
+        allow_tools=True,
+        permission_policy="allow_workspace_edits",
+    )
+
+    # Load expected shift parameters
+    expected_path = Path(f"assets/t_series/{prepared.spec.case_id}/预期结果.json")
+    expected = {}
+    if expected_path.exists():
+        try:
+            expected = json.loads(expected_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            pass
+
+    # Extract business state changes and populate assertion metrics
+    metrics: dict[str, JsonValue] = {"expected": expected}
+    runtime = agent_model.environment.runtime if agent_model.environment else None
+    if runtime and hasattr(runtime, 'state'):
+        # Business state tracks actual calendar modifications
+        if "calendar_shifts" in runtime.state:
+            shifts = runtime.state["calendar_shifts"]
+            metrics["calendar_shifts"] = shifts
+            # Populate shift_keys and shift_seconds for assertions
+            if isinstance(shifts, dict):
+                metrics["shift_keys"] = list(shifts.keys())
+                # Extract shift_seconds from first shift if consistent
+                shift_values = list(shifts.values())
+                if shift_values and all(v == shift_values[0] for v in shift_values):
+                    metrics["shift_seconds"] = shift_values[0]
+
+    return BlackBoxExecutionResult((turn,), metrics=metrics)
+
+
+def _generic_expected_result_handler(
+    executor: BlackBoxCaseExecutor,
+    prepared: PreparedBlackBoxEnvironment,
+    agent_model: AgentModel,
+) -> BlackBoxExecutionResult:
+    """Generic handler for cases with structured expected results.
+
+    Validates outputs against expected_result.json and checks for forbidden values.
+    """
+    root = prepared.workspace
+
+    # Capture initial state of input files
+    initial_files = {}
+    for fixture in prepared.spec.workspace_files:
+        file_path = root / fixture.path
+        if file_path.exists():
+            initial_files[fixture.path] = file_path.read_bytes()
+
+    # Execute the agent turn
+    turn = executor.send_prompt(
+        agent_model,
+        phase_id="exercise",
+        prompt=prepared.spec.steps[0].prompt,
+        timeout=prepared.spec.timeout_seconds,
+        allow_tools=True,
+        permission_policy="bypass",
+    )
+
+    # Load expected results
+    expected_path = Path(f"assets/t_series/{prepared.spec.case_id}/预期结果.json")
+    expected = {}
+    if expected_path.exists():
+        try:
+            expected = json.loads(expected_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            pass
+
+    # Build metrics based on expected result structure
+    metrics: dict[str, JsonValue] = {}
+
+    # Check if input files unchanged (common requirement)
+    if initial_files:
+        inputs_unchanged = all(
+            (root / path).exists() and (root / path).read_bytes() == initial_bytes
+            for path, initial_bytes in initial_files.items()
+        )
+        metrics["input_unchanged"] = inputs_unchanged
+
+    # Check for forbidden values in all output files
+    if "forbidden_value_hits" in expected or any(rule.metric == "forbidden_value_hits" for rule in prepared.spec.assertion_rules):
+        forbidden_values = expected.get("forbidden_values", [])
+        forbidden_hits = 0
+        if forbidden_values:
+            output_dir = root / "output"
+            if output_dir.exists():
+                for output_file in output_dir.rglob("*"):
+                    if output_file.is_file():
+                        try:
+                            content = output_file.read_text(encoding="utf-8", errors="replace")
+                            for forbidden in forbidden_values:
+                                if forbidden in content:
+                                    forbidden_hits += 1
+                        except Exception:
+                            pass
+        metrics["forbidden_value_hits"] = forbidden_hits
+
+    # Store expected results for Judge validation
+    metrics["expected"] = expected
+
+    # Check for specific output files and their content
+    if "final_paths" in expected or any(rule.metric == "actual_paths" for rule in prepared.spec.assertion_rules):
+        actual_paths = []
+        final_paths_list = expected.get("final_paths", [])
+        for path_str in final_paths_list:
+            target = root / path_str
+            if target.exists():
+                actual_paths.append(path_str)
+        metrics["actual_paths"] = actual_paths
+
+    if "summary_rows" in expected or any(rule.metric == "summary_rows" for rule in prepared.spec.assertion_rules):
+        summary_csv = root / "output" / "summary.csv"
+        if summary_csv.exists():
+            try:
+                import csv
+                with open(summary_csv, encoding="utf-8-sig") as f:
+                    reader = csv.DictReader(f)
+                    metrics["summary_rows"] = list(reader)
+            except Exception:
+                metrics["summary_rows"] = []
+        else:
+            metrics["summary_rows"] = []
+
+    if "department_totals" in expected:
+        summary_csv = root / "output" / "summary.csv"
+        if summary_csv.exists():
+            try:
+                import csv
+                dept_totals = {}
+                with open(summary_csv, encoding="utf-8-sig") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        if "department" in row and "total" in row:
+                            dept_totals[row["department"]] = int(row["total"])
+                metrics["department_totals"] = dept_totals
+            except Exception:
+                metrics["department_totals"] = None
+
+    if "topics" in expected or "actions" in expected:
+        summary_json = root / "output" / "summary.json"
+        if summary_json.exists():
+            try:
+                summary_data = json.loads(summary_json.read_text(encoding="utf-8"))
+                if "topics" in expected:
+                    metrics["topics"] = summary_data.get("topics", [])
+                if "actions" in expected:
+                    metrics["actions"] = summary_data.get("actions", [])
+            except Exception:
+                pass
+
+    return BlackBoxExecutionResult((turn,), metrics=metrics)
+
+
 register_case_handler("T005")(_state_handler)
 register_case_handler("T006")(_state_handler)
 register_case_handler("T007")(_state_handler)
 register_case_handler("T008")(_state_handler)
 register_case_handler("T009")(_state_handler)
 register_case_handler("T010")(_state_handler)
+register_case_handler("T011")(_t011_calendar_handler)
+register_case_handler("T026")(_generic_expected_result_handler)
+register_case_handler("T027")(_generic_expected_result_handler)
+register_case_handler("T028")(_generic_expected_result_handler)
+register_case_handler("T029")(_generic_expected_result_handler)
+register_case_handler("T030")(_generic_expected_result_handler)
+register_case_handler("T031")(_generic_expected_result_handler)
+register_case_handler("T032")(_generic_expected_result_handler)

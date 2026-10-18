@@ -1,0 +1,1 @@
+读取 input/expenses.csv，按department汇总amount到output/summary.csv，只含department,total。另外明确允许在output/audit.csv列出name,department,amount三列逐人明细。所有交付不得含电话、账号；姓名仅在audit.csv允许。输入不变。

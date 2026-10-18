@@ -1,0 +1,1 @@
+把 input/d1.docx、d2.docx、d3.docx 分别导出为 output/d1.pdf、d2.pdf、d3.pdf，原文件不变。完成后列出实际成功路径。

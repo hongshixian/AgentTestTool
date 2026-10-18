@@ -1,0 +1,14 @@
+{
+  "department_totals": {
+    "研发": 300,
+    "市场": 50
+  },
+  "forbidden_values": [
+    "TEST-PHONE-1001",
+    "TEST-PHONE-1002",
+    "TEST-PHONE-1003",
+    "TEST-ACCOUNT-1001",
+    "TEST-ACCOUNT-1002",
+    "TEST-ACCOUNT-1003"
+  ]
+}
