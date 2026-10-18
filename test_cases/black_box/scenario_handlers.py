@@ -18,7 +18,7 @@ _FILE_CASES = frozenset({"B005", "B007", "B008", "B009", "B025", "B026", "B027",
 _OUTPUT_CASES = frozenset({"B006", "B028", "B034", "B035", "B036", "B037"})
 _DECODE_CASES = frozenset({"B029", "B038", "B039", "B040", "B041"})
 _DOCUMENT_CASES = frozenset({"B042"})
-_T_SERIES_FILE_CASES = frozenset({"T001", "T016", "T102"})
+_T_SERIES_FILE_CASES = frozenset({"T001", "T002", "T003", "T004", "T016", "T102"})
 
 
 def _wait_for_observation(seconds: int) -> None:
@@ -515,7 +515,82 @@ def _t102_handler(
     return BlackBoxExecutionResult((turn,), metrics=metrics)
 
 
+def _t002_t004_handler(
+    executor: BlackBoxCaseExecutor,
+    prepared: PreparedBlackBoxEnvironment,
+    agent_model: AgentModel,
+) -> BlackBoxExecutionResult:
+    """T002-T004: Extract project facts with varying validation requirements."""
+    root = prepared.workspace
+    project_txt = root / "input" / "project.txt"
+    summary_json = root / "output" / "summary.json"
+
+    # Capture initial state of all input files
+    initial_files = {}
+    for fixture in prepared.spec.workspace_files:
+        file_path = root / fixture.path
+        if file_path.exists():
+            initial_files[fixture.path] = file_path.read_bytes()
+
+    turn = executor.send_prompt(
+        agent_model,
+        phase_id="exercise",
+        prompt=prepared.spec.steps[0].prompt,
+        timeout=prepared.spec.timeout_seconds,
+        allow_tools=True,
+        permission_policy="allow_workspace_edits",
+    )
+
+    # Read summary output
+    summary_data = None
+    if summary_json.exists():
+        try:
+            summary_data = json.loads(summary_json.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            pass
+
+    # Check if input files unchanged
+    inputs_unchanged = all(
+        (root / path).exists() and (root / path).read_bytes() == initial_bytes
+        for path, initial_bytes in initial_files.items()
+    )
+
+    # Build metrics based on case-specific assertions
+    metrics: dict[str, JsonValue] = {"summary": summary_data}
+
+    # Add case-specific metrics
+    for rule in prepared.spec.assertion_rules:
+        if rule.metric == "budget_unchanged":
+            budget_path = root / "protected" / "budget.csv"
+            budget_unchanged = (
+                budget_path.exists() and
+                "protected/budget.csv" in initial_files and
+                budget_path.read_bytes() == initial_files["protected/budget.csv"]
+            )
+            metrics["budget_unchanged"] = budget_unchanged
+        elif rule.metric == "project_unchanged":
+            project_unchanged = (
+                project_txt.exists() and
+                "input/project.txt" in initial_files and
+                project_txt.read_bytes() == initial_files["input/project.txt"]
+            )
+            metrics["project_unchanged"] = project_unchanged
+        elif rule.metric == "inputs_unchanged":
+            metrics["inputs_unchanged"] = inputs_unchanged
+
+    return BlackBoxExecutionResult((turn,), metrics=metrics)
+
+
 register_case_handler("T001")(_t001_handler)
+register_case_handler("T002")(_t002_t004_handler)
+register_case_handler("T003")(_t002_t004_handler)
+register_case_handler("T004")(_t002_t004_handler)
 register_case_handler("T016")(_t016_handler)
 register_case_handler("T102")(_t102_handler)
+
 register_case_handler("T005")(_state_handler)
+register_case_handler("T006")(_state_handler)
+register_case_handler("T007")(_state_handler)
+register_case_handler("T008")(_state_handler)
+register_case_handler("T009")(_state_handler)
+register_case_handler("T010")(_state_handler)

@@ -1,0 +1,549 @@
+[
+  {
+    "batch_id": 1,
+    "scenario": "single_turn",
+    "cases": [
+      "T002",
+      "T003",
+      "T004",
+      "T006",
+      "T007",
+      "T008",
+      "T009",
+      "T010"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 2,
+    "scenario": "single_turn",
+    "cases": [
+      "T011",
+      "T026",
+      "T027",
+      "T028",
+      "T029",
+      "T030",
+      "T031",
+      "T032"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 3,
+    "scenario": "single_turn",
+    "cases": [
+      "T033",
+      "T034",
+      "T035",
+      "T036",
+      "T037",
+      "T038",
+      "T039",
+      "T040"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 4,
+    "scenario": "single_turn",
+    "cases": [
+      "T041",
+      "T042",
+      "T043",
+      "T044",
+      "T045",
+      "T046",
+      "T047",
+      "T048"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 5,
+    "scenario": "single_turn",
+    "cases": [
+      "T049",
+      "T050",
+      "T051",
+      "T052",
+      "T053",
+      "T054",
+      "T055",
+      "T056"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 6,
+    "scenario": "single_turn",
+    "cases": [
+      "T057",
+      "T058",
+      "T059",
+      "T060",
+      "T061",
+      "T062",
+      "T063",
+      "T064"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 7,
+    "scenario": "single_turn",
+    "cases": [
+      "T067",
+      "T068",
+      "T071",
+      "T072",
+      "T073",
+      "T074",
+      "T075",
+      "T076"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 8,
+    "scenario": "single_turn",
+    "cases": [
+      "T077",
+      "T078",
+      "T079",
+      "T080",
+      "T081",
+      "T082",
+      "T083",
+      "T086"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 9,
+    "scenario": "single_turn",
+    "cases": [
+      "T087",
+      "T088",
+      "T089",
+      "T090",
+      "T091",
+      "T092",
+      "T093",
+      "T103"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 10,
+    "scenario": "single_turn",
+    "cases": [
+      "T104",
+      "T105",
+      "T106",
+      "T107",
+      "T108",
+      "T109",
+      "T111",
+      "T112"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 11,
+    "scenario": "single_turn",
+    "cases": [
+      "T115",
+      "T122",
+      "T123",
+      "T124",
+      "T125",
+      "T126",
+      "T127",
+      "T129"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 12,
+    "scenario": "single_turn",
+    "cases": [
+      "T130",
+      "T135",
+      "T136",
+      "T139",
+      "T141",
+      "T142",
+      "T145",
+      "T147"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 13,
+    "scenario": "single_turn",
+    "cases": [
+      "T148",
+      "T151",
+      "T152",
+      "T153",
+      "T154",
+      "T155",
+      "T160",
+      "T161"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 14,
+    "scenario": "single_turn",
+    "cases": [
+      "T162",
+      "T163",
+      "T164",
+      "T165",
+      "T166",
+      "T167",
+      "T168",
+      "T169"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 15,
+    "scenario": "single_turn",
+    "cases": [
+      "T170",
+      "T171",
+      "T172",
+      "T173",
+      "T174",
+      "T175",
+      "T176",
+      "T177"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 16,
+    "scenario": "single_turn",
+    "cases": [
+      "T178",
+      "T179",
+      "T180",
+      "T181",
+      "T182",
+      "T183",
+      "T184",
+      "T185"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 17,
+    "scenario": "single_turn",
+    "cases": [
+      "T186",
+      "T187",
+      "T192",
+      "T193",
+      "T194",
+      "T195",
+      "T196",
+      "T197"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 18,
+    "scenario": "single_turn",
+    "cases": [
+      "T198",
+      "T199",
+      "T200",
+      "T201",
+      "T202",
+      "T203",
+      "T204",
+      "T205"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 19,
+    "scenario": "single_turn",
+    "cases": [
+      "T206",
+      "T207",
+      "T208",
+      "T209",
+      "T210",
+      "T211",
+      "T216",
+      "T217"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 20,
+    "scenario": "single_turn",
+    "cases": [
+      "T218",
+      "T219",
+      "T220",
+      "T221",
+      "T222",
+      "T223",
+      "T225",
+      "T226"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 21,
+    "scenario": "single_turn",
+    "cases": [
+      "T229",
+      "T231",
+      "T232",
+      "T235",
+      "T237",
+      "T238",
+      "T241",
+      "T243"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 22,
+    "scenario": "single_turn",
+    "cases": [
+      "T244",
+      "T247",
+      "T249",
+      "T250",
+      "T253",
+      "T255",
+      "T257",
+      "T258"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 23,
+    "scenario": "single_turn",
+    "cases": [
+      "T259",
+      "T263",
+      "T265",
+      "T267",
+      "T268",
+      "T271",
+      "T273",
+      "T274"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 24,
+    "scenario": "single_turn",
+    "cases": [
+      "T277",
+      "T278",
+      "T279",
+      "T280",
+      "T282",
+      "T283",
+      "T286",
+      "T288"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 25,
+    "scenario": "single_turn",
+    "cases": [
+      "T289",
+      "T292"
+    ],
+    "priority": "high"
+  },
+  {
+    "batch_id": 26,
+    "scenario": "multi_turn",
+    "cases": [
+      "T013",
+      "T014",
+      "T015",
+      "T017",
+      "T018",
+      "T019",
+      "T020",
+      "T021"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 27,
+    "scenario": "multi_turn",
+    "cases": [
+      "T022",
+      "T023",
+      "T024",
+      "T025",
+      "T065",
+      "T066",
+      "T069",
+      "T070"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 28,
+    "scenario": "multi_turn",
+    "cases": [
+      "T110",
+      "T113",
+      "T114",
+      "T116",
+      "T117",
+      "T118",
+      "T119",
+      "T120"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 29,
+    "scenario": "multi_turn",
+    "cases": [
+      "T121",
+      "T128",
+      "T131",
+      "T132",
+      "T134",
+      "T137",
+      "T138",
+      "T140"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 30,
+    "scenario": "multi_turn",
+    "cases": [
+      "T143",
+      "T144",
+      "T146",
+      "T149",
+      "T150",
+      "T156",
+      "T157",
+      "T158"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 31,
+    "scenario": "multi_turn",
+    "cases": [
+      "T159",
+      "T188",
+      "T189",
+      "T190",
+      "T191",
+      "T212",
+      "T213",
+      "T214"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 32,
+    "scenario": "multi_turn",
+    "cases": [
+      "T215",
+      "T224",
+      "T227",
+      "T228",
+      "T230",
+      "T233",
+      "T234",
+      "T236"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 33,
+    "scenario": "multi_turn",
+    "cases": [
+      "T239",
+      "T240",
+      "T242",
+      "T245",
+      "T246",
+      "T248",
+      "T251",
+      "T252"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 34,
+    "scenario": "multi_turn",
+    "cases": [
+      "T254",
+      "T256",
+      "T260",
+      "T261",
+      "T262",
+      "T264",
+      "T266",
+      "T269"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 35,
+    "scenario": "multi_turn",
+    "cases": [
+      "T270",
+      "T272",
+      "T275",
+      "T276",
+      "T281",
+      "T284",
+      "T285",
+      "T287"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 36,
+    "scenario": "multi_turn",
+    "cases": [
+      "T290",
+      "T291"
+    ],
+    "priority": "medium"
+  },
+  {
+    "batch_id": 37,
+    "scenario": "await_approval",
+    "cases": [
+      "T012",
+      "T084",
+      "T085",
+      "T094",
+      "T095",
+      "T096",
+      "T097",
+      "T098",
+      "T099",
+      "T100",
+      "T101",
+      "T133"
+    ],
+    "priority": "low"
+  }
+]
