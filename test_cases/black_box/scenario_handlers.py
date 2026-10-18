@@ -459,3 +459,4 @@ for _case_id in (f"B{index:03d}" for index in range(1, 43)):
 
 register_case_handler("T001")(_t001_handler)
 register_case_handler("T016")(_t016_handler)
+register_case_handler("T005")(_state_handler)
