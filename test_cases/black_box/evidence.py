@@ -70,6 +70,9 @@ class BlackBoxEvidenceProjector:
                 "business_state_before": dict(evidence.business_state_before),
                 "business_state_after": dict(evidence.business_state_after),
                 "metrics": dict(evidence.metrics),
+                "execution": {
+                    "retry_count": execution.retry_count,
+                },
             },
         )
         return evidence

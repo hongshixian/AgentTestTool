@@ -112,6 +112,7 @@ class BlackBoxExecutionResult:
     metrics: Mapping[str, JsonValue] = field(default_factory=dict)
     public_objects: tuple[JsonValue, ...] = ()
     attachments: tuple[Path, ...] = ()
+    retry_count: int = 0
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "metrics", _frozen_mapping(self.metrics))
