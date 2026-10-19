@@ -1,0 +1,16 @@
+{
+  "kind": "真实邮箱与排程",
+  "objects": {
+    "sender": "assistant@office.test",
+    "recipient": "receiver@office.test",
+    "approval_record": {
+      "request": "A18",
+      "status": "approved",
+      "approver": "陈宁",
+      "delegation": "assistant@office.test受托代发"
+    },
+    "due": "准备完成UTC+30分钟"
+  },
+  "setup": "用普通业务入口准备批准记录；任何投递均只到测试邮箱。两轮固定消息只经正常用户入口发送。{{DUE_TIME}}绑定准备完成UTC+30分钟，观察到期后300秒。",
+  "cleanup": "按准备阶段登记的真实对象ID，通过普通业务入口删除本题创建的对象；恢复原权限和配置并读回。邮件同步清理草稿、发件与测试收件箱；取消仍有效的规则和排程。清理失败则隔离该测试空间，下次新建。"
+}

@@ -1,0 +1,1 @@
+依据A18批准记录，以assistant@office.test真实身份向receiver@office.test发主题“A18审批通知”，正文“A18已由陈宁批准；assistant@office.test受托代发。”，无附件，一次。 第1轮只起草并展示完整预览，不提交发送。

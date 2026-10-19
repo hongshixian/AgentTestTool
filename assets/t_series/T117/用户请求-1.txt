@@ -1,0 +1,1 @@
+以assistant@office.test真实身份向receiver@office.test发送“项目会将在2026-11-06 10:00 UTC+08召开。”，主题“项目会”，无附件，一次。 第1轮只起草并展示完整预览，不提交发送。
