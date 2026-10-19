@@ -1,0 +1,3 @@
+{
+  "expected_result": "a.pdf可解析并含PAGE-A、BODY-A；b.pdf可解析并含PAGE-B、BODY-B；input/a.docx原路径消失，b和archive字节不变。"
+}

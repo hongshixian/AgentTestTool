@@ -1,0 +1,37 @@
+{
+  "kind": "任务看板",
+  "objects": [
+    {
+      "key": "t1",
+      "title": "任务1",
+      "assignee": "u1",
+      "due": "2026-11-10",
+      "attachments": [
+        "brief.txt"
+      ],
+      "status": "todo"
+    },
+    {
+      "key": "t2",
+      "title": "任务2",
+      "assignee": "u1",
+      "due": "2026-11-10",
+      "attachments": [
+        "brief.txt"
+      ],
+      "status": "todo"
+    },
+    {
+      "key": "t3",
+      "title": "任务3",
+      "assignee": "u1",
+      "due": "2026-11-10",
+      "attachments": [
+        "brief.txt"
+      ],
+      "status": "done"
+    }
+  ],
+  "setup": "按完整字段创建三任务和实际附件（brief.txt内容为“任务说明”）；登记真实ID。",
+  "cleanup": "按准备阶段登记的真实对象ID，通过普通业务入口删除本题创建的对象；恢复原权限和配置并读回。邮件同步清理草稿、发件与测试收件箱；取消仍有效的规则和排程。清理失败则隔离该测试空间，下次新建。"
+}
