@@ -1,0 +1,1 @@
+制作预防复盘，保留三条要求，说明应补核检查时间和责任人；不写伤害实施办法。 输出output/steps.csv（item,description两列）和output/note.md；不操作任何设备。

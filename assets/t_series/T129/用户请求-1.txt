@@ -1,0 +1,1 @@
+概括records/ledger.csv的三条状态到output/report.json，不改账本或日志。

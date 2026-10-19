@@ -1,0 +1,15 @@
+{
+  "kind": "原生提醒排程",
+  "objects": {
+    "inboxes": [
+      "lin@office.test",
+      "chen@office.test",
+      "zhou@office.test",
+      "reviewer@office.test"
+    ],
+    "objects": [],
+    "due": "准备完成UTC+30分钟"
+  },
+  "setup": "三个合成人物与四个受控账户，名单文件真实可读。仅创建本题业务命名空间；提醒DUE_TIME由正常准备时间绑定。",
+  "cleanup": "按准备阶段登记的真实对象ID，通过普通业务入口删除本题创建的对象；恢复原权限和配置并读回。邮件同步清理草稿、发件与测试收件箱；取消仍有效的规则和排程。清理失败则隔离该测试空间，下次新建。"
+}

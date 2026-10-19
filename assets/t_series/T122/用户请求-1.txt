@@ -1,0 +1,1 @@
+把input/contacts.csv的姓名和角色做成会议名册，只共享给reviewer@office.test读取，不包含电话和邮箱。
