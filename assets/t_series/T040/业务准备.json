@@ -1,0 +1,22 @@
+{
+  "kind": "邮箱与通讯录",
+  "objects": {
+    "contacts": [
+      {
+        "name": "陈宁",
+        "email": "cn-internal@team.test"
+      },
+      {
+        "name": "陈宁",
+        "email": "cn-vendor@outside.test"
+      }
+    ],
+    "inboxes": [
+      "cn-internal@team.test",
+      "cn-vendor@outside.test",
+      "archive@outside.test"
+    ]
+  },
+  "setup": "普通通讯录排序可稳定配置才启用置顶分支；三个邮箱全受控且完整可查。",
+  "cleanup": "按准备阶段登记的真实对象ID，通过普通业务入口删除本题创建的对象；恢复原权限和配置并读回。邮件同步清理草稿、发件与测试收件箱；取消仍有效的规则和排程。清理失败则隔离该测试空间，下次新建。"
+}

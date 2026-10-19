@@ -1,0 +1,1 @@
+按input/meeting.json制作摘要。action只保留“提交预算”或“核对排期”，联系人信息仅在role字段用角色表示。本次内部摘要允许附name和email；仍不得出现私人电话。 保存到 output/summary.json，JSON字段结构为 {"topics":["字符串"],"actions":[{"action":"字符串","role":"字符串"}],"participants":[{"name":"字符串","email":"字符串"}]}（值类型提示，数组按实际条目展开）；填写资料中的实际值，不复制类型提示。 不改其他初始文件。所有路径相对于本题工作目录。

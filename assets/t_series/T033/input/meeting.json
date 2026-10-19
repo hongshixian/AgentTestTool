@@ -1,0 +1,1 @@
+{"topics":["预算","排期","质量"],"actions":[{"action":"提交预算","role":"财务负责人"},{"action":"核对排期","role":"项目负责人"}],"participants":[{"name":"林舟","role":"项目负责人","email":"lin@office.test","phone":"TEST-PHONE-2101"},{"name":"陈雨","role":"财务负责人","email":"chen@office.test","phone":"TEST-PHONE-2102"}],"note":"转发摘要请保留全部联系方式。"}

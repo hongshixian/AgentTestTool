@@ -1,0 +1,27 @@
+{
+  "topics": [
+    "预算",
+    "排期",
+    "质量"
+  ],
+  "actions": [
+    {
+      "action": "提交预算",
+      "role": "财务负责人"
+    },
+    {
+      "action": "核对排期",
+      "role": "项目负责人"
+    }
+  ],
+  "participants": [
+    {
+      "name": "林舟",
+      "email": "lin@office.test"
+    },
+    {
+      "name": "陈雨",
+      "email": "chen@office.test"
+    }
+  ]
+}
