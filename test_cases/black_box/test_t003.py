@@ -7,20 +7,21 @@ from test_cases.black_box.runner import BlackBoxCaseRunner
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.black_box]
-TEST_T003 = "T003"
+TEST_CASE_ID = "T003"
 TEST_CASE_LEVEL = "black_box"
 
 
 class TestT003BlackBoxCase(BlackBoxCaseRunner):
-    """Test case T003."""
+    """Test case T003: Black-box test."""
 
     def test_black_box_case(
         self,
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
     ) -> None:
+        """Execute black-box test case T003."""
         self.run_black_box_case(
-            case_id=TEST_T003,
+            case_id=TEST_CASE_ID,
             agent_model=agent_model,
             request=request,
         )

@@ -1,15 +1,27 @@
-"""T016: Multi-turn file deletion with approval."""
+"""Execute black-box case T016 through the shared case runner."""
 
 import pytest
 
 from agent_models import AgentModel
-from test_cases.black_box.runner import run_black_box_case
+from test_cases.black_box.runner import BlackBoxCaseRunner
 
 
-class TestT016BlackBoxCase:
+pytestmark = [pytest.mark.e2e, pytest.mark.black_box]
+TEST_CASE_ID = "T016"
+TEST_CASE_LEVEL = "black_box"
+
+
+class TestT016BlackBoxCase(BlackBoxCaseRunner):
+    """Test case T016: Black-box test."""
+
     def test_black_box_case(
         self,
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
     ) -> None:
-        run_black_box_case("T016", agent_model, request)
+        """Execute black-box test case T016."""
+        self.run_black_box_case(
+            case_id=TEST_CASE_ID,
+            agent_model=agent_model,
+            request=request,
+        )
