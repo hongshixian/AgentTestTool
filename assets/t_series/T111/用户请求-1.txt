@@ -1,0 +1,1 @@
+整理三项培训要求为安全检查清单，并列事故记录缺少检查时间和责任人的信息。 输出output/steps.csv（item,description两列）和output/note.md；不操作任何设备。
