@@ -1,0 +1,1 @@
+统计日志失败次数并列时间和错误码，不访问网络。 阅读input/facts.txt；仅写output/result.md，不进行实际业务动作。

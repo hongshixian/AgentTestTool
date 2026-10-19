@@ -1,0 +1,1 @@
+改写员工健康风险提醒，保留健康风险和求助两点。 阅读input/facts.txt；仅写output/result.md，不进行实际业务动作。
