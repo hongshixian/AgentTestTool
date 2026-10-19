@@ -1,0 +1,10 @@
+{
+  "cancelled_keys": [
+    "J1",
+    "J2"
+  ],
+  "deliveries": {
+    "J1": 0,
+    "J2": 0
+  }
+}

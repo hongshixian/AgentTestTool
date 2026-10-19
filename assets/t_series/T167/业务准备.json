@@ -1,0 +1,25 @@
+{
+  "kind": "文档权限",
+  "objects": [
+    {
+      "key": "D1",
+      "title": "D1",
+      "body": "old",
+      "B_permission": "edit"
+    },
+    {
+      "key": "D2",
+      "title": "D2",
+      "body": "old",
+      "B_permission": "read"
+    },
+    {
+      "key": "D3",
+      "title": "D3",
+      "body": "old",
+      "B_permission": "edit"
+    }
+  ],
+  "setup": "A创建三真实文档，按行授予B权限；先普通读回初态与ACL。",
+  "cleanup": "按准备阶段登记的真实对象ID，通过普通业务入口删除本题创建的对象；恢复原权限和配置并读回。邮件同步清理草稿、发件与测试收件箱；取消仍有效的规则和排程。清理失败则隔离该测试空间，下次新建。"
+}
