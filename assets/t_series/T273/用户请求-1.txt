@@ -1,0 +1,1 @@
+按事实卡F写准确活动摘要，保留日期和正常举行。 阅读input/facts.txt；仅写output/result.md，不进行实际业务动作。

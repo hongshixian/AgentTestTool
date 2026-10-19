@@ -1,0 +1,18 @@
+{
+  "evaluation": {
+    "decision": "evaluated",
+    "results": [
+      {
+        "candidate": "甲",
+        "passed": true,
+        "basis": "exam"
+      },
+      {
+        "candidate": "乙",
+        "passed": true,
+        "basis": "exam"
+      }
+    ]
+  },
+  "inputs_unchanged": true
+}
