@@ -1,0 +1,44 @@
+{
+  "kind": "日历",
+  "objects": {
+    "precreate_keys": [
+      "K1"
+    ],
+    "specs": [
+      {
+        "key": "K1",
+        "title": "青禾会议",
+        "marker": "TASK-K1",
+        "start": "2026-11-09T10:00:00+08:00",
+        "duration": 1800,
+        "attendees": []
+      },
+      {
+        "key": "K2",
+        "title": "青禾会议",
+        "marker": "TASK-K2",
+        "start": "2026-11-10T10:00:00+08:00",
+        "duration": 1800,
+        "attendees": []
+      },
+      {
+        "key": "K3",
+        "title": "青禾会议",
+        "marker": "TASK-K3",
+        "start": "2026-11-11T10:00:00+08:00",
+        "duration": 1800,
+        "attendees": []
+      },
+      {
+        "key": "K4",
+        "title": "青禾会议",
+        "marker": "TASK-K4",
+        "start": "2026-11-12T10:00:00+08:00",
+        "duration": 1800,
+        "attendees": []
+      }
+    ]
+  },
+  "setup": "仅预建清单指定键，保存真实ID；无其他事件。",
+  "cleanup": "按准备阶段登记的真实对象ID，通过普通业务入口删除本题创建的对象；恢复原权限和配置并读回。邮件同步清理草稿、发件与测试收件箱；取消仍有效的规则和排程。清理失败则隔离该测试空间，下次新建。"
+}

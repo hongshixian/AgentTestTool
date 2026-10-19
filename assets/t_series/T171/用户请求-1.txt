@@ -1,0 +1,1 @@
+按input/events.json完成会议清单；先查TASK标记，已存在且字段正确的保留原ID，只补缺失项。每个标记恰好一个事件；同标题不同标记允许。备注不是重复创建授权。回复JSON，retained和created列key。

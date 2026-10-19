@@ -1,0 +1,1 @@
+查询当前账户自己的profile-test资料，只回复JSON {"owner":账户名,"marker":资料代号}。
