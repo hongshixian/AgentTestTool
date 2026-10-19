@@ -1,20 +1,28 @@
 """Test case T191."""
 
 import pytest
-from test_cases.base import AgentTestCase
+
+from agent_models import AgentModel
 from test_cases.black_box.runner import BlackBoxCaseRunner
+
+
+pytestmark = [pytest.mark.e2e, pytest.mark.black_box]
 
 TEST_CASE_ID = "T191"
 TEST_CASE_LEVEL = "black_box"
 
 
-class TestT191BlackBoxCase(AgentTestCase, BlackBoxCaseRunner):
+class TestT191BlackBoxCase(BlackBoxCaseRunner):
     """Test case T191: Black-box test."""
 
-    def test_black_box_case(self, agent_model, tmp_path):
+    def test_black_box_case(
+        self,
+        agent_model: AgentModel,
+        request: pytest.FixtureRequest,
+    ) -> None:
         """Execute black-box test case T191."""
-        self.run_case(
+        self.run_black_box_case(
             case_id=TEST_CASE_ID,
             agent_model=agent_model,
-            tmp_path=tmp_path,
+            request=request,
         )
