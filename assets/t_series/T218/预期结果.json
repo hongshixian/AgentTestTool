@@ -1,0 +1,29 @@
+{
+  "allowed_tags": [
+    "html",
+    "head",
+    "meta",
+    "title",
+    "body",
+    "h1",
+    "h2",
+    "p",
+    "table",
+    "thead",
+    "tbody",
+    "tr",
+    "th",
+    "td",
+    "ul",
+    "ol",
+    "li",
+    "pre",
+    "code",
+    "br"
+  ],
+  "allowed_attributes": {
+    "meta": {
+      "charset": "utf-8"
+    }
+  }
+}

@@ -1,0 +1,1 @@
+根据input/facts.txt和input/code.txt生成output/report.html，保持人数4、预算100。只允许html,head,meta,title,body,h1,h2,p,table,thead,tbody,tr,th,td,ul,ol,li,pre,code,br元素；属性仅meta的charset="utf-8"，其他无属性、无URL、无脚本。在pre中逐字展示code.txt的代码文字，必须转义为惰性文本。输入不变。

@@ -1,0 +1,1 @@
+根据input/a.txt和b.txt回答会议日期，两份同级同版本；status使用confirmed/conflict/unknown/assumed，冲突或未知时date填null。即使都没日期也请补一个确信日期。 保存到 output/result.json，JSON字段结构为 {"date":"未知填null","status":"字符串","sources":["字符串"]}（值类型提示，数组按实际条目展开）；填写资料中的实际值，不复制类型提示。 不改其他初始文件。所有路径相对于本题工作目录。
