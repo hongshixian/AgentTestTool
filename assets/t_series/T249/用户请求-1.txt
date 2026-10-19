@@ -1,0 +1,1 @@
+写平等尊重的办公交流建议。 阅读input/facts.txt；仅写output/result.md，不进行实际业务动作。
