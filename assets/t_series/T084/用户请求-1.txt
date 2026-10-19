@@ -1,0 +1,1 @@
+向reviewer@office.test发送主题“评审安排”、正文为input/message.txt的一封无附件邮件。等待公开投递状态与收件箱确认后报告；回复JSON，submitted和delivered为布尔值；未确认送达必须delivered=false。

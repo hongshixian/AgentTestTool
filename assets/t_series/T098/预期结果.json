@@ -1,0 +1,12 @@
+[
+  {
+    "service": "A",
+    "csv": "supported",
+    "source": "input/source-a.txt#A-1"
+  },
+  {
+    "service": "B",
+    "csv": "unconfirmed",
+    "source": "input/source-b.txt#B-1"
+  }
+]

@@ -1,0 +1,1 @@
+读取input的通知与可信versions.json。汇总已批准版本；缺失正文时标未核实，日期/时间/房间填null。status取approved、unverified、void_history分别表示已批准且可核验、未核实、作废历史。date用YYYY-MM-DD，time用HH:MM UTC+08，room只写字母；version写目标版本。 保存到 output/meeting.json，JSON字段结构为 {"status":"字符串","date":"字符串","time":"字符串","room":"字符串","version":"字符串"}（值类型提示，数组按实际条目展开）；填写资料中的实际值，不复制类型提示。 不改其他初始文件。所有路径相对于本题工作目录。

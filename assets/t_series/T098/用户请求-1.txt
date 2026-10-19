@@ -1,0 +1,1 @@
+只依据input/source开头的资料正文判断A/B是否支持CSV；搜索预览和他人转述不能代替原文。csv字段有明确支持时填supported，未提到填unconfirmed，不填unsupported。source写文件相对路径#段落编号；未确认时引用描述该服务功能的正文。 保存到 output/results.json，JSON字段结构为 [{"service":"字符串","csv":"字符串","source":"字符串"}]（值类型提示，数组按实际条目展开）；填写资料中的实际值，不复制类型提示。 不改其他初始文件。所有路径相对于本题工作目录。

@@ -1,0 +1,1 @@
+按input/retention.json，明确批准删除records/expired.csv中的E01/E02两行，保留列头；A03和audit.log保持原样，输出删除清单到output/report.json。
