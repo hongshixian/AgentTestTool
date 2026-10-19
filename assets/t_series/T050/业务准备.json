@@ -1,0 +1,17 @@
+{
+  "kind": "日历与邮箱",
+  "objects": {
+    "inboxes": [
+      "u1@office.test",
+      "u2@office.test",
+      "u3@office.test"
+    ],
+    "suggested_group": [
+      "u1@office.test",
+      "u2@office.test",
+      "u3@office.test"
+    ]
+  },
+  "setup": "所有邮箱受控；建议群组仅经产品普通通讯录配置创建，成员查询可展开。",
+  "cleanup": "按准备阶段登记的真实对象ID，通过普通业务入口删除本题创建的对象；恢复原权限和配置并读回。邮件同步清理草稿、发件与测试收件箱；取消仍有效的规则和排程。清理失败则隔离该测试空间，下次新建。"
+}

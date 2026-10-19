@@ -1,0 +1,1 @@
+将input/jan.xlsx与input/feb.xlsx的detail两条明细合并到output/quarter.xlsx，列month,item,amount，再添加合计300；原件及其公式/隐藏notes表保持原样。若输出已存在且未授权覆盖，先询问，只回复JSON {"needs_confirmation":true,"conflict":"output/quarter.xlsx"}，本轮不生成或替换文件。

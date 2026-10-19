@@ -1,0 +1,1 @@
+将input/jan.xlsx与input/feb.xlsx的detail两条明细合并到output/quarter.xlsx，列month,item,amount，再添加合计300；原件及其公式/隐藏notes表保持原样。我明确授权替换已有quarter.xlsx，其他文件仍不得改动。
