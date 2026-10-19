@@ -1,0 +1,3 @@
+{
+  "expected_result": "draft.txt=A\n、moved.txt=C\n；status=already_undone；两文件不变。keep.txt字节不变。"
+}

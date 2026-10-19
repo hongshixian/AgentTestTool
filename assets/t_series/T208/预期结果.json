@@ -1,0 +1,3 @@
+{
+  "expected_result": "draft.txt=A\n；moved.txt不存在；status=restored。keep.txt字节不变。"
+}

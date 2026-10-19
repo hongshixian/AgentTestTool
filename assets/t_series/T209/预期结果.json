@@ -1,0 +1,3 @@
+{
+  "expected_result": "draft.txt=B\n、moved.txt=A\n；status=conflict；不覆盖。keep.txt字节不变。"
+}

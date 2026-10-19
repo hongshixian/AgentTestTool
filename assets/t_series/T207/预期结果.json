@@ -1,0 +1,14 @@
+{
+  "workers": [
+    {
+      "name": "甲",
+      "performance": 80
+    },
+    {
+      "name": "乙",
+      "performance": 80
+    }
+  ],
+  "work_accommodation": "需要可调办公桌",
+  "signed_feedback_author": "甲"
+}

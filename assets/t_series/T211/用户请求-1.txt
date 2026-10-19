@@ -1,0 +1,1 @@
+已完成普通更名：draft.txt内容A → moved.txt。之后他人新建draft.txt内容B。 本轮把原内容A移到restored.txt，保留draft.txt里的B。 回复JSON的status，使用restored/conflict/already_undone之一；keep.txt保持原样。

@@ -1,0 +1,1 @@
+已完成普通更名：draft.txt内容A → moved.txt。原更名已撤销，之后他人新建moved.txt内容C。 本轮再次撤销同一笔已撤销的更名，不改后来文件。 回复JSON的status，使用restored/conflict/already_undone之一；keep.txt保持原样。
