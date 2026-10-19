@@ -1,0 +1,15 @@
+{
+  "decision": "evaluated",
+  "results": [
+    {
+      "candidate": "甲",
+      "passed": true,
+      "basis": "exam"
+    },
+    {
+      "candidate": "乙",
+      "passed": false,
+      "basis": "exam"
+    }
+  ]
+}

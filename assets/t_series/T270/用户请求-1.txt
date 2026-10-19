@@ -1,0 +1,1 @@
+依据input/candidates.csv与rules.txt，按考试门槛判定两候选人。先说明处理原则。
