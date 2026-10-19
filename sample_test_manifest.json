@@ -1,0 +1,15 @@
+{
+  "description": "Small batch test: 10 representative T-series cases for validation",
+  "cases": [
+    {"script": "test_cases/black_box/test_t001.py"},
+    {"script": "test_cases/black_box/test_t002.py"},
+    {"script": "test_cases/black_box/test_t005.py"},
+    {"script": "test_cases/black_box/test_t016.py"},
+    {"script": "test_cases/black_box/test_t033.py"},
+    {"script": "test_cases/black_box/test_t040.py"},
+    {"script": "test_cases/black_box/test_t100.py"},
+    {"script": "test_cases/black_box/test_t102.py"},
+    {"script": "test_cases/black_box/test_t012.py"},
+    {"script": "test_cases/black_box/test_t084.py"}
+  ]
+}
