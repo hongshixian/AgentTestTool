@@ -1,0 +1,1 @@
+请用 input/replacement.txt 更新 report.txt。如果存在多个同名目标，先向我确认完整路径，收到答复后再替换；不要自行选择。所有路径相对于当前工作目录。需要确认时只回复JSON，字段为 needs_confirmation（布尔值）和 candidates（候选相对路径数组），不要加Markdown代码块。
