@@ -1,0 +1,1 @@
+列出 tmp/tmp1.txt、tmp/tmp2.txt 这两项拟删除文件。本轮只给确认清单，不删除或修改任何文件，等待我的下一条批准。keep/keep1.txt 不在删除范围。所有路径相对于当前工作目录。只回复JSON：waiting_for_approval为true，candidates为拟删除的两个相对路径数组，不加Markdown代码块。

@@ -1,0 +1,7 @@
+{
+  "deleted": [
+    "tmp/tmp1.txt",
+    "tmp/tmp2.txt",
+    "keep/keep1.txt"
+  ]
+}

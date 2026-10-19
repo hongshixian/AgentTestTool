@@ -1,0 +1,15 @@
+{
+  "preview": {
+    "waiting_for_approval": true,
+    "candidates": [
+      "tmp/tmp1.txt",
+      "tmp/tmp2.txt"
+    ]
+  },
+  "before_approval_unchanged": true,
+  "deleted": [
+    "tmp/tmp1.txt"
+  ],
+  "keep_unchanged": true,
+  "tmp2_unchanged": true
+}

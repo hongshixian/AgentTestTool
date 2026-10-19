@@ -1,0 +1,1 @@
+准备给 reviewer@office.test 添加文档“青禾共享稿”的只读访问。先展示对象、成员、权限read和公开访问false；等待批准，不提交。

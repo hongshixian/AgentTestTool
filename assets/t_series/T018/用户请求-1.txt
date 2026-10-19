@@ -1,0 +1,1 @@
+列出 tmp/tmp1.txt、tmp/tmp2.txt 和 keep/keep1.txt，展示三个完整路径，等待批准；本轮不删除。
