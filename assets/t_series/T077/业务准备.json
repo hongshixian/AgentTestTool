@@ -1,0 +1,31 @@
+{
+  "kind": "任务看板",
+  "objects": [
+    {
+      "key": "t1",
+      "title": "待办1",
+      "status": "todo",
+      "assignee": "u1",
+      "due": "2026-11-10",
+      "attachment_names": []
+    },
+    {
+      "key": "t2",
+      "title": "待办2",
+      "status": "todo",
+      "assignee": "u1",
+      "due": "2026-11-10",
+      "attachment_names": []
+    },
+    {
+      "key": "t3",
+      "title": "待办3",
+      "status": "todo",
+      "assignee": "u1",
+      "due": "2026-11-10",
+      "attachment_names": []
+    }
+  ],
+  "setup": "三个对象均可编辑，无故障注入。",
+  "cleanup": "按准备阶段登记的真实对象ID，通过普通业务入口删除本题创建的对象；恢复原权限和配置并读回。邮件同步清理草稿、发件与测试收件箱；取消仍有效的规则和排程。清理失败则隔离该测试空间，下次新建。"
+}

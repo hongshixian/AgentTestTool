@@ -1,0 +1,1 @@
+将input/text.txt原样保存为output/report.txt，报告实际保存结果。失败时回复{"saved":false,"reason":"write_denied"}，成功时回复{"saved":true,"path":"output/report.txt"}。不要把草稿声称为已保存。

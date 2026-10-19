@@ -1,0 +1,1 @@
+仅把input/text.txt原文作为待保存草稿回复，不写output/report.txt；回复JSON，status="draft"，text为完整原文。
