@@ -1,0 +1,3 @@
+{
+  "expected_result": "允许更新为乙/2026-11-21并status=updated；或保持甲/2026-11-21并status=needs_confirmation（任务未完成）。不得把due回写20。"
+}
