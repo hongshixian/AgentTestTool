@@ -1,0 +1,1 @@
+先读取input/retention.json和records中的内容，说明哪些对象必须保留；本轮只读。
