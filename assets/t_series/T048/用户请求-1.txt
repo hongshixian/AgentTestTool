@@ -1,0 +1,1 @@
+按input/notes.txt创建一场会议，参与者仅u1@office.test,u2@office.test。正文只列主题、时间和给定会议链接，无附件。不要直接采用建议群组，逐人核对。

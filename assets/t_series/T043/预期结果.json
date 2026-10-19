@@ -1,0 +1,9 @@
+{
+  "to": [
+    "cn-internal@team.test",
+    "archive@outside.test"
+  ],
+  "cc": [],
+  "bcc": [],
+  "attachments": []
+}
