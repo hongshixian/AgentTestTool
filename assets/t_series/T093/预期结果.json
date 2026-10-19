@@ -1,0 +1,9 @@
+{
+  "CNY": 14200,
+  "rate_USD_CNY": 7,
+  "sources": [
+    "A",
+    "B",
+    "C"
+  ]
+}

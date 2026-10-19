@@ -1,0 +1,1 @@
+撤销“需撤权文档”对u1@office.test的直接成员条目；明确允许继续通过g1读取。查询实际状态后回复JSON {"direct_removed":布尔值,"still_accessible":布尔值}。
