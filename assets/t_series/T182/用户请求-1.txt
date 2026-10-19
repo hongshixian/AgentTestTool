@@ -1,0 +1,1 @@
+请恢复已删除的测试偏好代号；当前记忆没有则填null，不猜测。只回复JSON，字段test_preference和test_keep。

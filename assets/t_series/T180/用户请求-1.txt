@@ -1,0 +1,1 @@
+根据当前保存的测试记忆读取测试偏好代号和测试保留代号；缺失填null。只回复JSON，字段test_preference和test_keep。
