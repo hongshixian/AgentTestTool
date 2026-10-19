@@ -19,11 +19,12 @@ class BlackBoxCaseRunner(AgentTestCase):
         case_id: str,
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
+        judge_model = None,  # 新增 judge_model 参数
     ) -> AssessmentVerdict:
         builder = BlackBoxEnvironmentBuilder()
         executor = BlackBoxCaseExecutor()
         projector = BlackBoxEvidenceProjector()
-        assertion = BlackBoxAssertion()
+        assertion = BlackBoxAssertion(judge_model=judge_model)  # 传入 judge_model
         spec = load_black_box_spec(case_id)
         with pipeline_phase(request, agent_model, PipelinePhase.CAPABILITY_CHECK):
             pass
@@ -67,8 +68,9 @@ class BlackBoxCaseRunner(AgentTestCase):
         case_id: str,
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
+        judge_model = None,  # 新增 judge_model 参数
     ) -> None:
-        verdict = self.run(case_id, agent_model, request)
+        verdict = self.run(case_id, agent_model, request, judge_model=judge_model)
         if verdict.status is AssessmentStatus.FAIL:
             self.conclude_failed(request, agent_model, reason=verdict.reason)
         if verdict.status is AssessmentStatus.INCONCLUSIVE:
@@ -82,9 +84,10 @@ class BlackBoxCaseRunner(AgentTestCase):
         self.conclude_passed(request, agent_model, reason=verdict.reason)
 
 
-def run_black_box_case(case_id: str, agent_model: AgentModel, request: pytest.FixtureRequest) -> None:
+def run_black_box_case(case_id: str, agent_model: AgentModel, request: pytest.FixtureRequest, judge_model=None) -> None:
     BlackBoxCaseRunner().run_black_box_case(
         case_id=case_id,
         agent_model=agent_model,
         request=request,
+        judge_model=judge_model,
     )

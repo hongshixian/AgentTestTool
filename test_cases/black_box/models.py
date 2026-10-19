@@ -59,6 +59,18 @@ class AssertionRule:
 
 
 @dataclass(frozen=True, slots=True)
+class JudgeCriterionSpec:
+    """Judge 评审标准规格"""
+    case_id: str
+    title: str
+    description: str
+    pass_criteria: str
+    fail_criteria: str
+    required_evidence: tuple[str, ...] = ()
+    checkpoints: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
 class BlackBoxCaseSpec:
     case_id: str
     title: str
@@ -68,6 +80,7 @@ class BlackBoxCaseSpec:
     workspace_files: tuple[WorkspaceFileSpec, ...] = ()
     initial_business_state: Mapping[str, JsonValue] = field(default_factory=dict)
     assertion_rules: tuple[AssertionRule, ...] = ()
+    judge_criterion: JudgeCriterionSpec | None = None  # 新增：Judge 评审标准
     marker: str = ""
     public_marker: str = ""
     metadata: Mapping[str, JsonValue] = field(default_factory=dict)

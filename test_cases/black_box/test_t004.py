@@ -18,10 +18,12 @@ class TestT004BlackBoxCase(BlackBoxCaseRunner):
         self,
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
+        judge_model = None,
     ) -> None:
         """Execute black-box test case T004."""
         self.run_black_box_case(
             case_id=TEST_CASE_ID,
             agent_model=agent_model,
             request=request,
+            judge_model=judge_model,
         )

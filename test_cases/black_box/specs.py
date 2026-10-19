@@ -8,7 +8,13 @@ from pathlib import Path
 from typing import Mapping
 
 from agent_models.evidence import JsonValue
-from test_cases.black_box.models import AssertionRule, BlackBoxCaseSpec, PublicStepSpec, WorkspaceFileSpec
+from test_cases.black_box.models import (
+    AssertionRule,
+    BlackBoxCaseSpec,
+    JudgeCriterionSpec,
+    PublicStepSpec,
+    WorkspaceFileSpec
+)
 
 CONFIG_DIR = Path(__file__).resolve().parents[2] / "configs"
 DEFAULT_CATALOG = CONFIG_DIR / "black_box_cases.json"
@@ -54,7 +60,7 @@ def case_spec_from_mapping(value: Mapping[str, JsonValue]) -> BlackBoxCaseSpec:
     if not isinstance(files_value, list) or not isinstance(rules_value, list):
         raise ValueError(f"{case_id}: files and assertion rules must be arrays")
     known = {"case_id", "Case_ID", "title", "name", "case_name", "repeat_count", "timeout_seconds",
-             "steps", "workspace_files", "initial_business_state", "assertion_rules", "marker",
+             "steps", "workspace_files", "initial_business_state", "assertion_rules", "judge_criterion", "marker",
              "public_marker", "input_config", "Input_Config"}
     if not files_value:
         declared_files = config.get("Files")
@@ -88,6 +94,27 @@ def case_spec_from_mapping(value: Mapping[str, JsonValue]) -> BlackBoxCaseSpec:
                 {"metric": metric, "operator": "eq", "expected": target}
                 for metric, target in expected.items()
             ]
+
+    # 加载 judge_criterion（如果有）
+    judge_criterion = None
+    criterion_data = data.get("judge_criterion")
+    if isinstance(criterion_data, dict):
+        judge_criterion = JudgeCriterionSpec(
+            case_id=str(criterion_data.get("case_id", case_id)),
+            title=str(criterion_data.get("title", title)),
+            description=str(criterion_data.get("description", "")),
+            pass_criteria=str(criterion_data.get("pass_criteria", "")),
+            fail_criteria=str(criterion_data.get("fail_criteria", "")),
+            required_evidence=tuple(
+                str(item) for item in criterion_data.get("required_evidence", [])
+                if isinstance(item, str)
+            ),
+            checkpoints=tuple(
+                str(item) for item in criterion_data.get("checkpoints", [])
+                if isinstance(item, str)
+            )
+        )
+
     metadata = {key: item for key, item in data.items() if key not in known}
     metadata["input_config"] = config
     return BlackBoxCaseSpec(
@@ -107,6 +134,7 @@ def case_spec_from_mapping(value: Mapping[str, JsonValue]) -> BlackBoxCaseSpec:
         assertion_rules=tuple(AssertionRule(str(item.get("metric") or ""),
                                             str(item.get("operator") or "eq"), item.get("expected"))
                               for item in rules_value if isinstance(item, dict)),
+        judge_criterion=judge_criterion,  # 新增
         marker=str(data.get("marker") or config.get("Marker") or ""),
         public_marker=str(data.get("public_marker") or config.get("Public_Marker") or ""),
         metadata=metadata,

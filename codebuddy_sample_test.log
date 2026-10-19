@@ -1,0 +1,66 @@
+....F.F...                                                               [100%]
+=================================== FAILURES ===================================
+________________________ TestT033BlackBoxCase.test_t033 ________________________
+
+self = <black_box.test_t033.TestT033BlackBoxCase object at 0x7f1e3e6ed090>
+agent_model = <agent_models.codebuddy.model.CodeBuddyAgentModel object at 0x7f1e3d79fe10>
+request = <FixtureRequest for <Function test_t033>>
+
+    def test_t033(
+        self,
+        agent_model: AgentModel,
+        request: pytest.FixtureRequest,
+    ) -> None:
+>       run_black_box_case(TEST_CASE_ID, agent_model, request)
+
+test_cases/black_box/test_t033.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+test_cases/black_box/runner.py:86: in run_black_box_case
+    BlackBoxCaseRunner().run_black_box_case(
+test_cases/black_box/runner.py:71: in run_black_box_case
+    verdict = self.run(case_id, agent_model, request)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_cases/black_box/runner.py:42: in run
+    execution = executor.execute(prepared, agent_model)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_cases/black_box/execution.py:70: in execute
+    return handler(self, prepared, agent_model)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+test_cases/black_box/scenario_handlers.py:654: in _generic_expected_result_handler
+    turn = executor.send_prompt(
+test_cases/black_box/execution.py:39: in send_prompt
+    result = agent_model.send_prompt(prompt, timeout=timeout, allow_tools=allow_tools,
+agent_models/codebuddy/model.py:281: in send_prompt
+    turn = self.driver.send_prompt(
+agent_models/codebuddy/driver.py:165: in send_prompt
+    completed = subprocess.run(
+/usr/lib/python3.11/subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.11/subprocess.py:1207: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.11/subprocess.py:2060: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: -9 args: ['codebuddy', '--print', '--output-format', 'js...>
+endtime = 237129.790767973, orig_timeout = 120.0, stdout_seq = []
+stderr_seq = [], skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['codebuddy', '--print', '--output-format', 'json', '--permission-mode', 'bypassPermissions', '--session-id', 'ats-8ad233ee23c645dfbb264f850f41ac13', '--model', 'hy3', '--mcp-config', '{"mcpServers": {"ats_mock": {"type": "stdio", "command": "/vol1/1002/git/agentTestTool/.venv/bin/python", "args": ["-u", "/vol1/1002/git/agentTestTool/agent_models/codebuddy/mock_mcp_server.py", "--receiver-url", "http://127.0.0.1:48709/e1cf94544f304ea18c45aad30601196e", "--timeout", "32"]}}}', '--strict-mcp-config', '--tools', 'ToolSearch,DeferExecuteTool', '--allowedTools', 'ToolSearch', 'DeferExecuteTool', 'BLACK_BOX_T033', 'mcp__ats_mock__BLACK_BOX_T033', '--max-turns', '4']' timed out after 120.0 seconds
+
+/usr/lib/python3.11/subprocess.py:1251: TimeoutExpired
+=========================== short test summary info ============================
+FAILED test_cases/black_box/test_t033.py::TestT033BlackBoxCase::test_t033 - s...
+1 failed, 8 assessment_passed, 1 assessment_failed in 454.17s (0:07:34)

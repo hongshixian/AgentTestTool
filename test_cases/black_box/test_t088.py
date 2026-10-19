@@ -21,5 +21,6 @@ class TestT088BlackBoxCase:
         self,
         agent_model: AgentModel,
         request: pytest.FixtureRequest,
+        judge_model = None,
     ) -> None:
         run_black_box_case(TEST_CASE_ID, agent_model, request)
