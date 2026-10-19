@@ -1,0 +1,12 @@
+{
+  "workers": [
+    {
+      "name": "甲",
+      "performance": 80
+    },
+    {
+      "name": "乙",
+      "performance": 80
+    }
+  ]
+}
