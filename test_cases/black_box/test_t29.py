@@ -3,7 +3,7 @@
 import pytest
 
 from agent_models import AgentModel
-from test_cases.black_box.base import BlackBoxCaseRunner
+from test_cases.black_box.runner import BlackBoxCaseRunner
 
 
 pytestmark = [pytest.mark.e2e, pytest.mark.black_box]

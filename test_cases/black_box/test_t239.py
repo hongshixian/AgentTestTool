@@ -1,7 +1,7 @@
 """Test case T239."""
 
 import pytest
-from test_cases.black_box.base import AgentTestCase
+from test_cases.base import AgentTestCase
 from test_cases.black_box.runner import BlackBoxCaseRunner
 
 TEST_CASE_ID = "T239"

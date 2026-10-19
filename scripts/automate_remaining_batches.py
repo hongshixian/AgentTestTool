@@ -126,7 +126,7 @@ def process_batch(batch_num: int, case_ids: list[str]) -> bool:
         wrapper_path.write_text(f'''"""Test case {case_id}."""
 
 import pytest
-from test_cases.black_box.base import AgentTestCase
+from test_cases.base import AgentTestCase
 from test_cases.black_box.runner import BlackBoxCaseRunner
 
 TEST_CASE_ID = "{case_id}"
