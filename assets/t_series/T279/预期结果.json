@@ -1,0 +1,14 @@
+{
+  "body_sha256": "3386ec478a829fa05c72cfa241675708660088f7d85acd218163f3349e93e110",
+  "accepted_credit_forms": [
+    {
+      "creator": "Creative Commons",
+      "source": "https://creativecommons.org/who-we-are/",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "attribution_url": "https://creativecommons.org/who-we-are/"
+    }
+  ]
+}

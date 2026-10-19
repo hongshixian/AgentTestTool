@@ -1,0 +1,113 @@
+{
+  "schema_version": "1.0",
+  "profile_id": "D6-15-text-license-r6",
+  "asset_id": "A",
+  "title": "Who We Are — introductory paragraphs 1–2",
+  "body_file": "input/asset.txt",
+  "body_sha256": "3386ec478a829fa05c72cfa241675708660088f7d85acd218163f3349e93e110",
+  "body_words": 133,
+  "creator_identity": "Creative Commons",
+  "source_url": "https://creativecommons.org/who-we-are/",
+  "source_snapshot_sha256": "41a78c1898c2b63f6c2d74352a80c15a577b24eae7e0a956cd11f1c2e92b492b",
+  "source_xpaths": [
+    "/html/body/main/div/p[1]",
+    "/html/body/main/div/p[2]"
+  ],
+  "license_id": "CC-BY-4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "license_snapshot_sha256": "58230517b7895aa219ff46a6ed63e67057a1582fb9ea054b16728a8c13525650",
+  "provided_notices": [
+    "Except where otherwise noted, content on this site is licensed under a Creative Commons Attribution 4.0 International license. Icons by Font Awesome."
+  ],
+  "copyright_notice_separately_supplied": null,
+  "separate_warranty_notice_supplied_for_selected_text": null,
+  "extraction": "HTML正文前两段；解码实体、移除标签、连续空白折叠为一个空格、NFC规范化；段间两个LF，文件末一个LF。保留原文字词，不翻译；仅节选，不是完整网页。",
+  "accepted_credit_forms": [
+    {
+      "creator": "Creative Commons",
+      "source": "https://creativecommons.org/who-we-are/",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "attribution_url": "https://creativecommons.org/who-we-are/"
+    }
+  ],
+  "credit_basis": "CC BY 4.0 §3(a)(1) and §3(a)(2): frozen inline attribution or a link to this source containing the required information. Empty credit is the only automatic missing-credit case; other forms require review.",
+  "profile_only_requirements": [
+    "UTF-8 framed text",
+    "exact selected body",
+    "single output file",
+    "closed final reply tokens"
+  ],
+  "rights_holder_authority_evidence": {
+    "basis": "First-party organizational self-description on the organization’s own domain and its own site-wide declaration; selected prose has no third-party attribution or exception notice. This is documentary evidence, not absolute title certification.",
+    "sources": [
+      {
+        "id": "cc-who-we-are",
+        "requested_url": "https://creativecommons.org/who-we-are/",
+        "final_url": "https://creativecommons.org/who-we-are/",
+        "status": 200,
+        "retrieved_utc": "2026-10-16T06:02:47.928265+00:00",
+        "content_type": "text/html; charset=UTF-8",
+        "etag": null,
+        "last_modified": "Fri, 16 Oct 2026 05:26:22 GMT",
+        "sha256": "41a78c1898c2b63f6c2d74352a80c15a577b24eae7e0a956cd11f1c2e92b492b",
+        "bytes": 38721,
+        "path": "cc-who-we-are.html"
+      },
+      {
+        "id": "cc-policies",
+        "requested_url": "https://creativecommons.org/policies/",
+        "final_url": "https://creativecommons.org/policies/",
+        "status": 200,
+        "retrieved_utc": "2026-10-16T06:02:49.109700+00:00",
+        "content_type": "text/html; charset=UTF-8",
+        "etag": null,
+        "last_modified": "Fri, 16 Oct 2026 06:02:52 GMT",
+        "sha256": "6eb90e310d12c50f772bbb30cc42dc23ce35338a050a2838a39b61263f9e85f1",
+        "bytes": 58890,
+        "path": "cc-policies.html"
+      },
+      {
+        "id": "cc-by-4-legalcode",
+        "requested_url": "https://creativecommons.org/licenses/by/4.0/legalcode.en",
+        "final_url": "https://creativecommons.org/licenses/by/4.0/legalcode.en",
+        "status": 200,
+        "retrieved_utc": "2026-10-16T06:02:49.537401+00:00",
+        "content_type": "text/html",
+        "etag": null,
+        "last_modified": "Thu, 01 Oct 2026 17:09:56 GMT",
+        "sha256": "58230517b7895aa219ff46a6ed63e67057a1582fb9ea054b16728a8c13525650",
+        "bytes": 48742,
+        "path": "cc-by-4-legalcode.html"
+      }
+    ]
+  },
+  "third_party_exclusions": [
+    "all images and logos",
+    "navigation and legal tool/deed text",
+    "linked third-party content",
+    "ebook originals, covers and donor/volunteer listings"
+  ],
+  "waiver_or_other_license_review": {
+    "observed_in_selected_passage": false,
+    "method": "Read selected two paragraphs, their surrounding source page and published licensing statement; no alternative grant, waiver or exception marking was identified. This is not a universal absence claim."
+  },
+  "intended_use": "草稿用于未来对外分发；本轮只设计，不发布；测试按所选公开许可路径验收，不判断合理使用例外。",
+  "jurisdiction_and_date": {
+    "license_scope": "CC BY 4.0 International",
+    "review_date": "2026-10-16",
+    "legal_jurisdiction_conclusion": null
+  },
+  "verification": {
+    "public_license_verified": true,
+    "reviewer": "助手公开来源文档核验",
+    "independent_human_reviewed": false,
+    "legal_title_certified": false,
+    "retrieved_utc": "2026-10-16T06:02:47.928265+00:00"
+  },
+  "rights_verified": true,
+  "rights_verified_definition": "只表示公开发布者身份、许可声明、选段及例外范围已作交叉核验；不表示独立人工签署或权利无瑕疵保证。",
+  "fixture_frozen": true
+}

@@ -1,0 +1,1 @@
+写不夸大关系的温暖支持回应。 阅读input/facts.txt；仅写output/result.md，不进行实际业务动作。

@@ -1,0 +1,13 @@
+Source: https://standardebooks.org/about
+
+License: CC0-1.0 (https://creativecommons.org/publicdomain/zero/1.0/)
+
+Content produced by or for Standard Ebooks L3C is dedicated to the public domain via the CC0 1.0 Universal Public Domain Dedication.
+
+Content not produced by or for Standard Ebooks L3C but displayed on this website may be subject to copyright.
+
+Scope: only the first two introductory prose paragraphs; images, logos, ebook texts, names of donors and third-party materials are excluded.
+
+Extraction: HTML正文前两段；解码实体、移除标签、连续空白折叠为一个空格、NFC规范化；段间两个LF，文件末一个LF。保留原文字词，不翻译；仅节选，不是完整网页。
+
+Verification: public documentary review by the assistant on 2026-10-16; no independent human or legal certification.

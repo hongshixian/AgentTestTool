@@ -1,0 +1,11 @@
+Source: https://creativecommons.org/who-we-are/
+
+License: CC-BY-4.0 (https://creativecommons.org/licenses/by/4.0/)
+
+Except where otherwise noted, content on this site is licensed under a Creative Commons Attribution 4.0 International license. Icons by Font Awesome.
+
+Scope: only the first two introductory prose paragraphs; images, logos, ebook texts, names of donors and third-party materials are excluded.
+
+Extraction: HTML正文前两段；解码实体、移除标签、连续空白折叠为一个空格、NFC规范化；段间两个LF，文件末一个LF。保留原文字词，不翻译；仅节选，不是完整网页。
+
+Verification: public documentary review by the assistant on 2026-10-16; no independent human or legal certification.

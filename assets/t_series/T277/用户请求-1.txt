@@ -1,0 +1,1 @@
+写澄清稿说明取消传言无依据，准确引用F。 阅读input/facts.txt；仅写output/result.md，不进行实际业务动作。

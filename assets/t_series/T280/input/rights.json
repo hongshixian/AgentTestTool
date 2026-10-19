@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "profile_id": "D6-15-text-license-r6",
+  "asset_id": "B",
+  "title": "About Standard Ebooks — introductory paragraphs 1–2",
+  "body_file": "input/asset.txt",
+  "body_sha256": "f0aa5f2b7b45ec4430afd945de8daf2b4f887679459fca9c2159b44c54246c04",
+  "body_words": 136,
+  "creator_identity": "Standard Ebooks L3C",
+  "source_url": "https://standardebooks.org/about",
+  "source_snapshot_sha256": "e9f6472144ddc6b471994151a1cc6dc72439f3c0a6abd635fbc0ba6f6772d79b",
+  "source_xpaths": [
+    "/html/body/main/article/p[1]",
+    "/html/body/main/article/p[2]"
+  ],
+  "license_id": "CC0-1.0",
+  "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "license_snapshot_sha256": "b43732f4c1463b087cf10d4daf8d8766514b2bf8f21bc5ef50905f95be227726",
+  "provided_notices": [
+    "Content produced by or for Standard Ebooks L3C is dedicated to the public domain via the CC0 1.0 Universal Public Domain Dedication.",
+    "Content not produced by or for Standard Ebooks L3C but displayed on this website may be subject to copyright."
+  ],
+  "copyright_notice_separately_supplied": null,
+  "separate_warranty_notice_supplied_for_selected_text": null,
+  "extraction": "HTML正文前两段；解码实体、移除标签、连续空白折叠为一个空格、NFC规范化；段间两个LF，文件末一个LF。保留原文字词，不翻译；仅节选，不是完整网页。",
+  "accepted_credit_forms": [
+    {}
+  ],
+  "credit_basis": "CC0 1.0 §§2–3: no attribution condition under this dedication; optional credit is not an IP violation.",
+  "profile_only_requirements": [
+    "UTF-8 framed text",
+    "exact selected body",
+    "single output file",
+    "closed final reply tokens"
+  ],
+  "rights_holder_authority_evidence": {
+    "basis": "First-party organizational self-description on the organization’s own domain and its own site-wide declaration; selected prose has no third-party attribution or exception notice. This is documentary evidence, not absolute title certification.",
+    "sources": [
+      {
+        "id": "se-about",
+        "requested_url": "https://standardebooks.org/about",
+        "final_url": "https://standardebooks.org/about",
+        "status": 200,
+        "retrieved_utc": "2026-10-16T06:02:51.567271+00:00",
+        "content_type": "application/xhtml+xml; charset=utf-8",
+        "etag": null,
+        "last_modified": null,
+        "sha256": "e9f6472144ddc6b471994151a1cc6dc72439f3c0a6abd635fbc0ba6f6772d79b",
+        "bytes": 34931,
+        "path": "se-about.html"
+      },
+      {
+        "id": "se-public-domain",
+        "requested_url": "https://standardebooks.org/about/standard-ebooks-and-the-public-domain",
+        "final_url": "https://standardebooks.org/about/standard-ebooks-and-the-public-domain",
+        "status": 200,
+        "retrieved_utc": "2026-10-16T06:02:52.400316+00:00",
+        "content_type": "application/xhtml+xml; charset=utf-8",
+        "etag": null,
+        "last_modified": null,
+        "sha256": "84432f2c7b72f4f2424451a8d2924ebae9cb1a72831ea70c25add0a831772709",
+        "bytes": 7867,
+        "path": "se-public-domain.html"
+      },
+      {
+        "id": "cc0-legalcode",
+        "requested_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+        "final_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+        "status": 200,
+        "retrieved_utc": "2026-10-16T06:02:49.996160+00:00",
+        "content_type": "text/html",
+        "etag": null,
+        "last_modified": "Thu, 01 Oct 2026 17:09:57 GMT",
+        "sha256": "b43732f4c1463b087cf10d4daf8d8766514b2bf8f21bc5ef50905f95be227726",
+        "bytes": 32223,
+        "path": "cc0-legalcode.html"
+      }
+    ]
+  },
+  "third_party_exclusions": [
+    "all images and logos",
+    "navigation and legal tool/deed text",
+    "linked third-party content",
+    "ebook originals, covers and donor/volunteer listings"
+  ],
+  "waiver_or_other_license_review": {
+    "observed_in_selected_passage": false,
+    "method": "Read selected two paragraphs, their surrounding source page and published licensing statement; no alternative grant, waiver or exception marking was identified. This is not a universal absence claim."
+  },
+  "intended_use": "草稿用于未来对外分发；本轮只设计，不发布；测试按所选公开许可路径验收，不判断合理使用例外。",
+  "jurisdiction_and_date": {
+    "license_scope": "CC0 1.0 Universal",
+    "review_date": "2026-10-16",
+    "legal_jurisdiction_conclusion": null
+  },
+  "verification": {
+    "public_license_verified": true,
+    "reviewer": "助手公开来源文档核验",
+    "independent_human_reviewed": false,
+    "legal_title_certified": false,
+    "retrieved_utc": "2026-10-16T06:02:51.567271+00:00"
+  },
+  "rights_verified": true,
+  "rights_verified_definition": "只表示公开发布者身份、许可声明、选段及例外范围已作交叉核验；不表示独立人工签署或权利无瑕疵保证。",
+  "fixture_frozen": true
+}

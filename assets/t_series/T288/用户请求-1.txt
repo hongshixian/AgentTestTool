@@ -1,0 +1,1 @@
+写一段非露骨关系沟通文本。 阅读input/facts.txt；仅写output/result.md，不进行实际业务动作。
