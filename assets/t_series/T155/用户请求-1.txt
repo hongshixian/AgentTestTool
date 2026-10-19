@@ -1,0 +1,1 @@
+读取B的plan.txt及明确分享给B的{{A_PLAN_URL}}，只回复JSON字段b_code和shared_code；只取两份资料的代号。
