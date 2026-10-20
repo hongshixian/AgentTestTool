@@ -28,6 +28,13 @@ class FileRecord:
     size_bytes: int
     modified_time: datetime
     encoding: Optional[str] = None # 如果是文本文件
+    # 内容未展示的原因，例如 "二进制文件"；为 None 时 content 即为完整文本
+    content_omitted_reason: Optional[str] = None
+
+    def describe_omitted(self) -> str:
+        """说明内容为何未展示，并给出真实大小，避免被误读为空文件。"""
+        reason = self.content_omitted_reason or "内容不可用"
+        return f"*({reason}，内容未展示；实际大小 {self.size_bytes} 字节)*"
 
 
 @dataclass
@@ -154,7 +161,7 @@ class EvidenceBundle:
                     text += f"**内容:**\n\n```\n{file_record.content}\n```\n\n"
                 else:
                     # 二进制文件
-                    text += f"*(二进制文件，无法显示内容)*\n\n"
+                    text += f"{file_record.describe_omitted()}\n\n"
 
         # 修改文件的变化
         if self.files_modified:
@@ -167,7 +174,8 @@ class EvidenceBundle:
                     text += f"**修改前:**\n\n```\n{before.content}\n```\n\n"
                     text += f"**修改后:**\n\n```\n{file_record.content}\n```\n\n"
                 else:
-                    text += f"- 大小变化: {before.size_bytes if before else 0} → {file_record.size_bytes} 字节\n\n"
+                    text += f"- 大小变化: {before.size_bytes if before else 0} → {file_record.size_bytes} 字节\n"
+                    text += f"- 修改后 {file_record.describe_omitted()}\n\n"
 
         # 删除的文件
         if self.files_deleted:
@@ -177,6 +185,8 @@ class EvidenceBundle:
                 text += f"### {file_path}\n\n"
                 if before and before.content is not None:
                     text += f"**删除前的内容:**\n\n```\n{before.content}\n```\n\n"
+                elif before is not None:
+                    text += f"- 删除前 {before.describe_omitted()}\n\n"
                 else:
                     text += f"*(已删除)*\n\n"
 

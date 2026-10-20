@@ -202,23 +202,26 @@ def create_evidence_bundle_from_legacy(
         full_path = root / file_path
 
         content = file_info.get("content")  # 首先尝试从快照中获取
-        encoding = None
+        encoding = 'utf-8' if content is not None else None
+        omitted_reason = file_info.get("omitted_reason")
+        size_bytes = file_info.get("size")
 
-        # 如果快照没有内容，尝试从文件系统读取
-        if content is None and full_path.is_file():
+        # 快照未提供信息时才回退到文件系统读取
+        if content is None and omitted_reason is None and full_path.is_file():
             try:
-                content = full_path.read_text(encoding='utf-8')
+                raw = full_path.read_bytes()
+                size_bytes = len(raw) if size_bytes is None else size_bytes
+                content = raw.decode('utf-8')
                 encoding = 'utf-8'
-            except (UnicodeDecodeError, OSError):
-                # 二进制文件或无法读取
-                pass
-        elif content is not None:
-            encoding = 'utf-8'
+            except UnicodeDecodeError:
+                omitted_reason = "二进制文件"
+            except OSError:
+                omitted_reason = "文件无法读取"
 
-        # 确保 size_bytes 正确
-        size_bytes = file_info.get("size", 0)
-        if size_bytes == 0 and content:
-            size_bytes = len(content.encode('utf-8'))
+        if size_bytes is None:
+            size_bytes = len(content.encode('utf-8')) if content is not None else 0
+        if content is None and omitted_reason is None:
+            omitted_reason = "内容未采集"
 
         return FileRecord(
             path=file_path,
@@ -226,7 +229,8 @@ def create_evidence_bundle_from_legacy(
             content_hash=file_info.get("hash", ""),
             size_bytes=size_bytes,
             modified_time=datetime.fromtimestamp(file_info.get("mtime", 0)) if file_info.get("mtime") else datetime.now(),
-            encoding=encoding
+            encoding=encoding,
+            content_omitted_reason=omitted_reason,
         )
 
     for path in added_paths:

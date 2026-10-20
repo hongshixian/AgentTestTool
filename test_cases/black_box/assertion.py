@@ -9,6 +9,20 @@ from test_cases.black_box.models import AssertionRule, BlackBoxCaseSpec, BlackBo
 from test_cases.black_box.evidence_models import JudgeCriterion
 
 
+def _snapshot_file_info(entry) -> dict:
+    """Describe one snapshot file for Judge: real size always, text only when decodable."""
+    raw = entry.content or b""
+    info = {"hash": entry.sha256, "size": len(raw), "mtime": 0, "content": None, "omitted_reason": None}
+    if not raw:
+        info["content"] = ""
+        return info
+    try:
+        info["content"] = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        info["omitted_reason"] = "二进制文件"
+    return info
+
+
 def _compare(actual: JsonValue, rule: AssertionRule) -> bool:
     expected = rule.expected
     operations = {"eq": lambda: actual == expected, "ne": lambda: actual != expected,
@@ -71,32 +85,15 @@ class BlackBoxAssertion:
             import json
             from pathlib import Path
 
-            # 尝试从 metrics 中读取文件内容
-            files_with_content = {}
-            metrics = evidence.metrics
-
-            # 检查 metrics 中的 summary 数据
-            if "summary" in metrics:
-                files_with_content["output/summary.json"] = json.dumps(metrics["summary"], ensure_ascii=False, indent=2)
-
+            # 内存快照保存了每个文件的真实字节，大小和文本内容都以它为准
             files_snapshot = {
                 "before": {
-                    entry.path: {
-                        "hash": entry.sha256,
-                        "size": 0,  # 旧格式没有大小信息
-                        "mtime": 0,   # 旧格式没有时间信息
-                        "content": None
-                    }
+                    entry.path: _snapshot_file_info(entry)
                     for entry in evidence.files.before.entries
                     if not entry.is_directory
                 },
                 "after": {
-                    entry.path: {
-                        "hash": entry.sha256,
-                        "size": len(files_with_content.get(entry.path, "").encode('utf-8')) if entry.path in files_with_content else 0,
-                        "mtime": 0,
-                        "content": files_with_content.get(entry.path)  # 从 metrics 提取的内容
-                    }
+                    entry.path: _snapshot_file_info(entry)
                     for entry in evidence.files.after.entries
                     if not entry.is_directory
                 }

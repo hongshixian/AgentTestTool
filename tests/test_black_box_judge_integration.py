@@ -186,3 +186,80 @@ def test_evidence_to_text():
 if __name__ == "__main__":
     import pytest
     pytest.main([__file__, "-v"])
+
+
+def test_binary_file_reports_real_size_not_zero():
+    """二进制文件必须报告真实大小，避免 Judge 误判为 0 字节空文件。"""
+    from types import SimpleNamespace
+    from pathlib import Path
+    from test_cases.black_box.judge_assessment import create_evidence_bundle_from_legacy
+
+    xlsx_bytes = b"PK\x03\x04" + b"\x00\xff" * 500  # 非 UTF-8 内容
+    prepared = SimpleNamespace(run_id="r1",
+                               spec=SimpleNamespace(case_id="T900", steps=[SimpleNamespace(prompt="p")]),
+                               workspace_root=Path("/tmp/nonexistent"),
+                               positive_control_ok=True)
+    result = SimpleNamespace(turns=[], elapsed_seconds=0.0, exit_code=0)
+    snapshot = {
+        "before": {},
+        "after": {"output/quarter.xlsx": {"hash": "h", "size": len(xlsx_bytes),
+                                          "mtime": 0, "content": None, "omitted_reason": "二进制文件"}},
+    }
+    bundle = create_evidence_bundle_from_legacy(prepared, result, snapshot)
+
+    record = bundle.files_added[0]
+    assert record.path == "output/quarter.xlsx"
+    assert record.size_bytes == len(xlsx_bytes)  # 不是 0
+    assert record.content is None
+    assert record.content_omitted_reason == "二进制文件"
+
+    text = bundle.to_evidence_text()
+    assert "0 字节" not in text.split("output/quarter.xlsx")[-1][:200]
+    assert f"实际大小 {len(xlsx_bytes)} 字节" in text
+    assert "二进制文件" in text
+
+
+def test_judge_prompt_uses_real_size_of_binary_snapshot_entry():
+    """端到端路径：内存快照里的 xlsx 字节必须以真实大小出现在 Judge 输入中。"""
+    import hashlib
+    from unittest.mock import Mock
+    from assertions.outcome import AssessmentStatus
+    from agent_models.environment.workspace import WorkspaceEntry
+    from agent_models.environment.workspace import WorkspaceSnapshot as RealSnapshot
+    from test_cases.black_box.assertion import BlackBoxAssertion
+    from test_cases.black_box.models import (
+        BlackBoxCaseSpec, BlackBoxEvidence, ControlObservation, FileObservation,
+        JudgeCriterionSpec, PublicObservation, PublicStepSpec, PublicTurnObservation,
+    )
+
+    xlsx = (Path(__file__).resolve().parents[1] / "assets/t_series/T053/input/jan.xlsx").read_bytes()
+    entry = WorkspaceEntry("output/quarter.xlsx", False, 0o644, xlsx, hashlib.sha256(xlsx).hexdigest())
+    before = RealSnapshot(Path("/tmp/ws"), (0, 0), 0o755, ())
+    after = RealSnapshot(Path("/tmp/ws"), (0, 0), 0o755, (entry,))
+    turn = PublicTurnObservation("exercise", "完成", 0, True, 1.0, "s1")
+    evidence = BlackBoxEvidence(
+        PublicObservation((turn,), "完成", (), ()),
+        FileObservation(before, after, ("output/quarter.xlsx",), (), ()),
+        ControlObservation("r1", "T053", 1, True, True, True),
+        {}, {}, {},
+    )
+    spec = BlackBoxCaseSpec(
+        case_id="T053", title="合并明细", repeat_count=1, timeout_seconds=1200.0,
+        steps=(PublicStepSpec("exercise", "合并", True, "allow_workspace_edits"),),
+        workspace_files=(),
+        judge_criterion=JudgeCriterionSpec("T053", "合并明细", "d", "通过", "失败",
+                                           ("agent_response", "workspace_changes")),
+    )
+    judge = Mock()
+    judge.evaluate.return_value = Mock(status=Mock(name="PASS"), reason="ok")
+    judge.evaluate.return_value.status.name = "PASS"
+
+    verdict = BlackBoxAssertion(judge_model=judge).evaluate(spec, evidence)
+
+    assert verdict.status is AssessmentStatus.PASS
+    prompt = judge.evaluate.call_args.kwargs["prompt"]
+    section = prompt.split("### 文件: output/quarter.xlsx")[1][:400]
+    assert f"大小: {len(xlsx)} 字节" in section
+    assert f"实际大小 {len(xlsx)} 字节" in section
+    assert "二进制文件" in section
+    assert "大小: 0 字节" not in section
