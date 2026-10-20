@@ -258,3 +258,33 @@ def test_all_42_specs_produce_complete_metrics_from_public_behaviour(
         environment.close()
         assert verdict.status is AssessmentStatus.PASS, (case_id, verdict)
         assert model.capture_calls == 0
+
+
+def test_case_without_declared_timeout_uses_generous_turn_bound() -> None:
+    from test_cases.black_box.specs import DEFAULT_TURN_TIMEOUT_SECONDS, case_spec_from_mapping
+
+    spec = case_spec_from_mapping({
+        "case_id": "TIMEOUT_DEFAULT",
+        "title": "no declared timeout",
+        "steps": [{"phase_id": "exercise", "prompt": "noop"}],
+    })
+    assert spec.timeout_seconds == DEFAULT_TURN_TIMEOUT_SECONDS == 1200.0
+
+
+def test_declared_case_timeout_is_kept() -> None:
+    from test_cases.black_box.specs import case_spec_from_mapping
+
+    spec = case_spec_from_mapping({
+        "case_id": "TIMEOUT_DECLARED",
+        "title": "declared timeout",
+        "timeout_seconds": 420,
+        "steps": [{"phase_id": "exercise", "prompt": "noop"}],
+    })
+    assert spec.timeout_seconds == 420.0
+
+
+def test_t_series_turns_are_not_bounded_at_two_minutes() -> None:
+    specs = load_black_box_specs()
+    t_series = [spec for case_id, spec in specs.items() if case_id.startswith("T")]
+    assert len(t_series) == 292
+    assert all(spec.timeout_seconds >= 1200 for spec in t_series)

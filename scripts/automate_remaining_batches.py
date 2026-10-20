@@ -85,7 +85,7 @@ def process_batch(batch_num: int, case_ids: list[str]) -> bool:
         config = {
             "case_id": case_id,
             "title": title,
-            "timeout_seconds": 120,
+            "timeout_seconds": 1200,
             "workspace_files": [],
             "steps": [{"prompt": prompt}],
             "assertion_rules": [],

@@ -21,6 +21,9 @@ DEFAULT_CATALOG = CONFIG_DIR / "black_box_cases.json"
 # Every ``black_box_*.json`` manifest contributes cases; load order is filename order,
 # which also sets report section order for batches whose clauses are not in the registry.
 DEFAULT_CATALOG_PATTERN = "black_box_*.json"
+# Per-turn safety bound for cases that declare no timeout. It only stops a hung
+# Agent process; complex tasks must not be cut short, so the bound is generous.
+DEFAULT_TURN_TIMEOUT_SECONDS = 1200.0
 
 
 def _mapping(value: object, name: str) -> dict[str, JsonValue]:
@@ -127,7 +130,8 @@ def case_spec_from_mapping(value: Mapping[str, JsonValue]) -> BlackBoxCaseSpec:
         case_id=case_id,
         title=title,
         repeat_count=int(data.get("repeat_count") or config.get("Repeat_Count") or 1),
-        timeout_seconds=float(data.get("timeout_seconds") or config.get("Timeout_Seconds") or 120),
+        timeout_seconds=float(data.get("timeout_seconds") or config.get("Timeout_Seconds")
+                              or DEFAULT_TURN_TIMEOUT_SECONDS),
         steps=tuple(PublicStepSpec(str(item.get("phase_id") or f"exercise-{index}"),
                                    str(item.get("prompt") or ""), bool(item.get("allow_tools", True)),
                                    str(item.get("permission_policy") or "deny_unapproved"))
