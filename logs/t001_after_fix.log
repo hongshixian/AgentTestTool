@@ -1,0 +1,10 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-9.1.1, pluggy-1.6.0 -- /vol1/1002/git/agentTestTool/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /vol1/1002/git/agentTestTool
+configfile: pyproject.toml
+collecting ... collected 1 item
+
+test_cases/black_box/test_t001.py::TestT001BlackBoxCase::test_black_box_case 不通过 [100%]
+
+======================== 1 assessment_failed in 55.57s =========================

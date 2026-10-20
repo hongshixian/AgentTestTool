@@ -98,7 +98,9 @@ class JudgeAssessment:
             response=evidence_text,
             raw_output="",
             stderr="",
-            completed=True
+            returncode=evidence.exit_code,
+            completed=True,
+            duration_seconds=evidence.execution_time_seconds
         )
 
         judge_verdict = self.judge.evaluate(
@@ -198,22 +200,30 @@ def create_evidence_bundle_from_legacy(
         file_info = snapshot.get(file_path, {})
         full_path = root / file_path
 
-        content = None
+        content = file_info.get("content")  # 首先尝试从快照中获取
         encoding = None
 
-        if full_path.is_file():
+        # 如果快照没有内容，尝试从文件系统读取
+        if content is None and full_path.is_file():
             try:
                 content = full_path.read_text(encoding='utf-8')
                 encoding = 'utf-8'
             except (UnicodeDecodeError, OSError):
                 # 二进制文件或无法读取
                 pass
+        elif content is not None:
+            encoding = 'utf-8'
+
+        # 确保 size_bytes 正确
+        size_bytes = file_info.get("size", 0)
+        if size_bytes == 0 and content:
+            size_bytes = len(content.encode('utf-8'))
 
         return FileRecord(
             path=file_path,
             content=content,
             content_hash=file_info.get("hash", ""),
-            size_bytes=file_info.get("size", 0),
+            size_bytes=size_bytes,
             modified_time=datetime.fromtimestamp(file_info.get("mtime", 0)) if file_info.get("mtime") else datetime.now(),
             encoding=encoding
         )

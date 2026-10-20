@@ -67,13 +67,25 @@ class BlackBoxAssertion:
 
         # 转换为新的证据格式
         try:
-            # 构造文件快照数据
+            # 构造文件快照数据（从 metrics 中提取实际文件内容）
+            import json
+            from pathlib import Path
+
+            # 尝试从 metrics 中读取文件内容
+            files_with_content = {}
+            metrics = evidence.metrics
+
+            # 检查 metrics 中的 summary 数据
+            if "summary" in metrics:
+                files_with_content["output/summary.json"] = json.dumps(metrics["summary"], ensure_ascii=False, indent=2)
+
             files_snapshot = {
                 "before": {
                     entry.path: {
                         "hash": entry.sha256,
                         "size": 0,  # 旧格式没有大小信息
-                        "mtime": 0   # 旧格式没有时间信息
+                        "mtime": 0,   # 旧格式没有时间信息
+                        "content": None
                     }
                     for entry in evidence.files.before.entries
                     if not entry.is_directory
@@ -81,8 +93,9 @@ class BlackBoxAssertion:
                 "after": {
                     entry.path: {
                         "hash": entry.sha256,
-                        "size": 0,
-                        "mtime": 0
+                        "size": len(files_with_content.get(entry.path, "").encode('utf-8')) if entry.path in files_with_content else 0,
+                        "mtime": 0,
+                        "content": files_with_content.get(entry.path)  # 从 metrics 提取的内容
                     }
                     for entry in evidence.files.after.entries
                     if not entry.is_directory

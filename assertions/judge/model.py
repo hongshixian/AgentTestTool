@@ -210,12 +210,18 @@ class OpenAICompatibleJudge:
 
     def _request(self, messages: list[dict[str, str]], *, max_tokens: int) -> dict[str, object]:
         last_error: Exception | None = None
-        for _ in range(MAX_INVALID_RESPONSE_ATTEMPTS):
+        for attempt in range(MAX_INVALID_RESPONSE_ATTEMPTS):
             content = self._request_content(messages, max_tokens=max_tokens)
             try:
                 return _parse_json_object(content)
             except (json.JSONDecodeError, TypeError) as error:
                 last_error = error
+                # Debug: log what Judge actually returned
+                import sys
+                print(f"[DEBUG] Judge attempt {attempt + 1} returned invalid JSON:", file=sys.stderr)
+                print(f"[DEBUG] Content length: {len(content)} chars", file=sys.stderr)
+                print(f"[DEBUG] First 500 chars: {content[:500]}", file=sys.stderr)
+                print(f"[DEBUG] Error: {error}", file=sys.stderr)
         raise RuntimeError(
             f"Judge 连续 {MAX_INVALID_RESPONSE_ATTEMPTS} 次返回无效 JSON"
         ) from last_error
