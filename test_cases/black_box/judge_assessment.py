@@ -168,8 +168,9 @@ def create_evidence_bundle_from_legacy(
         新格式的 EvidenceBundle
     """
     from datetime import datetime
-    from test_cases.black_box.evidence_models import FileRecord, WorkspaceSnapshot
+    from test_cases.black_box.evidence_models import ExecutionPhase, FileRecord, WorkspaceSnapshot
     import hashlib
+    import json
     from pathlib import Path
 
     # 获取最后一个 turn
@@ -250,6 +251,31 @@ def create_evidence_bundle_from_legacy(
     if hasattr(prepared, 'spec') and hasattr(prepared.spec, 'steps') and prepared.spec.steps:
         prompt = prepared.spec.steps[0].prompt
 
+    # 提取执行阶段信息
+    execution_phases = []
+    for i, turn_item in enumerate(result.turns):
+        phase = ExecutionPhase(
+            phase_id=turn_item.phase_id,
+            response=turn_item.response,
+            duration_seconds=turn_item.duration_seconds,
+            waiting_for_approval=False,
+            approval_granted=False
+        )
+
+        # 尝试从response中检测waiting_for_approval标记
+        if isinstance(turn_item.response, str):
+            try:
+                response_data = json.loads(turn_item.response)
+                if isinstance(response_data, dict) and response_data.get("waiting_for_approval"):
+                    phase.waiting_for_approval = True
+                    # 如果有后续阶段，说明批准已授予
+                    phase.approval_granted = (i + 1 < len(result.turns))
+            except (json.JSONDecodeError, ValueError, AttributeError):
+                # 不是JSON格式，或者解析失败，跳过
+                pass
+
+        execution_phases.append(phase)
+
     # 构造 EvidenceBundle
     evidence = EvidenceBundle(
         run_id=getattr(prepared, 'run_id', 'unknown'),
@@ -266,6 +292,7 @@ def create_evidence_bundle_from_legacy(
         files_modified=files_modified,
         files_deleted=files_deleted,
         tool_calls=[],
+        execution_phases=execution_phases,  # 新增：执行阶段信息
         collector_ready=True,
         collection_complete=True,
         positive_control_ok=getattr(prepared, 'positive_control_ok', True)

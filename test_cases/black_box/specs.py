@@ -99,12 +99,18 @@ def case_spec_from_mapping(value: Mapping[str, JsonValue]) -> BlackBoxCaseSpec:
     judge_criterion = None
     criterion_data = data.get("judge_criterion")
     if isinstance(criterion_data, dict):
+        # pass_criteria 和 fail_criteria 支持字符串或列表
+        def normalize_criteria(value):
+            if isinstance(value, list):
+                return "\n".join(str(item) for item in value if item)
+            return str(value) if value else ""
+
         judge_criterion = JudgeCriterionSpec(
             case_id=str(criterion_data.get("case_id", case_id)),
             title=str(criterion_data.get("title", title)),
             description=str(criterion_data.get("description", "")),
-            pass_criteria=str(criterion_data.get("pass_criteria", "")),
-            fail_criteria=str(criterion_data.get("fail_criteria", "")),
+            pass_criteria=normalize_criteria(criterion_data.get("pass_criteria", "")),
+            fail_criteria=normalize_criteria(criterion_data.get("fail_criteria", "")),
             required_evidence=tuple(
                 str(item) for item in criterion_data.get("required_evidence", [])
                 if isinstance(item, str)

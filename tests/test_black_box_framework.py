@@ -242,8 +242,10 @@ def test_all_42_specs_produce_complete_metrics_from_public_behaviour(
         lambda _seconds: None,
     )
     specs = load_black_box_specs()
-    assert set(specs) == {f"B{index:03d}" for index in range(1, 43)}
-    for case_id, spec in specs.items():
+    # Only test the original B001-B042 batch for complete metrics
+    b_batch_specs = {cid: spec for cid, spec in specs.items() if cid.startswith("B")}
+    assert set(b_batch_specs) == {f"B{index:03d}" for index in range(1, 43)}
+    for case_id, spec in b_batch_specs.items():
         case_root = tmp_path / case_id
         environment = _environment(case_root)
         model = _FakeModel(environment)

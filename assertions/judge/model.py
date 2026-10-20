@@ -83,7 +83,7 @@ class OpenAICompatibleJudge:
                 ),
             },
         ]
-        parsed = self._request(messages, max_tokens=512)
+        parsed = self._request(messages, max_tokens=8192)
         if not isinstance(parsed.get("passed"), bool):
             raise RuntimeError("Judge 返回缺少布尔类型 passed 字段")
         reason = _required_reason(parsed)
@@ -169,7 +169,7 @@ class OpenAICompatibleJudge:
                 ),
             },
         ]
-        parsed = self._request(messages, max_tokens=768)
+        parsed = self._request(messages, max_tokens=8192)
         try:
             status = JudgeStatus(parsed.get("status"))
         except (TypeError, ValueError) as error:

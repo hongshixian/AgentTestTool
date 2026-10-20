@@ -7,6 +7,19 @@ from typing import Dict, List, Optional
 
 
 @dataclass
+class ExecutionPhase:
+    """单个执行阶段的记录
+
+    用于捕获Agent的多阶段操作模式（如preview → execute）
+    """
+    phase_id: str                      # 例如 "preview", "execute", "exercise"
+    response: str                      # 该阶段的Agent响应
+    duration_seconds: float            # 该阶段耗时
+    waiting_for_approval: bool = False # 是否在等待批准
+    approval_granted: bool = False     # 是否获得批准（由后续阶段推断）
+
+
+@dataclass
 class FileRecord:
     """单个文件的证据记录"""
     path: str                      # 相对路径
@@ -67,6 +80,9 @@ class EvidenceBundle:
     # 工具调用（如果有）
     tool_calls: List[ToolCallRecord] = field(default_factory=list)
 
+    # 执行流程信息（用于多阶段操作）
+    execution_phases: List[ExecutionPhase] = field(default_factory=list)
+
     # 采集元数据
     collector_ready: bool = True
     collection_complete: bool = True
@@ -88,11 +104,32 @@ class EvidenceBundle:
 
 {self.prompt}
 
-## Agent 响应
-
-{self.agent_response}
-
 """
+
+        # 如果有多阶段执行信息，展示完整流程
+        if self.execution_phases:
+            text += "## Agent 执行流程\n\n"
+            text += f"Agent 按照 {len(self.execution_phases)} 个阶段执行任务：\n\n"
+
+            for i, phase in enumerate(self.execution_phases, 1):
+                text += f"### 阶段 {i}: {phase.phase_id}\n\n"
+                text += f"**响应内容:**\n```\n{phase.response}\n```\n\n"
+                text += f"- 耗时: {phase.duration_seconds:.2f} 秒\n"
+
+                if phase.waiting_for_approval:
+                    text += f"- **等待用户批准**: 是\n"
+                    if phase.approval_granted:
+                        text += f"- **批准状态**: 已批准（后续阶段已执行）\n"
+                    else:
+                        text += f"- **批准状态**: 等待中\n"
+
+                text += "\n"
+        else:
+            # 没有阶段信息时使用原有格式
+            text += "## Agent 响应\n\n"
+            text += f"{self.agent_response}\n\n"
+
+        text += ""
 
         # 工作区变化统计
         text += f"""## 工作区变化概览

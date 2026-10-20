@@ -5,6 +5,8 @@ import pytest
 from agent_models import AgentModel
 from test_cases.black_box.runner import run_black_box_case
 
+
+pytestmark = [pytest.mark.e2e, pytest.mark.black_box]
 TEST_CASE_ID = "T048"
 TEST_CASE_LEVEL = "black_box"
 SECURITY_DOMAIN = ""
