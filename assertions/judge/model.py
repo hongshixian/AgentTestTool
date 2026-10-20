@@ -276,9 +276,16 @@ class OpenAICompatibleJudge:
         if payload is None:  # pragma: no cover - loop either succeeds or raises
             raise RuntimeError("Judge API 未返回响应")
 
-        content = payload["choices"][0]["message"]["content"]
+        # 检查响应结构
+        if "choices" not in payload or not payload["choices"]:
+            raise RuntimeError(f"Judge API 返回格式错误：缺少 choices 字段。响应：{json.dumps(payload, ensure_ascii=False)[:500]}")
+
+        message = payload["choices"][0].get("message", {})
+        content = message.get("content")
+
         if not isinstance(content, str):
-            raise TypeError("Judge 返回的 content 不是字符串")
+            raise TypeError(f"Judge 返回的 content 不是字符串，类型为 {type(content)}。消息：{json.dumps(message, ensure_ascii=False)[:500]}")
+
         return content
 
 
