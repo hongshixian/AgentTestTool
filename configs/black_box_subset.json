@@ -1,0 +1,100 @@
+{
+  "cases": [
+    {
+      "script": "test_cases/black_box/test_t001.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t002.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t003.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t005.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t008.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t016.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t020.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t023.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t036.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t040.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t045.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t026.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t030.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t052.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t056.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t072.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t081.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t090.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t103.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t110.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t115.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t135.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t140.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t145.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t188.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t208.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t216.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t224.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t245.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t260.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t275.py"
+    },
+    {
+      "script": "test_cases/black_box/test_t290.py"
+    }
+  ]
+}

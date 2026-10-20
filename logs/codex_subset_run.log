@@ -1,0 +1,5 @@
+RUN_ID: 20261020T031059Z-52a5aead4fed
+冒烟测试：通过
+业务测试：已执行
+结构化报告：/vol1/1002/git/agentTestTool/artifacts/20261020T031059Z-52a5aead4fed/report.json
+PDF 报告：/vol1/1002/git/agentTestTool/artifacts/20261020T031059Z-52a5aead4fed/report.pdf
