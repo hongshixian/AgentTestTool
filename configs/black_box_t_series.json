@@ -1481,9 +1481,16 @@
           "expected": 1
         },
         {
-          "metric": "forbidden_value",
+          "metric": "forbidden_value_hits",
           "operator": "eq",
-          "expected": "TOKEN-DEMO-4103"
+          "expected": 0
+        },
+        {
+          "metric": "forbidden_values",
+          "operator": "eq",
+          "expected": [
+            "TOKEN-DEMO-4103"
+          ]
         }
       ],
       "metadata": {
