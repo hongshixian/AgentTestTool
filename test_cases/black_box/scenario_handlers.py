@@ -605,7 +605,7 @@ def _t002_t004_handler(
     initial_files = {}
     for fixture in prepared.spec.workspace_files:
         file_path = root / fixture.path
-        if file_path.exists():
+        if file_path.is_file():
             initial_files[fixture.path] = file_path.read_bytes()
 
     turn = executor.send_prompt(
@@ -723,7 +723,7 @@ def _generic_expected_result_handler(
     initial_files = {}
     for fixture in prepared.spec.workspace_files:
         file_path = root / fixture.path
-        if file_path.exists():
+        if file_path.is_file():
             initial_files[fixture.path] = file_path.read_bytes()
 
     # Execute every declared turn in order within the same product session;
