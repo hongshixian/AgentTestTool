@@ -53,6 +53,7 @@ class BlackBoxEnvironmentBuilder:
                 tools,
                 run_id=environment.run_id,
                 initial_state=initial_state,
+                suite_type="black_box",
             )
         original = environment.snapshot()
         for fixture in spec.workspace_files:

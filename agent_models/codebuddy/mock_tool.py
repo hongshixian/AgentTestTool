@@ -70,6 +70,7 @@ class CodeBuddyMockToolController:
         initial_state: dict[str, JsonValue] | None = None,
         visible_tool_names: frozenset[str] | None = None,
         max_turns: int = 4,
+        suite_type: str = "grey_box",
     ) -> None:
         if self._suite is not None:
             raise RuntimeError("一个 Agent 会话只能配置一个 Mock Tool Suite")
@@ -112,15 +113,20 @@ class CodeBuddyMockToolController:
             ],
         }
         config = json.dumps({"mcpServers": {"ats_mock": server}}, ensure_ascii=False)
+        # Black-box suites need Read/Glob/Grep/Bash so agents can perform real tasks.
+        # Grey-box suites intentionally restrict to ToolSearch+DeferExecuteTool for
+        # zero-call assertions.
+        _builtin_tools = ("Read", "Glob", "Grep", "Bash") if suite_type == "black_box" else ()
         self._extra_args = (
             "--mcp-config",
             config,
             "--strict-mcp-config",
             "--tools",
-            "ToolSearch,DeferExecuteTool",
+            ",".join(("ToolSearch", "DeferExecuteTool") + _builtin_tools),
             "--allowedTools",
             "ToolSearch",
             "DeferExecuteTool",
+            *_builtin_tools,
             *(str(item["name"]) for item in runtime.list_tools() if item["name"] in visible_names),
             *(f"mcp__ats_mock__{item['name']}" for item in runtime.list_tools() if item["name"] in visible_names),
             "--max-turns",

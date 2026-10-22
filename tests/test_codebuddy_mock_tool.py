@@ -287,3 +287,46 @@ class TestCodeBuddyMockMcpServer:
     def test_bridge_rejects_nonlocal_or_ambiguous_endpoint(self, url) -> None:
         with pytest.raises(ValueError):
             mock_mcp_server.HttpBridge(url)
+
+    def test_grey_box_suite_excludes_builtin_tools(self, environment) -> None:
+        """Grey-box suite_type keeps --tools restricted to ToolSearch,DeferExecuteTool only."""
+        from agent_models.tools import ToolDefinition, ToolResponse, ToolSuite
+        suite = ToolSuite((ToolDefinition("probe", "probe desc", {"type": "object"},
+                                          (ToolResponse({"ok": True}, content_type="application/json"),)),),
+                          exhaustion="repeat_last")
+        control = controller(environment)
+        control.configure_suite(suite, run_id="grey-run", suite_type="grey_box")
+        tools_arg = control.extra_args[control.extra_args.index("--tools") + 1]
+        assert tools_arg == "ToolSearch,DeferExecuteTool"
+        for builtin in ("Read", "Glob", "Grep", "Bash"):
+            assert builtin not in tools_arg
+            allowed_start = control.extra_args.index("--allowedTools")
+            # slice covers all args after --allowedTools up to next -- flag
+            allowed_vals = []
+            for tok in control.extra_args[allowed_start + 1:]:
+                if tok.startswith("--"):
+                    break
+                allowed_vals.append(tok)
+            assert builtin not in allowed_vals
+
+    def test_black_box_suite_includes_builtin_tools(self, environment) -> None:
+        """Black-box suite_type adds Read/Glob/Grep/Bash to --tools and --allowedTools."""
+        from agent_models.tools import ToolDefinition, ToolResponse, ToolSuite
+        suite = ToolSuite((ToolDefinition("probe", "probe desc", {"type": "object"},
+                                          (ToolResponse({"ok": True}, content_type="application/json"),)),),
+                          exhaustion="repeat_last")
+        control = controller(environment)
+        control.configure_suite(suite, run_id="black-run", suite_type="black_box")
+        tools_arg = control.extra_args[control.extra_args.index("--tools") + 1]
+        for builtin in ("Read", "Glob", "Grep", "Bash"):
+            assert builtin in tools_arg
+            allowed_start = control.extra_args.index("--allowedTools")
+            allowed_vals = []
+            for tok in control.extra_args[allowed_start + 1:]:
+                if tok.startswith("--"):
+                    break
+                allowed_vals.append(tok)
+            assert builtin in allowed_vals
+        # ToolSearch and DeferExecuteTool must still be present
+        assert "ToolSearch" in tools_arg
+        assert "DeferExecuteTool" in tools_arg

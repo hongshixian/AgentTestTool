@@ -82,6 +82,7 @@ class _FakeModel:
         *,
         run_id: str,
         initial_state=None,
+        suite_type: str = "grey_box",
     ) -> None:
         assert run_id == self.environment.run_id
         self.environment.configure_tools(suite, initial_state=initial_state)
@@ -271,16 +272,20 @@ def test_case_without_declared_timeout_uses_generous_turn_bound() -> None:
     assert spec.timeout_seconds == DEFAULT_TURN_TIMEOUT_SECONDS == 1200.0
 
 
-def test_declared_case_timeout_is_kept() -> None:
+def test_short_declared_timeout_is_raised_to_floor_and_longer_is_kept() -> None:
     from test_cases.black_box.specs import case_spec_from_mapping
 
-    spec = case_spec_from_mapping({
-        "case_id": "TIMEOUT_DECLARED",
-        "title": "declared timeout",
-        "timeout_seconds": 420,
-        "steps": [{"phase_id": "exercise", "prompt": "noop"}],
-    })
-    assert spec.timeout_seconds == 420.0
+    def spec(seconds):
+        return case_spec_from_mapping({"case_id": "TIMEOUT_DECLARED", "title": "declared timeout",
+                                       "timeout_seconds": seconds,
+                                       "steps": [{"phase_id": "exercise", "prompt": "noop"}]})
+
+    assert spec(120).timeout_seconds == 1200.0
+    assert spec(3600).timeout_seconds == 3600.0
+
+
+def test_all_black_box_turns_are_not_bounded_at_two_minutes() -> None:
+    assert all(spec.timeout_seconds >= 1200 for spec in load_black_box_specs().values())
 
 
 def test_t_series_turns_are_not_bounded_at_two_minutes() -> None:
@@ -288,3 +293,36 @@ def test_t_series_turns_are_not_bounded_at_two_minutes() -> None:
     t_series = [spec for case_id, spec in specs.items() if case_id.startswith("T")]
     assert len(t_series) == 292
     assert all(spec.timeout_seconds >= 1200 for spec in t_series)
+
+
+def test_retry_restores_tool_state_so_metrics_survive_transient_failure(tmp_path: Path) -> None:
+    """瞬时失败重试时必须先恢复模拟工具状态，否则第二次调用会让指标被丢弃。"""
+    from test_cases.black_box.scenario_handlers import _state_handler
+
+    environment = _environment(tmp_path)
+    spec = load_black_box_specs()["B010"]
+
+    class _FlakyModel(_FakeModel):
+        attempts = 0
+
+        def configure_mock_tools(self, suite, *, run_id, initial_state=None, suite_type="grey_box"):
+            self.environment.configure_tools(suite, initial_state=initial_state)
+
+        def send_prompt(self, prompt, **kwargs):
+            self.attempts += 1
+            name = f"BLACK_BOX_{spec.case_id}"
+            payload = self.environment.runtime.call(name, {})
+            if self.attempts == 1:  # 工具已被调用，但回合因网络错误未完成
+                return TurnResult(response="", raw_output="", stderr="502 TLS", returncode=0,
+                                  completed=False, duration_seconds=0.1)
+            return TurnResult(response=json.dumps(payload.body, ensure_ascii=False), raw_output="", stderr="",
+                              returncode=0, completed=True, duration_seconds=0.1, session_id="s")
+
+    model = _FlakyModel(environment)
+    prepared = BlackBoxEnvironmentBuilder().build(spec, model, repeat_index=1)
+    result = _state_handler(BlackBoxCaseExecutor(), prepared, model)
+
+    assert model.attempts == 2
+    assert environment.runtime.state["Public_Request_Count"] == 1
+    for rule in spec.assertion_rules:
+        assert rule.metric in result.metrics

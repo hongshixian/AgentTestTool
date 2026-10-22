@@ -1599,7 +1599,8 @@ class CodeBuddyAgentModel(AgentModel):
     def configure_mock_tools(self, suite: ToolSuite, *, run_id: str,
                              initial_state: dict[str, JsonValue] | None = None,
                              visible_tool_names: frozenset[str] | None = None,
-                             max_turns: int = 4) -> None:
+                             max_turns: int = 4,
+                             suite_type: str = "grey_box") -> None:
         if self._has_attempted_session:
             raise RuntimeError("必须在 Agent 会话开始前配置 Mock Tool")
         self.mock_tool.configure_suite(
@@ -1608,6 +1609,7 @@ class CodeBuddyAgentModel(AgentModel):
             initial_state=initial_state,
             visible_tool_names=visible_tool_names,
             max_turns=max_turns,
+            suite_type=suite_type,
         )
 
     def prepare_local_state(self, request: LocalStateRequest) -> tuple[EvidenceRecord, ...]:
