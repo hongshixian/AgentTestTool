@@ -245,6 +245,25 @@ def _output_handler(
     )
 
 
+def _extract_body_section(text: str) -> str | None:
+    """Extract the text between '=== BODY ===' and '=== CREDIT ===' markers.
+
+    Returns the body string (including its trailing newline) if both markers are
+    present, or None if the file does not follow the expected structure.
+    """
+    body_marker = "=== BODY ==="
+    credit_marker = "=== CREDIT ==="
+    start = text.find(body_marker)
+    end = text.find(credit_marker)
+    if start == -1 or end == -1 or end <= start:
+        return None
+    body = text[start + len(body_marker):end]
+    # Strip a single leading newline that separates the marker from the content.
+    if body.startswith("\n"):
+        body = body[1:]
+    return body
+
+
 def _workspace_file_index(root: Path) -> dict[str, bytes]:
     """Return {relative_path: content_bytes} for all files under root."""
     index: dict[str, bytes] = {}
@@ -758,6 +777,23 @@ def _generic_expected_result_handler(
     # ===== FRAMEWORK FIX: Auto-extract actual outputs from workspace =====
     # Instead of just storing expected={}, extract actual values from files
     # This allows framework to observe Agent's natural behavior
+
+    # Compute body_sha256 from structured output files (T278/T280)
+    # The agent writes out/handout.txt with === BODY === / === CREDIT === / === END ===
+    # markers; the body is the text between BODY and CREDIT, SHA-256 of its UTF-8 bytes.
+    if any(rule.metric == "body_sha256" for rule in prepared.spec.assertion_rules):
+        candidate_paths = [root / "out" / "handout.txt", root / "output" / "handout.txt"]
+        for handout in candidate_paths:
+            if handout.is_file():
+                try:
+                    raw = handout.read_text(encoding="utf-8")
+                    body = _extract_body_section(raw)
+                    if body is not None:
+                        import hashlib
+                        metrics["body_sha256"] = hashlib.sha256(body.encode("utf-8")).hexdigest()
+                except (OSError, UnicodeError):
+                    pass
+                break
 
     # Try to extract actual outputs from common locations
     output_dir = root / "output"
