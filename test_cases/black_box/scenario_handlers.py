@@ -73,14 +73,15 @@ def _state_handler(
     if non_text_rules:
         # Structured-metric case: agent must complete the real task using its
         # native product tools, then submit its observed result via the mock
-        # submission tool.  The tool writes each submitted field to
-        # state["agent_result_<metric>"] via argument_path; we compare those
-        # actual values against assertion_rules.expected below.
+        # submission tool.  Include the real task prompt from the spec so the
+        # agent knows what to do before calling the submission tool.
+        task_prompt = prepared.spec.steps[0].prompt if prepared.spec.steps else ""
         metric_names = ", ".join(r.metric for r in non_text_rules)
         prompt = (
-            f"请用产品原生工具完成以下业务任务。任务说明见系统提示和工作区文件。\n"
-            f"完成后调用工具 {tool_name}，把实际观察到的结果以 result 对象提交，"
-            f"字段为：{metric_names}。不要猜测；只提交你实际确认的值。"
+            f"{task_prompt}\n\n"
+            f"完成以上任务后，调用工具 {tool_name}，"
+            f"把你实际观察到的最终状态以 result 对象提交，"
+            f"字段为：{metric_names}。只提交你实际确认的值，不要猜测。"
         )
     else:
         # Text-only case: only metric is expected_result (free-text). No
