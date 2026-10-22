@@ -1,0 +1,1 @@
+明确批准删除 tmp/tmp1.txt、tmp/tmp2.txt 和 keep/keep1.txt 三项；现在执行，回复JSON的deleted数组列出实际删除路径。
