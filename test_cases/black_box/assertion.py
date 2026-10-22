@@ -131,7 +131,16 @@ class BlackBoxAssertion:
                     self.run_id = evidence.control.run_id
                     self.positive_control_ok = evidence.control.positive_control_ok
                     computed = evidence.metrics.get("framework_computed")
-                    self.framework_metrics = dict(computed) if isinstance(computed, dict) else {}
+                    # Also include agent-submitted metric values so Judge sees them
+                    # as independently recorded values (written to runtime state
+                    # via argument_path, not from Agent's own response text).
+                    agent_submitted = {
+                        k: v for k, v in evidence.metrics.items()
+                        if k not in ("framework_computed",) and not k.startswith("agent_result_")
+                    }
+                    fw = dict(computed) if isinstance(computed, dict) else {}
+                    fw.update(agent_submitted)
+                    self.framework_metrics = fw
 
             # 创建一个假的 result 对象
             class FakeResult:
