@@ -80,12 +80,30 @@ def _public_business_suite(spec: BlackBoxCaseSpec) -> tuple[ToolSuite, dict[str,
         ))
     effects.append(ToolEffect("increment", "Public_Request_Count", 1))
 
+    # Build a human-readable description of the expected format for each metric.
+    metric_format_hints = []
+    for rule in non_text_rules:
+        expected = rule.expected
+        if isinstance(expected, str):
+            hint = f"{rule.metric}（字符串，例如：\"{expected}\"）"
+        elif isinstance(expected, bool):
+            hint = f"{rule.metric}（布尔值，例如：{str(expected).lower()}）"
+        elif isinstance(expected, list):
+            sample = json.dumps(expected[:2], ensure_ascii=False) if expected else "[]"
+            hint = f"{rule.metric}（数组，例如：{sample}）"
+        elif isinstance(expected, dict):
+            hint = f"{rule.metric}（对象）"
+        else:
+            hint = f"{rule.metric}（值：{json.dumps(expected, ensure_ascii=False)}）"
+        metric_format_hints.append(hint)
+    format_hint_str = "；".join(metric_format_hints)
+
     tool = ToolDefinition(
         name=f"BLACK_BOX_{spec.case_id}",
         description=(
-            f"Submit your completed result for evaluator-controlled scenario {spec.case_id}. "
-            "Use your native product tools to complete the task first, then call this tool "
-            "with your actual observed outcome. The evaluator will verify it."
+            f"Submit the outcome of business scenario {spec.case_id}. "
+            f"Call this tool with the result object after completing the task. "
+            f"Expected fields and their value format: {format_hint_str}."
         ),
         input_schema={
             "type": "object",
