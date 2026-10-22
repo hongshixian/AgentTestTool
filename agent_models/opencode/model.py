@@ -934,6 +934,7 @@ class OpenCodeAgentModel(AgentModel):
         initial_state: dict | None = None,
         visible_tool_names: frozenset[str] | None = None,
         max_turns: int = 4,
+        suite_type: str = "grey_box",
     ) -> None:
         if self._execution_path is not None:
             raise RuntimeError("Mock tools must be configured before sending a prompt")

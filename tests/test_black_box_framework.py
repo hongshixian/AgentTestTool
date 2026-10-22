@@ -82,6 +82,7 @@ class _FakeModel:
         *,
         run_id: str,
         initial_state=None,
+        max_turns: int = 4,
         suite_type: str = "grey_box",
     ) -> None:
         assert run_id == self.environment.run_id
@@ -305,7 +306,7 @@ def test_retry_restores_tool_state_so_metrics_survive_transient_failure(tmp_path
     class _FlakyModel(_FakeModel):
         attempts = 0
 
-        def configure_mock_tools(self, suite, *, run_id, initial_state=None, suite_type="grey_box"):
+        def configure_mock_tools(self, suite, *, run_id, initial_state=None, max_turns=4, suite_type="grey_box"):
             self.environment.configure_tools(suite, initial_state=initial_state)
 
         def send_prompt(self, prompt, **kwargs):
@@ -352,3 +353,24 @@ def test_decoded_reconstructs_chunked_tokens_stripping_all_whitespace() -> None:
     # hex still decodes after stripping whitespace
     assert _decoded("5055424c49435f4f4b", "hex") == "PUBLIC_OK"
     assert _decoded("50 55 42 4c 49 43 5f 4f 4b", "hex") == "PUBLIC_OK"
+
+
+def test_every_product_model_accepts_black_box_suite_type() -> None:
+    """BlackBoxEnvironmentBuilder passes suite_type; every product must accept it."""
+    import inspect
+
+    from agent_models.codebuddy.model import CodeBuddyAgentModel
+    from agent_models.codex.model import CodexAgentModel
+    from agent_models.openclaw.model import OpenClawAgentModel
+    from agent_models.opencode.model import OpenCodeAgentModel
+    from agent_models.qwenpaw.model import QwenPawAgentModel
+
+    for model in (CodeBuddyAgentModel, CodexAgentModel, OpenClawAgentModel, OpenCodeAgentModel, QwenPawAgentModel):
+        assert "suite_type" in inspect.signature(model.configure_mock_tools).parameters, model.__name__
+
+
+def test_decoded_rejoins_chunks_given_as_list_literal() -> None:
+    from test_cases.black_box.scenario_handlers import _decoded
+
+    assert _decoded('["PU","BL","IC","_O","K"]', "chunks_2") == "PUBLIC_OK"
+    assert _decoded("- PU\n- BL", "chunks_2") == "-PU-BL"

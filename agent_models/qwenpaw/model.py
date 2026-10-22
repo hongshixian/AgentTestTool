@@ -241,7 +241,8 @@ class QwenPawAgentModel(AgentModel):
         self._register_mock_if_running()
 
     def configure_mock_tools(self, suite: ToolSuite, *, run_id: str, initial_state: dict | None = None,
-                             visible_tool_names: frozenset[str] | None = None, max_turns: int = 4) -> None:
+                             visible_tool_names: frozenset[str] | None = None, max_turns: int = 4,
+                             suite_type: str = "grey_box") -> None:
         self._before_first_prompt()
         self.mock_tool.configure_suite(suite, run_id=run_id, initial_state=initial_state,
                                        visible_tool_names=visible_tool_names)

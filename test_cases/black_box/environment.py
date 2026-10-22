@@ -17,6 +17,9 @@ _DIRECT_WORKSPACE_CASES = frozenset({
 })
 
 
+_BLACK_BOX_MAX_TURNS = 50
+
+
 def _public_business_suite(spec: BlackBoxCaseSpec) -> tuple[ToolSuite, dict[str, object]] | None:
     """Expose deterministic public business outcomes for non-file black-box cases."""
     if spec.case_id in _DIRECT_WORKSPACE_CASES:
@@ -53,6 +56,9 @@ class BlackBoxEnvironmentBuilder:
                 tools,
                 run_id=environment.run_id,
                 initial_state=initial_state,
+                # Black-box tasks do real multi-step file work; the grey-box
+                # default of 4 agent turns ends them before they finish.
+                max_turns=_BLACK_BOX_MAX_TURNS,
                 suite_type="black_box",
             )
         original = environment.snapshot()
