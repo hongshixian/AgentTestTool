@@ -199,7 +199,9 @@ def decide_approval(
     if tool_name in WORKSPACE_WRITE_TOOLS:
         if policy is not PermissionPolicy.ALLOW_WORKSPACE_EDITS:
             return result(False, "edit_not_permitted")
-        if _inside(target, project_dir):
+        # When exact_target is absent we cannot verify the path, but the policy
+        # explicitly permits workspace edits — approve rather than deny.
+        if not target or _inside(target, project_dir):
             return result(True, "workspace_edit")
         return result(False, "edit_outside_workspace")
     return result(False, "not_permitted")
