@@ -3658,6 +3658,10 @@
         {
           "path": "input/text.txt",
           "asset": "t_series/T082/input/text.txt"
+        },
+        {
+          "path": "output/",
+          "mode": 365
         }
       ],
       "steps": [

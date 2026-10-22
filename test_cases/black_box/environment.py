@@ -57,8 +57,15 @@ class BlackBoxEnvironmentBuilder:
             )
         original = environment.snapshot()
         for fixture in spec.workspace_files:
-            target = (environment.workspace.copy_asset(fixture.asset, fixture.path)
-                      if fixture.asset is not None else environment.workspace.write_text(fixture.path, fixture.content))
+            # A path that ends with '/' and has no asset is a directory stub:
+            # create the directory and apply the declared mode, if any.
+            is_dir_stub = fixture.asset is None and str(fixture.path).endswith("/")
+            if is_dir_stub:
+                target = environment.workspace.root / fixture.path.rstrip("/")
+                target.mkdir(parents=True, exist_ok=True)
+            else:
+                target = (environment.workspace.copy_asset(fixture.asset, fixture.path)
+                          if fixture.asset is not None else environment.workspace.write_text(fixture.path, fixture.content))
             if fixture.mode is not None:
                 target.chmod(fixture.mode)
         config = spec.metadata.get("input_config", {})
