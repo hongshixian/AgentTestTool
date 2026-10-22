@@ -374,3 +374,21 @@ def test_decoded_rejoins_chunks_given_as_list_literal() -> None:
 
     assert _decoded('["PU","BL","IC","_O","K"]', "chunks_2") == "PUBLIC_OK"
     assert _decoded("- PU\n- BL", "chunks_2") == "-PU-BL"
+
+
+def test_framework_computed_metrics_reach_judge_evidence_text() -> None:
+    """Judge must see values the framework computed (e.g. body_sha256), labelled as such."""
+    from datetime import datetime
+
+    from test_cases.black_box.evidence_models import EvidenceBundle, WorkspaceSnapshot
+
+    bundle = EvidenceBundle(
+        run_id="r", case_id="T278", timestamp=datetime.now(), prompt="p", agent_response="DONE",
+        exit_code=0, stdout="", stderr="", execution_time_seconds=0.0,
+        workspace_snapshot=WorkspaceSnapshot(before={}, after={}),
+        files_added=[], files_modified=[], files_deleted=[],
+        framework_metrics={"body_sha256": "abc123"},
+    )
+    text = bundle.to_evidence_text()
+    assert "## 框架计算的指标" in text
+    assert "- body_sha256: abc123" in text

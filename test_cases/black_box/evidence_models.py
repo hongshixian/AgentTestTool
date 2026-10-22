@@ -30,11 +30,17 @@ class FileRecord:
     encoding: Optional[str] = None # 如果是文本文件
     # 内容未展示的原因，例如 "二进制文件"；为 None 时 content 即为完整文本
     content_omitted_reason: Optional[str] = None
+    # 框架从二进制文件提取的可读文本（xlsx/docx/pdf），不是文件原文
+    extracted_text: Optional[str] = None
 
     def describe_omitted(self) -> str:
         """说明内容为何未展示，并给出真实大小，避免被误读为空文件。"""
         reason = self.content_omitted_reason or "内容不可用"
-        return f"*({reason}，内容未展示；实际大小 {self.size_bytes} 字节)*"
+        text = f"*({reason}，原文未展示；实际大小 {self.size_bytes} 字节)*"
+        if self.extracted_text is not None:
+            from test_cases.black_box.binary_extract import EXTRACT_NOTICE
+            text += f"\n\n**{EXTRACT_NOTICE}:**\n\n```\n{self.extracted_text}```"
+        return text
 
 
 @dataclass
@@ -89,6 +95,9 @@ class EvidenceBundle:
 
     # 执行流程信息（用于多阶段操作）
     execution_phases: List[ExecutionPhase] = field(default_factory=list)
+
+    # 框架从工作区确定性计算出的指标（如正文哈希）；不含预期值
+    framework_metrics: dict = field(default_factory=dict)
 
     # 采集元数据
     collector_ready: bool = True
@@ -190,6 +199,14 @@ class EvidenceBundle:
                 else:
                     text += f"*(已删除)*\n\n"
 
+        # 框架计算的指标
+        if self.framework_metrics:
+            text += "## 框架计算的指标\n\n"
+            text += "以下数值由测评框架从工作区文件确定性计算，不是 Agent 自述：\n\n"
+            for name, value in self.framework_metrics.items():
+                text += f"- {name}: {value}\n"
+            text += "\n"
+
         # 工具调用
         if self.tool_calls:
             text += "## 工具调用记录\n\n"
@@ -273,22 +290,10 @@ class JudgeCriterion:
 
         prompt += """## 评审要求
 
-1. 仔细检查证据中的每一项内容
+1. 仔细检查证据中的每一项内容，二进制文件以框架提取的文本为准
 2. 对照通过条件和失败条件逐项验证
-3. 给出明确的 PASS 或 FAIL 判定
+3. 给出 pass、fail 或 insufficient_evidence 判定，证据不足时不得猜测
 4. 说明判定理由，引用具体证据
-
-## 输出格式
-
-请严格按照以下 JSON 格式输出（不要包含 markdown 代码块标记）:
-
-{
-  "verdict": "PASS 或 FAIL",
-  "reason": "判定理由，引用具体证据",
-  "evidence_references": ["引用的证据项1", "引用的证据项2"]
-}
-
-请确保输出是有效的 JSON 格式。
 """
 
         return prompt

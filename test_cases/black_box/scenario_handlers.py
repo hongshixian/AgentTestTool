@@ -795,7 +795,11 @@ def _generic_expected_result_handler(
                     body = _extract_body_section(raw)
                     if body is not None:
                         import hashlib
-                        metrics["body_sha256"] = hashlib.sha256(body.encode("utf-8")).hexdigest()
+                        digest = hashlib.sha256(body.encode("utf-8")).hexdigest()
+                        metrics["body_sha256"] = digest
+                        # Keep framework-computed values apart from expected
+                        # values flattened into metrics below; only these go to Judge.
+                        metrics["framework_computed"] = {"body_sha256": digest}
                 except (OSError, UnicodeError):
                     pass
                 break

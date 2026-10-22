@@ -3,10 +3,10 @@
 Design principle: All semantic judgments are made by Judge, not by the framework.
 """
 
-import json
 from typing import Optional
 
-from assertions.judge.model import OpenAICompatibleJudge
+from assertions.judge.model import JudgeExchange, OpenAICompatibleJudge
+from assertions.judge.result import JudgeStatus
 from assertions.outcome import AssessmentStatus, AssessmentVerdict, assessment_verdict
 from test_cases.black_box.constraints import DeterministicConstraint
 from test_cases.black_box.evidence_models import EvidenceBundle, JudgeCriterion
@@ -16,138 +16,51 @@ class JudgeAssessment:
     """Judge 评审层
 
     职责：
-    - 将黑盒证据转换为 Judge 可以理解的格式
-    - 调用 Judge API 进行语义判断
-    - 转换 Judge 结果为测评结论
-
-    设计原则：
-    - 框架只做确定性检查（证据完整性）
-    - 所有语义判断由 Judge 完成
+    - 确定性检查证据完整性
+    - 把证据只发送一次给 Judge，做语义判断
+    - 把 Judge 三态结果映射到四态结论，并产出可落盘的完整调用记录
     """
 
     def __init__(self, judge_model: OpenAICompatibleJudge):
         self.judge = judge_model
         self.constraint_checker = DeterministicConstraint()
 
-    def evaluate(
+    def evaluate(self, evidence: EvidenceBundle, criterion: JudgeCriterion) -> AssessmentVerdict:
+        return self.assess(evidence, criterion)[0]
+
+    def assess(
         self,
         evidence: EvidenceBundle,
-        criterion: JudgeCriterion
-    ) -> AssessmentVerdict:
-        """执行完整评审流程
-
-        流程：
-        1. 确定性检查：证据是否完整
-        2. 调用 Judge：做语义判断
-        3. 转换结果：Judge verdict → Assessment verdict
-
-        Args:
-            evidence: 黑盒测试证据包
-            criterion: Judge 评审标准
-
-        Returns:
-            测评结论（PASS/FAIL/INCONCLUSIVE）
-        """
-        # 步骤 1：确定性检查 - 证据完整性
-        missing = self.constraint_checker.check_evidence_completeness(
-            evidence,
-            criterion.required_evidence
-        )
+        criterion: JudgeCriterion,
+    ) -> tuple[AssessmentVerdict, Optional[dict]]:
+        """返回测评结论和 Judge 记录；未调用 Judge 时记录为 None。"""
+        missing = self.constraint_checker.check_evidence_completeness(evidence, criterion.required_evidence)
         if missing:
-            return assessment_verdict(
-                AssessmentStatus.INCONCLUSIVE,
-                reason=f"{criterion.case_id} 证据不足：{missing}"
-            )
+            return AssessmentVerdict(AssessmentStatus.INCONCLUSIVE, f"{criterion.case_id} 证据不足：{missing}",
+                                     (missing,)), None
 
-        # 步骤 2：调用 Judge 做语义判断
-        try:
-            judge_verdict = self._call_judge(evidence, criterion)
-        except Exception as e:
-            # Judge 调用失败
-            return assessment_verdict(
-                AssessmentStatus.FAIL,
-                reason=f"{criterion.case_id} Judge 调用失败：{type(e).__name__}: {str(e)}"
-            )
-
-        # 步骤 3：转换 Judge 结果到测评结论
-        return self._convert_judge_verdict(judge_verdict, criterion.case_id)
-
-    def _call_judge(
-        self,
-        evidence: EvidenceBundle,
-        criterion: JudgeCriterion
-    ) -> dict:
-        """调用 Judge API 进行评审
-
-        使用简化的 evaluate() 接口，不使用复杂的 evaluate_evidence()
-        """
-        # 准备证据文本
-        evidence_text = evidence.to_evidence_text()
-
-        # 准备评审标准
-        criterion_prompt = criterion.to_judge_prompt()
-
-        # 构造完整的 Judge prompt
-        full_prompt = f"{criterion_prompt}\n\n{evidence_text}"
-
-        # 调用 Judge（使用简化接口）
-        # 创建一个假的 TurnResult 来适配现有接口
-        from agent_models.result import TurnResult
-
-        fake_turn = TurnResult(
-            response=evidence_text,
-            raw_output="",
-            stderr="",
-            returncode=evidence.exit_code,
-            completed=True,
-            duration_seconds=evidence.execution_time_seconds
+        exchange = self.judge.evaluate_black_box(
+            criterion_prompt=criterion.to_judge_prompt(),
+            evidence_text=evidence.to_evidence_text(),
         )
+        verdict = self._convert(exchange, criterion.case_id)
+        record = exchange.record()
+        record["assessment_status"] = verdict.status.value
+        record["assessment_reason"] = verdict.reason
+        return verdict, record
 
-        judge_verdict = self.judge.evaluate(
-            prompt=full_prompt,
-            turn=fake_turn,
-            criterion=f"{criterion.pass_criteria}\n\n失败条件：\n{criterion.fail_criteria}"
-        )
-
-        # 转换为字典格式
-        return {
-            "verdict": "PASS" if judge_verdict.status.name == "PASS" else "FAIL",
-            "reason": judge_verdict.reason
-        }
-
-    def _convert_judge_verdict(
-        self,
-        judge_result: dict,
-        case_id: str
-    ) -> AssessmentVerdict:
-        """转换 Judge 结果到测评结论
-
-        Args:
-            judge_result: Judge 返回的判定结果
-            case_id: 用例 ID
-
-        Returns:
-            测评结论
-        """
-        verdict = judge_result.get("verdict", "").upper()
-        reason = judge_result.get("reason", "无理由")
-
-        if verdict == "PASS":
-            return assessment_verdict(
-                AssessmentStatus.PASS,
-                reason=f"{case_id} Judge 评审通过：{reason}"
-            )
-        elif verdict == "FAIL":
-            return assessment_verdict(
-                AssessmentStatus.FAIL,
-                reason=f"{case_id} Judge 评审不通过：{reason}"
-            )
-        else:
-            # Judge 无法判断或返回了其他状态
-            return assessment_verdict(
-                AssessmentStatus.INCONCLUSIVE,
-                reason=f"{case_id} Judge 无法判断：{reason}"
-            )
+    @staticmethod
+    def _convert(exchange: JudgeExchange, case_id: str) -> AssessmentVerdict:
+        if exchange.error is not None or exchange.verdict is None:
+            return assessment_verdict(AssessmentStatus.FAIL,
+                                      reason=f"{case_id} Judge 调用失败：{exchange.error or '未返回判定'}")
+        status, reason = exchange.verdict.status, exchange.verdict.reason
+        if status is JudgeStatus.PASS:
+            return assessment_verdict(AssessmentStatus.PASS, reason=f"{case_id} Judge 评审通过：{reason}")
+        if status is JudgeStatus.FAIL:
+            return assessment_verdict(AssessmentStatus.FAIL, reason=f"{case_id} Judge 评审不通过：{reason}")
+        return AssessmentVerdict(AssessmentStatus.INCONCLUSIVE, f"{case_id} Judge 无法判定：{reason}",
+                                 ("Judge 可据以判定的完整证据",))
 
 
 def create_evidence_bundle_from_legacy(
@@ -231,6 +144,7 @@ def create_evidence_bundle_from_legacy(
             modified_time=datetime.fromtimestamp(file_info.get("mtime", 0)) if file_info.get("mtime") else datetime.now(),
             encoding=encoding,
             content_omitted_reason=omitted_reason,
+            extracted_text=file_info.get("extracted_text"),
         )
 
     for path in added_paths:
@@ -299,7 +213,8 @@ def create_evidence_bundle_from_legacy(
         execution_phases=execution_phases,  # 新增：执行阶段信息
         collector_ready=True,
         collection_complete=True,
-        positive_control_ok=getattr(prepared, 'positive_control_ok', True)
+        positive_control_ok=getattr(prepared, 'positive_control_ok', True),
+        framework_metrics=dict(getattr(prepared, 'framework_metrics', {}) or {}),
     )
 
     return evidence

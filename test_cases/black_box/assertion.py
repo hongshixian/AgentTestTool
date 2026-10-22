@@ -6,13 +6,19 @@ from agent_models.evidence import JsonValue
 from assertions.judge.model import JudgeConfig, OpenAICompatibleJudge
 from assertions.outcome import AssessmentStatus, AssessmentVerdict, assessment_verdict
 from test_cases.black_box.models import AssertionRule, BlackBoxCaseSpec, BlackBoxEvidence
+from test_cases.black_box.binary_extract import extract_text, supported
 from test_cases.black_box.evidence_models import JudgeCriterion
 
 
-def _snapshot_file_info(entry) -> dict:
-    """Describe one snapshot file for Judge: real size always, text only when decodable."""
+def _snapshot_file_info(entry, *, extract: bool = False) -> dict:
+    """Describe one snapshot file for Judge: real size always, text when decodable.
+
+    For changed binary deliverables (``extract=True``) xlsx/docx/pdf text is
+    extracted in a bounded, format-only way so Judge can read what was written.
+    """
     raw = entry.content or b""
-    info = {"hash": entry.sha256, "size": len(raw), "mtime": 0, "content": None, "omitted_reason": None}
+    info = {"hash": entry.sha256, "size": len(raw), "mtime": 0, "content": None,
+            "omitted_reason": None, "extracted_text": None}
     if not raw:
         info["content"] = ""
         return info
@@ -20,6 +26,12 @@ def _snapshot_file_info(entry) -> dict:
         info["content"] = raw.decode("utf-8")
     except UnicodeDecodeError:
         info["omitted_reason"] = "二进制文件"
+        if extract and supported(entry.path):
+            extraction = extract_text(entry.path, raw)
+            if extraction.text is not None:
+                info["extracted_text"] = extraction.text
+            else:
+                info["omitted_reason"] = f"二进制文件；{extraction.reason}"
     return info
 
 
@@ -47,6 +59,18 @@ class BlackBoxAssertion:
         self.judge_model = judge_model
 
     def evaluate(self, spec: BlackBoxCaseSpec, evidence: BlackBoxEvidence) -> AssessmentVerdict:
+        return self.evaluate_with_record(spec, evidence)[0]
+
+    def evaluate_with_record(
+        self, spec: BlackBoxCaseSpec, evidence: BlackBoxEvidence,
+    ) -> tuple[AssessmentVerdict, Optional[dict]]:
+        """返回结论和 Judge 调用记录；断言拿不到台账，记录交给 runner 落盘。"""
+        if spec.judge_criterion is not None and evidence.control.collector_ready \
+                and evidence.control.collection_complete and evidence.control.positive_control_ok:
+            return self._evaluate_with_judge(spec, evidence)
+        return self._evaluate_without_judge(spec, evidence), None
+
+    def _evaluate_without_judge(self, spec: BlackBoxCaseSpec, evidence: BlackBoxEvidence) -> AssessmentVerdict:
         # 检查证据完整性（确定性检查）
         if not evidence.control.collector_ready or not evidence.control.collection_complete:
             return AssessmentVerdict(AssessmentStatus.INCONCLUSIVE, "黑盒公开证据采集未完整闭合",
@@ -57,14 +81,12 @@ class BlackBoxAssertion:
                 reason="黑盒正对照未通过公开完成状态检查",
             )
 
-        # 如果有 judge_criterion，使用 Judge 评审
-        if spec.judge_criterion is not None:
-            return self._evaluate_with_judge(spec, evidence)
-
         # Fallback：使用旧的确定性断言（向后兼容）
         return self._evaluate_with_rules(spec, evidence)
 
-    def _evaluate_with_judge(self, spec: BlackBoxCaseSpec, evidence: BlackBoxEvidence) -> AssessmentVerdict:
+    def _evaluate_with_judge(
+        self, spec: BlackBoxCaseSpec, evidence: BlackBoxEvidence,
+    ) -> tuple[AssessmentVerdict, Optional[dict]]:
         """使用 Judge 进行语义评审"""
         from test_cases.black_box.judge_assessment import JudgeAssessment, create_evidence_bundle_from_legacy
 
@@ -77,7 +99,7 @@ class BlackBoxAssertion:
                 return assessment_verdict(
                     AssessmentStatus.FAIL,
                     reason=f"{spec.case_id} Judge 模型初始化失败：{str(e)}"
-                )
+                ), {"error": f"Judge 模型初始化失败：{type(e).__name__}", "judge_status": None}
 
         # 转换为新的证据格式
         try:
@@ -85,7 +107,9 @@ class BlackBoxAssertion:
             import json
             from pathlib import Path
 
-            # 内存快照保存了每个文件的真实字节，大小和文本内容都以它为准
+            # 内存快照保存了每个文件的真实字节，大小和文本内容都以它为准；
+            # 只对新增和被修改的二进制交付物提取文本，输入文件靠哈希比对即可
+            changed = set(evidence.files.added) | set(evidence.files.modified)
             files_snapshot = {
                 "before": {
                     entry.path: _snapshot_file_info(entry)
@@ -93,7 +117,7 @@ class BlackBoxAssertion:
                     if not entry.is_directory
                 },
                 "after": {
-                    entry.path: _snapshot_file_info(entry)
+                    entry.path: _snapshot_file_info(entry, extract=entry.path in changed)
                     for entry in evidence.files.after.entries
                     if not entry.is_directory
                 }
@@ -106,6 +130,8 @@ class BlackBoxAssertion:
                     self.workspace_root = workspace_root
                     self.run_id = evidence.control.run_id
                     self.positive_control_ok = evidence.control.positive_control_ok
+                    computed = evidence.metrics.get("framework_computed")
+                    self.framework_metrics = dict(computed) if isinstance(computed, dict) else {}
 
             # 创建一个假的 result 对象
             class FakeResult:
@@ -133,7 +159,7 @@ class BlackBoxAssertion:
             return assessment_verdict(
                 AssessmentStatus.FAIL,
                 reason=f"{spec.case_id} 证据转换失败：{str(e)}"
-            )
+            ), {"error": f"证据转换失败：{type(e).__name__}: {e}", "judge_status": None}
 
         # 转换 judge_criterion 格式
         criterion = JudgeCriterion(
@@ -148,7 +174,7 @@ class BlackBoxAssertion:
 
         # 调用 Judge 评审
         assessment = JudgeAssessment(self.judge_model)
-        return assessment.evaluate(evidence_bundle, criterion)
+        return assessment.assess(evidence_bundle, criterion)
 
     def _evaluate_with_rules(self, spec: BlackBoxCaseSpec, evidence: BlackBoxEvidence) -> AssessmentVerdict:
         """使用旧的确定性断言规则（向后兼容）"""
