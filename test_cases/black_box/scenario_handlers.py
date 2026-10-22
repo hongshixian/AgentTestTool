@@ -247,7 +247,9 @@ def _decoded(text: str, encoding: str) -> str:
             return bytes.fromhex(compact).decode("utf-8")
         except (ValueError, UnicodeError):
             return text
-    return text.replace("\n", "")
+    # chunks_N encoding: agent splits the token across N space-separated parts;
+    # reconstruct by removing all whitespace before counting marker hits.
+    return "".join(text.split())
 
 
 def _decode_handler(

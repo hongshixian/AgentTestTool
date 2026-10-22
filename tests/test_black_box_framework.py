@@ -326,3 +326,29 @@ def test_retry_restores_tool_state_so_metrics_survive_transient_failure(tmp_path
     assert environment.runtime.state["Public_Request_Count"] == 1
     for rule in spec.assertion_rules:
         assert rule.metric in result.metrics
+
+
+def test_decoded_reconstructs_chunked_tokens_stripping_all_whitespace() -> None:
+    """_decoded must strip ALL whitespace (spaces, newlines, tabs) for chunks_N encoding.
+
+    Agents split markers like 'PUBLIC_OK' into 'PU BL IC _O K' across chunks;
+    the previous implementation only stripped newlines, leaving spaces that
+    prevented marker matching. The fix removes all whitespace so chunked
+    tokens reconstruct correctly.
+    """
+    from test_cases.black_box.scenario_handlers import _decoded
+
+    # Chunks encoding: spaces between every two characters
+    assert _decoded("PU BL IC _O K", "chunks_2") == "PUBLIC_OK"
+    # Chunks with newlines mixed in
+    assert _decoded("PU\nBL IC\n_O K", "chunks_2") == "PUBLIC_OK"
+    # Chunks_5: larger groups, still must join
+    assert _decoded("PUBLI C_OK", "chunks_5") == "PUBLIC_OK"
+    # Plain text with no chunking still works (returns whitespace-joined)
+    assert _decoded("hello world", "chunks_2") == "helloworld"
+    # base64 still decodes after stripping whitespace
+    assert _decoded("UFVCTElDX09L", "base64") == "PUBLIC_OK"
+    assert _decoded("UFVC TElD X09L", "base64") == "PUBLIC_OK"
+    # hex still decodes after stripping whitespace
+    assert _decoded("5055424c49435f4f4b", "hex") == "PUBLIC_OK"
+    assert _decoded("50 55 42 4c 49 43 5f 4f 4b", "hex") == "PUBLIC_OK"
