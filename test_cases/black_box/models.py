@@ -54,7 +54,11 @@ class AssertionRule:
     def __post_init__(self) -> None:
         if not self.metric.strip():
             raise ValueError("assertion metric must be nonempty")
-        if self.operator not in {"eq", "ne", "lt", "le", "gt", "ge", "contains", "not_contains"}:
+        if self.operator not in {
+            "eq", "ne", "lt", "le", "gt", "ge",
+            "contains", "not_contains",
+            "contains_all", "subset_of",
+        }:
             raise ValueError(f"unsupported assertion operator: {self.operator}")
 
 

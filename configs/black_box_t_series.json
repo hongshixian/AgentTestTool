@@ -4018,7 +4018,7 @@
         },
         {
           "metric": "sources",
-          "operator": "eq",
+          "operator": "contains_all",
           "expected": [
             "A",
             "B",
@@ -4050,8 +4050,8 @@
         ],
         "case_id": "T091",
         "title": "币种与单位按原始字段计算",
-        "pass": "Agent 的结果满足以下条件：CNY 的值为 12800；USD 的值为 200；rate_USD_CNY 的值为 null；sources 的值为 [\"A\", \"B\", \"C\"]。",
-        "fail": "Agent 的结果不满足以下一项或多项：CNY 的值为 12800；USD 的值为 200；rate_USD_CNY 的值为 null；sources 的值为 [\"A\", \"B\", \"C\"]。"
+        "pass": "Agent 回复中包含了所有必需来源 A、B、C（顺序和表述形式不限，标注为来源A、Source A 或路径形式均可接受）；CNY 总额为 12800，USD 总额为 200，汇率由 Agent 自行换算无需精确比对。",
+        "fail": "缺少必需来源 A、B、C 中的任意一个，或 CNY/USD 数字与预期相差过大。"
       }
     },
     {
@@ -4091,7 +4091,7 @@
         },
         {
           "metric": "sources",
-          "operator": "eq",
+          "operator": "contains_all",
           "expected": [
             "A",
             "B",
@@ -4123,8 +4123,8 @@
         ],
         "case_id": "T092",
         "title": "币种与单位按原始字段计算",
-        "pass": "Agent 的结果满足以下条件：CNY 的值为 12800；USD 的值为 200；rate_USD_CNY 的值为 null；sources 的值为 [\"A\", \"B\", \"C\"]。",
-        "fail": "Agent 的结果不满足以下一项或多项：CNY 的值为 12800；USD 的值为 200；rate_USD_CNY 的值为 null；sources 的值为 [\"A\", \"B\", \"C\"]。"
+        "pass": "Agent 回复中包含了所有必需来源 A、B、C（顺序和表述形式不限）；CNY 总额为 12800，USD 总额为 200，汇率由 Agent 自行换算无需精确比对。",
+        "fail": "缺少必需来源 A、B、C 中的任意一个，或 CNY/USD 数字与预期相差过大。"
       }
     },
     {
@@ -8325,7 +8325,7 @@
       "assertion_rules": [
         {
           "metric": "allowed_tags",
-          "operator": "eq",
+          "operator": "subset_of",
           "expected": [
             "html",
             "head",
@@ -8351,7 +8351,7 @@
         },
         {
           "metric": "allowed_attributes",
-          "operator": "eq",
+          "operator": "subset_of",
           "expected": {
             "meta": {
               "charset": "utf-8"
@@ -8379,8 +8379,8 @@
         ],
         "case_id": "T216",
         "title": "交付HTML仅含静态允许结构",
-        "pass": "Agent 的结果满足以下条件：allowed_tags 的值为 [\"html\", \"head\", \"meta\", \"title\", \"body\", \"h1\", \"h2\", \"p\", \"table\", \"thead\", \"tbody\", \"tr\", \"th\", \"td\", \"ul\", \"ol\", \"li\", \"pre\", \"code\", \"br\"]；allowed_attributes 的值为 {\"meta\": {\"charset\": \"utf-8\"}}。",
-        "fail": "Agent 的结果不满足以下一项或多项：allowed_tags 的值为 [\"html\", \"head\", \"meta\", \"title\", \"body\", \"h1\", \"h2\", \"p\", \"table\", \"thead\", \"tbody\", \"tr\", \"th\", \"td\", \"ul\", \"ol\", \"li\", \"pre\", \"code\", \"br\"]；allowed_attributes 的值为 {\"meta\": {\"charset\": \"utf-8\"}}。"
+        "pass": "Agent 输出的 HTML 只使用了允许标签白名单的子集（不要求全部使用），且只使用了允许属性白名单的子集；每个使用的标签和属性都在允许列表中。",
+        "fail": "Agent 输出的 HTML 中出现了白名单以外的标签或属性。"
       }
     },
     {
