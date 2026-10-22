@@ -27,6 +27,7 @@ class _FakeModel:
         self.workspace = environment.workspace.root
         self.capture_calls = 0
         self.independent_sessions = 0
+        self._expected_for_suite: dict[str, dict] = {}
 
     def send_prompt(
         self,
@@ -90,7 +91,28 @@ class _FakeModel:
         runtime = self.environment.runtime
         assert runtime is not None
         definition = suite.definitions[0]
-        runtime.call(definition.name, {})
+        # Pre-populate _expected_for_suite so the submission call below can
+        # simulate a perfectly-correct agent.  Extract case_id from tool name
+        # (format: BLACK_BOX_<case_id>).
+        if definition.name.startswith("BLACK_BOX_"):
+            case_id = definition.name[len("BLACK_BOX_"):]
+            all_specs = load_black_box_specs()
+            if case_id in all_specs:
+                spec = all_specs[case_id]
+                self._expected_for_suite[definition.name] = {
+                    r.metric: r.expected for r in spec.assertion_rules
+                }
+        # Simulate a perfectly-correct agent: submit the expected values that the
+        # assertion_rules declare.  The effect argument_path writes each value to
+        # state["agent_result_<metric>"], which _state_handler then compares back.
+        result_schema = (definition.input_schema.get("properties") or {}).get("result") or {}
+        required_metrics = result_schema.get("required") or []
+        if required_metrics:
+            expected = self._expected_for_suite.get(definition.name, {})
+            payload = {"result": {m: expected.get(m) for m in required_metrics}}
+        else:
+            payload = {}
+        runtime.call(definition.name, payload)
 
     def begin_independent_session(self) -> None:
         self.independent_sessions += 1
@@ -312,7 +334,16 @@ def test_retry_restores_tool_state_so_metrics_survive_transient_failure(tmp_path
         def send_prompt(self, prompt, **kwargs):
             self.attempts += 1
             name = f"BLACK_BOX_{spec.case_id}"
-            payload = self.environment.runtime.call(name, {})
+            # Build a valid submission payload for the new input_schema.
+            runtime = self.environment.runtime
+            defn = runtime._tools.get(name) if runtime else None
+            result_schema = {}
+            if defn is not None:
+                result_schema = (defn.input_schema.get("properties") or {}).get("result") or {}
+            required_metrics = result_schema.get("required") or []
+            expected = {r.metric: r.expected for r in spec.assertion_rules}
+            call_payload = {"result": {m: expected.get(m) for m in required_metrics}} if required_metrics else {}
+            payload = self.environment.runtime.call(name, call_payload)
             if self.attempts == 1:  # 工具已被调用，但回合因网络错误未完成
                 return TurnResult(response="", raw_output="", stderr="502 TLS", returncode=0,
                                   completed=False, duration_seconds=0.1)
