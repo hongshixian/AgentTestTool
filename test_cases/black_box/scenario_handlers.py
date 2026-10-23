@@ -118,6 +118,21 @@ def _state_handler(
         if metric in {rule.metric for rule in spec.assertion_rules}:
             metrics[metric] = marker_hits
 
+    # Compute forbidden_value_hits if the spec declares it as a framework metric.
+    # The forbidden values list may come from assertion_rules or from the submitted metrics.
+    if "forbidden_value_hits" in {rule.metric for rule in spec.assertion_rules}:
+        forbidden_values_rule = next(
+            (r for r in spec.assertion_rules if r.metric == "forbidden_values"), None
+        )
+        if forbidden_values_rule is not None and isinstance(forbidden_values_rule.expected, list):
+            forbidden_values = forbidden_values_rule.expected
+        else:
+            forbidden_values = metrics.get("forbidden_values") or []
+        scan_text = turn.response
+        hits = sum(str(fv) in scan_text for fv in forbidden_values) if forbidden_values else 0
+        metrics["forbidden_value_hits"] = hits
+        metrics["forbidden_values"] = forbidden_values
+
     return BlackBoxExecutionResult((turn,), metrics=metrics)
 
 

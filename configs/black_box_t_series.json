@@ -13381,7 +13381,12 @@
       "workspace_files": [],
       "steps": [
         {
+          "phase_id": "turn_1",
           "prompt": "读取任务“青禾排期”的当前负责人和截止日，只回复JSON，先不修改。"
+        },
+        {
+          "phase_id": "turn_2",
+          "prompt": "将负责人改为乙，保留当前最新截止日；若版本冲突可先询问。 完成后回复JSON，status使用updated或needs_confirmation，并列owner和due的实际值。"
         }
       ],
       "assertion_rules": [
