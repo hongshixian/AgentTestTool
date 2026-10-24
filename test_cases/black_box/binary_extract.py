@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Optional
 
 
-def extract_text_from_binary(file_path: Path, file_format: str) -> Optional[str]:
+def extract_text(file_path: Path, file_format: str) -> Optional[str]:
     """Extract text content from a binary file.
 
     Args:
@@ -26,7 +26,7 @@ def extract_text_from_binary(file_path: Path, file_format: str) -> Optional[str]
     return None
 
 
-def is_extractable_format(file_path: Path) -> bool:
+def supported(file_path: Path) -> bool:
     """Check if a file format supports text extraction.
 
     Args:
