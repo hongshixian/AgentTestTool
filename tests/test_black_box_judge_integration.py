@@ -9,6 +9,7 @@ from test_cases.black_box.evidence_models import (
     JudgeCriterion,
     WorkspaceSnapshot,
 )
+from test_cases.black_box.evidence_adapters import adapt_evidence_bundle_to_unified
 from test_cases.black_box.constraints import DeterministicConstraint
 from test_cases.black_box.judge_assessment import JudgeAssessment
 
@@ -95,22 +96,25 @@ def test_deterministic_constraints():
 
     checker = DeterministicConstraint()
 
+    # 使用适配器将 EvidenceBundle 转换为 UnifiedEvidence
+    unified_evidence = adapt_evidence_bundle_to_unified(evidence)
+
     # 测试证据完整性检查
     missing = checker.check_evidence_completeness(
-        evidence,
+        unified_evidence,
         required_evidence=["agent_response", "workspace_changes"]
     )
     assert missing is None  # 证据完整
 
     # 测试文件存在检查
-    assert checker.check_file_exists(evidence, "output/summary.json") == True
-    assert checker.check_file_exists(evidence, "nonexistent.txt") == False
+    assert checker.check_file_exists(unified_evidence, "output/summary.json") == True
+    assert checker.check_file_exists(unified_evidence, "nonexistent.txt") == False
 
     # 测试文件未修改检查
-    assert checker.check_file_not_modified(evidence, "output/summary.json") == True  # 新增文件，不算修改
+    assert checker.check_file_not_modified(unified_evidence, "output/summary.json") == True  # 新增文件，不算修改
 
     # 测试文件变化统计
-    changes = checker.get_file_count_changes(evidence)
+    changes = checker.get_file_count_changes(unified_evidence)
     assert changes["added"] == 1
     assert changes["modified"] == 0
     assert changes["deleted"] == 0

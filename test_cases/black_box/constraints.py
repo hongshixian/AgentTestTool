@@ -15,7 +15,7 @@ Examples of FORBIDDEN checks:
 
 from typing import Optional
 
-from test_cases.black_box.evidence_models import EvidenceBundle
+from test_cases.black_box.unified_evidence import UnifiedEvidence
 
 
 class DeterministicConstraint:
@@ -34,7 +34,7 @@ class DeterministicConstraint:
 
     def check_evidence_completeness(
         self,
-        evidence: EvidenceBundle,
+        evidence: UnifiedEvidence,
         required_evidence: list[str]
     ) -> Optional[str]:
         """检查证据是否完整
@@ -48,24 +48,24 @@ class DeterministicConstraint:
             str - 缺失的证据描述
         """
         # 检查采集器状态（客观事实）
-        if not evidence.collector_ready:
-            return "证据采集器未就绪"
-
-        if not evidence.collection_complete:
-            return "证据采集未完成"
-
-        if not evidence.positive_control_ok:
-            return "正对照检查未通过"
+        if not evidence.is_ready_for_judge():
+            issues = evidence.get_quality_issues()
+            if issues:
+                return issues[0]  # 返回第一个质量问题
+            return "证据质量检查未通过"
 
         # 检查必需的证据项（客观事实）
         for required in required_evidence:
             if required == "agent_response":
-                if not evidence.agent_response or not evidence.agent_response.strip():
+                response = evidence.get_agent_response()
+                if not response or not response.strip():
                     return "缺少 Agent 响应"
 
             elif required == "workspace_changes":
-                if evidence.workspace_snapshot is None:
-                    return "缺少工作区快照"
+                # 检查是否有任何文件变化
+                summary = evidence.get_file_changes_summary()
+                if summary["total_changes"] == 0:
+                    return "缺少工作区变化"
 
             elif required == "execution_trace":
                 # 黑盒测试通常不需要执行 trace
@@ -81,7 +81,7 @@ class DeterministicConstraint:
 
     def check_file_exists(
         self,
-        evidence: EvidenceBundle,
+        evidence: UnifiedEvidence,
         file_path: str
     ) -> bool:
         """检查文件是否存在（客观事实）
@@ -89,23 +89,11 @@ class DeterministicConstraint:
         注意：这是客观事实检查，不是语义判断。
         只检查文件是否被创建或存在，不检查内容是否正确。
         """
-        # 检查是否在新增文件列表中
-        if any(f.path == file_path for f in evidence.files_added):
-            return True
-
-        # 检查是否在修改文件列表中（说明原本存在）
-        if any(f.path == file_path for f in evidence.files_modified):
-            return True
-
-        # 检查是否在执行后的快照中
-        if file_path in evidence.workspace_snapshot.after:
-            return True
-
-        return False
+        return evidence.has_file(file_path)
 
     def check_file_not_modified(
         self,
-        evidence: EvidenceBundle,
+        evidence: UnifiedEvidence,
         file_path: str
     ) -> bool:
         """检查文件是否未被修改（客观事实）
@@ -113,60 +101,47 @@ class DeterministicConstraint:
         注意：这是客观事实检查，不是语义判断。
         只检查文件是否在修改列表中，不判断修改是否合理。
         """
-        # 检查是否在修改文件列表中
-        if any(f.path == file_path for f in evidence.files_modified):
-            return False  # 文件被修改了
-
-        # 检查是否在删除文件列表中
-        if file_path in evidence.files_deleted:
-            return False  # 文件被删除了
-
-        return True  # 文件未被修改
+        return not evidence.is_file_modified(file_path)
 
     def check_file_deleted(
         self,
-        evidence: EvidenceBundle,
+        evidence: UnifiedEvidence,
         file_path: str
     ) -> bool:
         """检查文件是否被删除（客观事实）"""
-        return file_path in evidence.files_deleted
+        return evidence.is_file_deleted(file_path)
 
     def get_file_count_changes(
         self,
-        evidence: EvidenceBundle
+        evidence: UnifiedEvidence
     ) -> dict[str, int]:
         """获取文件变化统计（客观事实）
 
         Returns:
             包含 added, modified, deleted 计数的字典
         """
-        return {
-            "added": len(evidence.files_added),
-            "modified": len(evidence.files_modified),
-            "deleted": len(evidence.files_deleted),
-            "total_changes": len(evidence.files_added) + len(evidence.files_modified) + len(evidence.files_deleted)
-        }
+        return evidence.get_file_changes_summary()
 
     def check_execution_success(
         self,
-        evidence: EvidenceBundle
+        evidence: UnifiedEvidence
     ) -> bool:
         """检查进程是否成功退出（客观事实）
 
         注意：这只检查退出码是否为 0，不判断任务是否完成。
         """
-        return evidence.exit_code == 0
+        return evidence.is_successful()
 
     def check_has_tool_calls(
         self,
-        evidence: EvidenceBundle
+        evidence: UnifiedEvidence
     ) -> bool:
         """检查是否有工具调用（客观事实）"""
-        return len(evidence.tool_calls) > 0
+        return evidence.get_tool_call_count() > 0
 
     def check_response_contains_text(
         self,
-        evidence: EvidenceBundle,
+        evidence: UnifiedEvidence,
         text: str
     ) -> bool:
         """检查响应是否包含特定文本（客观事实）
@@ -174,11 +149,11 @@ class DeterministicConstraint:
         注意：这是字符串匹配，不是语义理解。
         只用于检查是否包含标记文本，不用于判断响应质量。
         """
-        return text in evidence.agent_response
+        return text in evidence.get_agent_response()
 
     def check_no_stderr(
         self,
-        evidence: EvidenceBundle
+        evidence: UnifiedEvidence
     ) -> bool:
         """检查是否没有标准错误输出（客观事实）"""
-        return not evidence.stderr or not evidence.stderr.strip()
+        return not evidence.has_errors()

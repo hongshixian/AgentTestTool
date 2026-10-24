@@ -1,13 +1,15 @@
-"""Project public output and explicit side effects into black-box evidence."""
+"""Project public output and explicit side effects into unified evidence."""
 
 from agent_models import AgentModel
+from test_cases.black_box.evidence_adapters import adapt_black_box_evidence_to_unified
 from test_cases.black_box.models import (BlackBoxEvidence, BlackBoxExecutionResult, ControlObservation,
                                          FileObservation, PreparedBlackBoxEnvironment, PublicObservation)
+from test_cases.black_box.unified_evidence import UnifiedEvidence
 
 
 class BlackBoxEvidenceProjector:
     def observe(self, prepared: PreparedBlackBoxEnvironment, execution: BlackBoxExecutionResult,
-                agent_model: AgentModel) -> BlackBoxEvidence:
+                agent_model: AgentModel) -> UnifiedEvidence:
         environment = agent_model.environment
         before = prepared.baseline.workspace
         after = environment.workspace.snapshot()
@@ -75,4 +77,6 @@ class BlackBoxEvidenceProjector:
                 },
             },
         )
-        return evidence
+
+        # 转换为 UnifiedEvidence
+        return adapt_black_box_evidence_to_unified(evidence, prepared, execution)
