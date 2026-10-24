@@ -89,6 +89,7 @@ class BlackBoxAssertion:
     ) -> tuple[AssessmentVerdict, Optional[dict]]:
         """使用 Judge 进行语义评审"""
         from test_cases.black_box.judge_assessment import JudgeAssessment, create_evidence_bundle_from_legacy
+        from test_cases.black_box.evidence_adapters import adapt_evidence_bundle_to_unified
 
         # 确保有 Judge 模型
         if self.judge_model is None:
@@ -164,6 +165,9 @@ class BlackBoxAssertion:
                 result,
                 files_snapshot
             )
+
+            # 转换为 UnifiedEvidence
+            unified_evidence = adapt_evidence_bundle_to_unified(evidence_bundle)
         except Exception as e:
             return assessment_verdict(
                 AssessmentStatus.FAIL,
@@ -183,7 +187,7 @@ class BlackBoxAssertion:
 
         # 调用 Judge 评审
         assessment = JudgeAssessment(self.judge_model)
-        return assessment.assess(evidence_bundle, criterion)
+        return assessment.assess(unified_evidence, criterion)
 
     def _evaluate_with_rules(self, spec: BlackBoxCaseSpec, evidence: BlackBoxEvidence) -> AssessmentVerdict:
         """使用旧的确定性断言规则（向后兼容）"""
