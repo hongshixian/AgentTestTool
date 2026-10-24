@@ -10,6 +10,7 @@ from assertions.judge.result import JudgeStatus
 from assertions.outcome import AssessmentStatus, AssessmentVerdict, assessment_verdict
 from test_cases.black_box.constraints import DeterministicConstraint
 from test_cases.black_box.evidence_models import EvidenceBundle, JudgeCriterion
+from test_cases.black_box.unified_evidence import UnifiedEvidence
 
 
 class JudgeAssessment:
@@ -25,12 +26,12 @@ class JudgeAssessment:
         self.judge = judge_model
         self.constraint_checker = DeterministicConstraint()
 
-    def evaluate(self, evidence: EvidenceBundle, criterion: JudgeCriterion) -> AssessmentVerdict:
+    def evaluate(self, evidence: UnifiedEvidence, criterion: JudgeCriterion) -> AssessmentVerdict:
         return self.assess(evidence, criterion)[0]
 
     def assess(
         self,
-        evidence: EvidenceBundle,
+        evidence: UnifiedEvidence,
         criterion: JudgeCriterion,
     ) -> tuple[AssessmentVerdict, Optional[dict]]:
         """返回测评结论和 Judge 记录；未调用 Judge 时记录为 None。"""
@@ -41,7 +42,7 @@ class JudgeAssessment:
 
         exchange = self.judge.evaluate_black_box(
             criterion_prompt=criterion.to_judge_prompt(),
-            evidence_text=evidence.to_evidence_text(),
+            evidence_text=evidence.to_judge_prompt(),
         )
         verdict = self._convert(exchange, criterion.case_id)
         record = exchange.record()
