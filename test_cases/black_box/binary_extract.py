@@ -1,70 +1,41 @@
-"""Binary file text extraction utilities.
+"""Binary file content extraction utilities for black-box testing.
 
-Used to extract readable text from binary files for evidence reporting.
+This module provides functions to extract text content from binary file formats
+such as DOCX, XLSX, and PDF files.
 """
 
 from pathlib import Path
-from typing import Tuple
+from typing import Optional
 
 
-def extract_text(file_path: str, max_bytes: int = 1024) -> str:
-    """Extract readable text from a binary file.
+def extract_text_from_binary(file_path: Path, file_format: str) -> Optional[str]:
+    """Extract text content from a binary file.
 
     Args:
         file_path: Path to the binary file
-        max_bytes: Maximum bytes to read for text extraction
+        file_format: File format hint (e.g., 'docx', 'xlsx', 'pdf')
 
     Returns:
-        Extracted text or size info for non-text files
+        Extracted text content, or None if extraction fails or is not supported
     """
-    path = Path(file_path)
+    if not file_path.exists():
+        return None
 
-    if not path.exists():
-        return f"[File not found: {file_path}]"
-
-    size = path.stat().st_size
-
-    # For small files, try to read as text
-    if size <= max_bytes:
-        try:
-            content = path.read_text(encoding='utf-8', errors='replace')
-            # Filter out non-printable characters
-            return ''.join(c for c in content if c.isprintable() or c.isspace())
-        except Exception as e:
-            return f"[Binary file: {size} bytes, error: {type(e).__name__}]"
-
-    # For large files, report size only
-    return f"[Large binary file: {size} bytes]"
+    # TODO: Implement actual extraction for supported formats
+    # For now, return None to indicate content is unavailable
+    return None
 
 
-def supported(file_path: str) -> bool:
-    """Check if text extraction is supported for this file.
-
-    Args:
-        file_path: Path to check
-
-    Returns:
-        True if extraction is supported (file exists)
-    """
-    return Path(file_path).exists()
-
-
-def extract_with_limit(file_path: str, max_bytes: int = 1024) -> Tuple[str, int]:
-    """Extract text and return actual file size.
+def is_extractable_format(file_path: Path) -> bool:
+    """Check if a file format supports text extraction.
 
     Args:
         file_path: Path to the file
-        max_bytes: Maximum bytes to extract
 
     Returns:
-        Tuple of (extracted_text, actual_file_size)
+        True if the format is potentially extractable
     """
-    path = Path(file_path)
-
-    if not path.exists():
-        return f"[File not found: {file_path}]", 0
-
-    size = path.stat().st_size
-    text = extract_text(file_path, max_bytes)
-
-    return text, size
+    suffix = file_path.suffix.lower()
+    # Common formats that could have text extraction
+    extractable_formats = {'.docx', '.xlsx', '.pdf', '.pptx', '.odt', '.ods'}
+    return suffix in extractable_formats
