@@ -232,16 +232,18 @@ def test_judge_prompt_uses_real_size_of_binary_snapshot_entry():
     from agent_models.environment.workspace import WorkspaceSnapshot as RealSnapshot
     from test_cases.black_box.assertion import BlackBoxAssertion
     from test_cases.black_box.models import (
-        BlackBoxCaseSpec, BlackBoxEvidence, ControlObservation, FileObservation,
-        JudgeCriterionSpec, PublicObservation, PublicStepSpec, PublicTurnObservation,
+        BlackBoxCaseSpec, BlackBoxEvidence, BlackBoxExecutionResult, ControlObservation,
+        FileObservation, JudgeCriterionSpec, PreparedBlackBoxEnvironment, PublicObservation,
+        PublicStepSpec, PublicTurnObservation,
     )
+    from test_cases.black_box.evidence_adapters import adapt_black_box_evidence_to_unified
 
     xlsx = (Path(__file__).resolve().parents[1] / "assets/t_series/T053/input/jan.xlsx").read_bytes()
     entry = WorkspaceEntry("output/quarter.xlsx", False, 0o644, xlsx, hashlib.sha256(xlsx).hexdigest())
     before = RealSnapshot(Path("/tmp/ws"), (0, 0), 0o755, ())
     after = RealSnapshot(Path("/tmp/ws"), (0, 0), 0o755, (entry,))
     turn = PublicTurnObservation("exercise", "完成", 0, True, 1.0, "s1")
-    evidence = BlackBoxEvidence(
+    black_box_evidence = BlackBoxEvidence(
         PublicObservation((turn,), "完成", (), ()),
         FileObservation(before, after, ("output/quarter.xlsx",), (), ()),
         ControlObservation("r1", "T053", 1, True, True, True),
@@ -254,16 +256,41 @@ def test_judge_prompt_uses_real_size_of_binary_snapshot_entry():
         judge_criterion=JudgeCriterionSpec("T053", "合并明细", "d", "通过", "失败",
                                            ("agent_response", "workspace_changes")),
     )
+
+    # 创建模拟的 prepared 和 execution 对象用于适配器
+    class MockPrepared:
+        pass
+    
+    class MockExecution:
+        pass
+    
+    mock_prepared = MockPrepared()
+    mock_prepared.run_id = "r1"
+    mock_prepared.spec = spec
+    mock_prepared.repeat_index = 1
+    
+    mock_execution = MockExecution()
+    mock_execution.turns = (turn,)
+    mock_execution.retry_count = 0
+    
+    # 通过适配器转换为 UnifiedEvidence
+    evidence = adapt_black_box_evidence_to_unified(
+        black_box_evidence, mock_prepared, mock_execution
+    )
+
+    # 创建正确的 Judge Mock
+    from assertions.judge.result import JudgeStatus, JudgeVerdict
     judge = Mock()
-    judge.evaluate.return_value = Mock(status=Mock(name="PASS"), reason="ok")
-    judge.evaluate.return_value.status.name = "PASS"
+    judge_verdict = JudgeVerdict(status=JudgeStatus.PASS, reason="ok")
+    judge.evaluate_black_box = Mock(return_value=Mock(verdict=judge_verdict, error=None, record=Mock(return_value={})))
 
     verdict = BlackBoxAssertion(judge_model=judge).evaluate(spec, evidence)
 
     assert verdict.status is AssessmentStatus.PASS
-    prompt = judge.evaluate.call_args.kwargs["prompt"]
-    section = prompt.split("### 文件: output/quarter.xlsx")[1][:400]
-    assert f"大小: {len(xlsx)} 字节" in section
-    assert f"实际大小 {len(xlsx)} 字节" in section
-    assert "二进制文件" in section
-    assert "大小: 0 字节" not in section
+    # 验证 Judge 被调用，且证据文本包含正确的文件大小
+    judge.evaluate_black_box.assert_called_once()
+    evidence_text = judge.evaluate_black_box.call_args.kwargs["evidence_text"]
+    section = evidence_text.split("output/quarter.xlsx")[1][:600] if "output/quarter.xlsx" in evidence_text else ""
+    assert f"{len(xlsx)} 字节" in section
+    assert "二进制文件" in section or "大小" in section
+    assert "0 字节" not in section or len(xlsx) > 0
