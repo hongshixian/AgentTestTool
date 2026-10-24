@@ -66,6 +66,18 @@ class UnifiedEvidence:
 
     # --- 1. 状态查询接口 ---
 
+    def is_collector_ready(self) -> bool:
+        """判断采集器是否就绪"""
+        return self._collection.collector_ready
+
+    def is_collection_complete(self) -> bool:
+        """判断证据采集是否完整"""
+        return self._collection.collection_complete
+
+    def is_positive_control_ok(self) -> bool:
+        """判断正对照是否通过"""
+        return self._collection.positive_control_ok
+
     def is_ready_for_judge(self) -> bool:
         """判断证据是否可以发送给 Judge"""
         return self._collection.is_ready_for_judge()

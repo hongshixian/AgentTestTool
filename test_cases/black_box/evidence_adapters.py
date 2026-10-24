@@ -1,4 +1,4 @@
-"""适配器：EvidenceBundle → UnifiedEvidence
+"""适配器：EvidenceBundle → UnifiedEvidence 和 BlackBoxEvidence → UnifiedEvidence
 
 这是过渡期的适配函数，用于重构期间保持兼容性。
 """
@@ -21,6 +21,7 @@ from test_cases.black_box.evidence_categories import (
     TurnRecord,
 )
 from test_cases.black_box.evidence_models import EvidenceBundle
+from test_cases.black_box.models import BlackBoxEvidence, BlackBoxExecutionResult, PreparedBlackBoxEnvironment
 from test_cases.black_box.unified_evidence import UnifiedEvidence
 
 
@@ -157,6 +158,116 @@ def adapt_evidence_bundle_to_unified(bundle: EvidenceBundle) -> UnifiedEvidence:
     metrics = ComputedMetrics(
         framework_computed=bundle.framework_metrics if hasattr(bundle, 'framework_metrics') else {},
         agent_submitted={}
+    )
+
+    return UnifiedEvidence(
+        _context=context,
+        _trace=trace,
+        _side_effects=side_effects,
+        _collection=collection,
+        _metrics=metrics
+    )
+
+
+def adapt_black_box_evidence_to_unified(
+    evidence: BlackBoxEvidence,
+    prepared: PreparedBlackBoxEnvironment,
+    execution: BlackBoxExecutionResult
+) -> UnifiedEvidence:
+    """将 BlackBoxEvidence 直接转换为 UnifiedEvidence
+
+    Args:
+        evidence: BlackBoxEvidenceProjector.observe() 创建的证据
+        prepared: 包含 spec、run_id、repeat_index 等上下文信息
+        execution: 包含 turns 和执行时间信息
+
+    Returns:
+        新格式的 UnifiedEvidence
+    """
+    # 1. ExecutionContext
+    context = ExecutionContext(
+        run_id=evidence.control.run_id,
+        case_id=evidence.control.case_id,
+        repeat_index=evidence.control.repeat_index,
+        timestamp=datetime.now()  # 使用当前时间作为采集时间戳
+    )
+
+    # 2. AgentTrace
+    turns = tuple(
+        TurnRecord(
+            phase_id=turn.phase_id,
+            prompt="",  # PublicTurnObservation 不包含 prompt
+            response=turn.response,
+            completed=turn.completed,
+            returncode=turn.returncode,
+            duration_seconds=turn.duration_seconds,
+            session_id=turn.session_id
+        )
+        for turn in evidence.public.turns
+    )
+
+    trace = AgentTrace(
+        prompt="",  # BlackBoxEvidence 不包含独立的 prompt
+        turns=turns,
+        final_response=evidence.public.output_text,
+        execution_phases=None,  # BlackBoxEvidence 不包含 execution_phases
+        exit_code=evidence.public.turns[-1].returncode if evidence.public.turns else 0,
+        duration_seconds=sum(t.duration_seconds for t in evidence.public.turns),
+        stdout="",  # BlackBoxEvidence 不包含 stdout
+        stderr=""   # BlackBoxEvidence 不包含 stderr
+    )
+
+    # 3. SideEffects
+    filesystem = FilesystemChanges(
+        before_snapshot=evidence.files.before,
+        after_snapshot=evidence.files.after,
+        added=evidence.files.added,
+        modified=evidence.files.modified,
+        deleted=evidence.files.deleted
+    )
+
+    tool_state = ToolStateChanges(
+        before=evidence.business_state_before,
+        after=evidence.business_state_after,
+        tool_calls=()  # BlackBoxEvidence 不包含 tool_calls
+    )
+
+    business_state = BusinessStateChanges(
+        before=evidence.business_state_before,
+        after=evidence.business_state_after
+    )
+
+    side_effects = SideEffects(
+        filesystem=filesystem,
+        tool_state=tool_state,
+        business_state=business_state,
+        public_objects=evidence.public.public_objects,
+        attachments=evidence.public.attachments
+    )
+
+    # 4. CollectionMetadata
+    collection = CollectionMetadata(
+        collector_ready=evidence.control.collector_ready,
+        collection_complete=evidence.control.collection_complete,
+        positive_control_ok=evidence.control.positive_control_ok,
+        dropped_event_count=evidence.control.dropped_event_count
+    )
+
+    # 5. ComputedMetrics
+    framework_computed = evidence.metrics.get("framework_computed", {})
+    if isinstance(framework_computed, dict):
+        framework_computed = dict(framework_computed)
+    else:
+        framework_computed = {}
+
+    agent_submitted = {
+        k: v for k, v in evidence.metrics.items()
+        if k not in ("framework_computed",) and not k.startswith("agent_result_")
+    }
+
+    metrics = ComputedMetrics(
+        framework_computed=framework_computed,
+        agent_submitted=agent_submitted
     )
 
     return UnifiedEvidence(

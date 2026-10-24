@@ -178,7 +178,7 @@ def test_executor_projects_response_without_raw_trace(tmp_path: Path) -> None:
     execution = BlackBoxCaseExecutor().execute(prepared, model)
     evidence = BlackBoxEvidenceProjector().observe(prepared, execution, model)
 
-    assert evidence.public.output_text == "PUBLIC_OK"
+    assert evidence.get_agent_response() == "PUBLIC_OK"
     assert "SECRET_TRACE" not in repr(evidence)
     assert model.capture_calls == 0
     BlackBoxEnvironmentBuilder().cleanup(prepared, model)

@@ -250,3 +250,64 @@ def test_adapt_evidence_with_quality_issues():
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
+
+def test_adapt_black_box_evidence_to_unified():
+    """测试 BlackBoxEvidence → UnifiedEvidence 直接适配"""
+    from test_cases.black_box.models import BlackBoxEvidence, ControlObservation, FileObservation, PublicObservation, PreparedBlackBoxEnvironment, BlackBoxExecutionResult, PublicTurnObservation
+    from test_cases.black_box.evidence_adapters import adapt_black_box_evidence_to_unified
+    from agent_models.environment.workspace import WorkspaceSnapshot, WorkspaceEntry
+    from pathlib import Path
+
+    # 构造测试数据
+    from pathlib import Path as P
+    before = WorkspaceSnapshot(root=P("/tmp"), root_identity=(0, 0), root_mode=0o755, entries=())
+    after = WorkspaceSnapshot(
+        root=P("/tmp"),
+        root_identity=(0, 0),
+        root_mode=0o755,
+        entries=(WorkspaceEntry("output.txt", b"test content", "abc123", False),)
+    )
+    
+    turns = [
+        PublicTurnObservation("phase_1", "response text", True, 0, 1.5, "session_1")
+    ]
+    
+    evidence = BlackBoxEvidence(
+        public=PublicObservation(turns, "response text", frozenset(), frozenset()),
+        files=FileObservation(before, after, ("output.txt",), (), ()),
+        control=ControlObservation("run_123", "T001", 1, True, True, True, 0),
+        business_state_before={"key": "before"},
+        business_state_after={"key": "after"},
+        metrics={"metric1": 42}
+    )
+    
+    # 构造 prepared 和 execution（简化版本）
+    class MockSpec:
+        case_id = "T001"
+    
+    class MockPrepared:
+        spec = MockSpec()
+        run_id = "run_123"
+        repeat_index = 1
+    
+    class MockExecution:
+        retry_count = 0
+    
+    prepared = MockPrepared()
+    execution = MockExecution()
+    
+    # 执行适配
+    unified = adapt_black_box_evidence_to_unified(evidence, prepared, execution)
+    
+    # 验证结果
+    assert unified.get_case_id() == "T001"
+    assert unified.get_run_id() == "run_123"
+    assert unified.get_repeat_index() == 1
+    assert unified.get_agent_response() == "response text"
+    assert unified.is_collector_ready() is True
+    assert unified.is_collection_complete() is True
+    assert unified.is_positive_control_ok() is True
+    assert len(unified.get_files_added()) == 1
+    assert "output.txt" in unified.get_files_added()
+    assert unified.get_metric("metric1") == 42
