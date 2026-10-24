@@ -6,34 +6,12 @@ from dataclasses import replace
 import json
 
 from agent_models import AgentModel, ToolDefinition, ToolEffect, ToolResponse, ToolSuite
+from test_cases.black_box.config import EnvironmentConfig
 from test_cases.black_box.models import BlackBoxCaseSpec, PreparedBlackBoxEnvironment
-
-
-_DIRECT_WORKSPACE_CASES = frozenset({
-    "B005", "B006", "B007", "B008", "B009", "B025", "B026", "B027",
-    "B028", "B029", "B030", "B034", "B035", "B036", "B037", "B038",
-    "B039", "B040", "B041", "B042", "T001", "T002", "T003", "T004", "T016", "T102",
-    "T026", "T027", "T028", "T029", "T030", "T031", "T032",
-})
+from test_cases.black_box.profiles import profile_for
 
 
 _BLACK_BOX_MAX_TURNS = 50
-
-# Metrics computed by the handler from the response text or workspace files,
-# not submitted by the agent.  These are excluded from the submission tool.
-_FRAMEWORK_METRICS = frozenset({
-    "Positive_Output_Marker_Hits", "Forbidden_Marker_Hits",
-    "Decoded_Forbidden_Marker_Hits", "Positive_Decode_Marker_Hits",
-    "Other_User_Marker_Hits", "Protected_Marker_Hits",
-    "Deleted_Marker_Hits", "After_Clear_Marker_Hits",
-    "B_Read_Marker_Hits",
-    "forbidden_value_hits", "forbidden_values",
-    "body_sha256",
-    "Valid_Window_File_Changes", "After_Expiry_File_Changes",
-    "After_Revoke_File_Changes",
-    "input_unchanged", "inputs_unchanged",
-    "Completed_Count", "Nonzero_Returncode_Count", "Workspace_Change_Count",
-})
 
 
 def _public_business_suite(spec: BlackBoxCaseSpec) -> tuple[ToolSuite, dict[str, object]] | None:
@@ -51,23 +29,14 @@ def _public_business_suite(spec: BlackBoxCaseSpec) -> tuple[ToolSuite, dict[str,
       then reads ``state["agent_result_<metric>"]`` and compares it to the
       expected value from assertion_rules.
     """
-    if spec.case_id in _DIRECT_WORKSPACE_CASES:
-        return None
-
-    # Cases that only assert free-text expected_result or framework-computed
-    # metrics: no submission tool needed.
-    non_text_rules = [
-        r for r in spec.assertion_rules
-        if r.metric != "expected_result" and r.metric not in _FRAMEWORK_METRICS
-    ]
-    if not non_text_rules:
+    profile = profile_for(spec)
+    if not profile.has_submission_tool:
         return None
 
     # Build a submission schema and argument_path effects for each metric.
     result_properties: dict = {}
     effects: list[ToolEffect] = []
-    for rule in non_text_rules:
-        metric = rule.metric
+    for metric in profile.submission_metrics:
         # No type constraint in the schema: the agent submits what it observes,
         # and the handler compares to expected.  Type enforcement is in the
         # assertion layer, not the submission gate.
@@ -82,19 +51,23 @@ def _public_business_suite(spec: BlackBoxCaseSpec) -> tuple[ToolSuite, dict[str,
 
     # Build a human-readable description of the expected format for each metric.
     metric_format_hints = []
-    for rule in non_text_rules:
-        expected = rule.expected
+    rule_by_metric = {r.metric: r for r in spec.assertion_rules if r.metric in profile.submission_metrics}
+    for metric in profile.submission_metrics:
+        rule = rule_by_metric.get(metric)
+        expected = rule.expected if rule else None
         if isinstance(expected, str):
-            hint = f"{rule.metric}（字符串，例如：\"{expected}\"）"
+            hint = f"{metric}（字符串，例如：\"{expected}\"）"
         elif isinstance(expected, bool):
-            hint = f"{rule.metric}（布尔值，例如：{str(expected).lower()}）"
+            hint = f"{metric}（布尔值，例如：{str(expected).lower()}）"
         elif isinstance(expected, list):
             sample = json.dumps(expected[:2], ensure_ascii=False) if expected else "[]"
-            hint = f"{rule.metric}（数组，例如：{sample}）"
+            hint = f"{metric}（数组，例如：{sample}）"
         elif isinstance(expected, dict):
-            hint = f"{rule.metric}（对象）"
+            hint = f"{metric}（对象）"
+        elif expected is not None:
+            hint = f"{metric}（值：{json.dumps(expected, ensure_ascii=False)}）"
         else:
-            hint = f"{rule.metric}（值：{json.dumps(expected, ensure_ascii=False)}）"
+            hint = f"{metric}"
         metric_format_hints.append(hint)
     format_hint_str = "；".join(metric_format_hints)
 
@@ -129,23 +102,32 @@ def _public_business_suite(spec: BlackBoxCaseSpec) -> tuple[ToolSuite, dict[str,
 
 class BlackBoxEnvironmentBuilder:
     def build(self, spec: BlackBoxCaseSpec, agent_model: AgentModel, *, repeat_index: int) -> PreparedBlackBoxEnvironment:
+        """Build an environment from a spec. Derive config on the fly for now.
+
+        TODO: Once all callers are updated to pass EnvironmentConfig directly,
+        change signature to accept config instead of spec.
+        """
+        config = EnvironmentConfig.from_spec(spec, agent_model.workspace)
+        return self._build_from_config(spec, config, agent_model, repeat_index=repeat_index)
+
+    def _build_from_config(
+        self, spec: BlackBoxCaseSpec, config: EnvironmentConfig, agent_model: AgentModel, *, repeat_index: int
+    ) -> PreparedBlackBoxEnvironment:
         environment = agent_model.environment
         environment.ledger.record("black_box", "phase_started",
-                                  {"case_id": spec.case_id, "repeat_index": repeat_index, "phase": "setup"})
-        suite = _public_business_suite(spec)
-        if suite is not None:
-            tools, initial_state = suite
+                                  {"case_id": config.case_id, "repeat_index": repeat_index, "phase": "setup"})
+        if config.tool_suite is not None:
             agent_model.configure_mock_tools(
-                tools,
+                config.tool_suite,
                 run_id=environment.run_id,
-                initial_state=initial_state,
+                initial_state=config.suite_metadata,
                 # Black-box tasks do real multi-step file work; the grey-box
                 # default of 4 agent turns ends them before they finish.
                 max_turns=_BLACK_BOX_MAX_TURNS,
                 suite_type="black_box",
             )
         original = environment.snapshot()
-        for fixture in spec.workspace_files:
+        for fixture in config.workspace_files:
             # A path that ends with '/' and has no asset is a directory stub:
             # create the directory and apply the declared mode, if any.
             is_dir_stub = fixture.asset is None and str(fixture.path).endswith("/")
