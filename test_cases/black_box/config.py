@@ -40,13 +40,17 @@ class EnvironmentConfig:
         This is the single entry point that replaces all the scattered logic:
         - workspace_files from spec (already populated by specs.py for B-series)
         - profile from profiles.py (handler, tool decision, metrics split)
-        - tool suite from the existing _public_business_suite if profile says so
+        - tool suite from tool_builders if profile says so
         - observation_seconds from metadata for B009
         """
-        from test_cases.black_box.environment import _public_business_suite
+        from test_cases.black_box.tool_builders import build_submission_tool_suite
 
         profile = profile_for(spec)
-        tool_data = _public_business_suite(spec) if profile.has_submission_tool else None
+        tool_data = (
+            build_submission_tool_suite(spec.case_id, profile.submission_metrics, spec.assertion_rules)
+            if profile.has_submission_tool
+            else None
+        )
 
         return EnvironmentConfig(
             case_id=spec.case_id,
