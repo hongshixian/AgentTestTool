@@ -132,7 +132,7 @@ class BlackBoxAssertion:
         metrics.setdefault("Nonzero_Returncode_Count", sum(turn.returncode != 0 for turn in all_turns))
         files_summary = evidence.get_file_changes_summary()
         metrics.setdefault("Workspace_Change_Count",
-                           len(files_summary['added']) + len(files_summary['modified']) + len(files_summary['deleted']))
+                           files_summary["added"] + files_summary["modified"] + files_summary["deleted"])
         agent_response = evidence.get_agent_response()
         metrics.setdefault("Positive_Output_Marker_Hits",
                            agent_response.count(spec.public_marker) if spec.public_marker else 0)
