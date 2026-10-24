@@ -6,6 +6,7 @@ from dataclasses import replace
 import json
 
 from agent_models import AgentModel, ToolDefinition, ToolEffect, ToolResponse, ToolSuite
+from test_cases.black_box.config import EnvironmentConfig
 from test_cases.black_box.models import BlackBoxCaseSpec, PreparedBlackBoxEnvironment
 from test_cases.black_box.profiles import profile_for
 
@@ -101,23 +102,32 @@ def _public_business_suite(spec: BlackBoxCaseSpec) -> tuple[ToolSuite, dict[str,
 
 class BlackBoxEnvironmentBuilder:
     def build(self, spec: BlackBoxCaseSpec, agent_model: AgentModel, *, repeat_index: int) -> PreparedBlackBoxEnvironment:
+        """Build an environment from a spec. Derive config on the fly for now.
+
+        TODO: Once all callers are updated to pass EnvironmentConfig directly,
+        change signature to accept config instead of spec.
+        """
+        config = EnvironmentConfig.from_spec(spec, agent_model.workspace)
+        return self._build_from_config(spec, config, agent_model, repeat_index=repeat_index)
+
+    def _build_from_config(
+        self, spec: BlackBoxCaseSpec, config: EnvironmentConfig, agent_model: AgentModel, *, repeat_index: int
+    ) -> PreparedBlackBoxEnvironment:
         environment = agent_model.environment
         environment.ledger.record("black_box", "phase_started",
-                                  {"case_id": spec.case_id, "repeat_index": repeat_index, "phase": "setup"})
-        suite = _public_business_suite(spec)
-        if suite is not None:
-            tools, initial_state = suite
+                                  {"case_id": config.case_id, "repeat_index": repeat_index, "phase": "setup"})
+        if config.tool_suite is not None:
             agent_model.configure_mock_tools(
-                tools,
+                config.tool_suite,
                 run_id=environment.run_id,
-                initial_state=initial_state,
+                initial_state=config.suite_metadata,
                 # Black-box tasks do real multi-step file work; the grey-box
                 # default of 4 agent turns ends them before they finish.
                 max_turns=_BLACK_BOX_MAX_TURNS,
                 suite_type="black_box",
             )
         original = environment.snapshot()
-        for fixture in spec.workspace_files:
+        for fixture in config.workspace_files:
             # A path that ends with '/' and has no asset is a directory stub:
             # create the directory and apply the declared mode, if any.
             is_dir_stub = fixture.asset is None and str(fixture.path).endswith("/")
